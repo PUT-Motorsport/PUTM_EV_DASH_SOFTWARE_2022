@@ -1,0 +1,28 @@
+QWidget {
+    background-color: #272727;
+    color: #272727;
+}
+
+QLabel {
+    background-color: transparent;
+    color: #eff1f3;
+}
+
+QProgressBar {
+    background-color: #009fb7;
+    color: #272727;
+    text-align: center;
+}
+
+QProgressBar::chunk {
+    background-color: #fe4e00;
+}
+
+QTextBrowser {
+    background-color: transparent;
+    color: white;
+}
+
+QComboBox {
+    color: white;
+}
