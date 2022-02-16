@@ -9,6 +9,7 @@
 #include "logs.h"
 #include "canhandler.h"
 #include "servicemode.h"
+#include "changeconfirm.h"
 
 #include "vehicle.h"
 #include "logger.h"
@@ -31,12 +32,14 @@ private:
     CanHandler * canHandler;
     QDialog* currentWindowPtr;  //enables easy window hiding through inheritance
     Window currentWindow;
+
     MainWindow * mainWindow;
     CanRaw * canRaw;
     DrivingSelect * drivingSelect;
     Logs * logs;
     DvSelect * dvSelect;
     ServiceMode * serviceMode;
+    ChangeConfirm * changeConfirm;
 };
 
 #endif // GUI_H

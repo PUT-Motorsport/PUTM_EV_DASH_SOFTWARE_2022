@@ -85,7 +85,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Driving Parameters - press Z</string>
+    <string>Driving Parameters - press A</string>
    </property>
   </widget>
   <widget class="QLabel" name="hint4">
@@ -103,7 +103,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Exit - press A</string>
+    <string>Exit - press B</string>
    </property>
   </widget>
   <widget class="QLabel" name="subtitle2">

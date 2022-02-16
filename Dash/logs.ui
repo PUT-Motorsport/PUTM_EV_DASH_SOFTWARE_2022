@@ -16,10 +16,10 @@
   <widget class="QLabel" name="title">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>791</width>
-     <height>61</height>
+     <x>10</x>
+     <y>10</y>
+     <width>381</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="font">
@@ -42,6 +42,27 @@
      <width>781</width>
      <height>421</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="hint">
+   <property name="geometry">
+    <rect>
+     <x>550</x>
+     <y>10</y>
+     <width>241</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>30</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Any to leave.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
  </widget>

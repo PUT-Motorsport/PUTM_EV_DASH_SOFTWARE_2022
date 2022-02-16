@@ -12,6 +12,7 @@ CONFIG += c++11
 SOURCES += \
     canhandler.cpp \
     canraw.cpp \
+    changeconfirm.cpp \
     drivingselect.cpp \
     dvselect.cpp \
     gui.cpp \
@@ -24,6 +25,7 @@ SOURCES += \
 HEADERS += \
     canhandler.h \
     canraw.h \
+    changeconfirm.h \
     drivingselect.h \
     dvselect.h \
     gui.h \
@@ -35,6 +37,7 @@ HEADERS += \
 
 FORMS += \
     canraw.ui \
+    changeconfirm.ui \
     drivingselect.ui \
     dvselect.ui \
     logs.ui \

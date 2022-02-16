@@ -12,10 +12,11 @@ GUI::GUI(QObject *parent)
     dvSelect = new DvSelect();  //add connection with canHandler (or pass a pointer to canHandler???)
     drivingSelect = new DrivingSelect();
     serviceMode = new ServiceMode();
+    changeConfirm = new ChangeConfirm();
     currentWindowPtr = nullptr;
     mainWindow->show();
     changeWindow(Window::CAN);
-    changeWindow(Window::ServiceMode);
+
 }
 
 GUI::~GUI()
@@ -78,6 +79,10 @@ void GUI::changeWindow(Window newWindow)
     case Window::ServiceMode:
         currentWindowPtr = serviceMode;
         serviceMode->show();
+        break;
+    case Window::ChangeConfirm:
+        currentWindowPtr = changeConfirm;
+        changeConfirm->show();
         break;
     default:
         Logger::add("Something went wrong in the changeWindow function");
