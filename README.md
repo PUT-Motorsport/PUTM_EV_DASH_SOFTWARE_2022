@@ -1,13 +1,15 @@
 # Dash Software
-The software for a Raspberry-Pi powered dash display. (Will be) Written in Qt 6.2.3.
+The software for a Raspberry-Pi powered dash display. (Will be) Written in Qt 6.2.3 on Ubuntu 21, targeted for Raspberry Pi OS 11.
+### Dependencies
+This app uses the external library `libsocketcan`; please ensure that the `libsocketcan-dev` package is installed.
+
 ### Proposed GUI look
 ![Main screen](https://i.ibb.co/T18HSnz/Screenshot-from-2022-02-14-14-29-39.png)
 ![Raw CAN data](https://i.ibb.co/0X1P8kq/Screenshot-from-2022-02-16-16-20-33.png)
 ![DV mission select](https://i.ibb.co/pW8ZNhq/Screenshot-from-2022-02-14-14-30-48.png)
 ![App and vehicle logs](https://i.ibb.co/8P1zmdb/Screenshot-from-2022-02-16-16-11-58.png)
-![Driving parameters select](https://i.ibb.co/tBvyGzH/Screenshot-from-2022-02-16-16-13-13.png)
+![Driving parameters select](https://i.ibb.co/GCKG50j/Screenshot-from-2022-02-17-10-30-38.png)
 ![Service Mode](https://i.ibb.co/M9Fy0jH/Screenshot-from-2022-02-15-15-23-28.png)
-![Driving parameters change confimration](https://i.ibb.co/Q6Smkvd/Screenshot-from-2022-02-16-16-14-44.png)
 
 ### Features
 The app will have a main menu displaying critical vehicle data: 
@@ -26,14 +28,15 @@ And subwindows available when vehicle is stationary:
 5. Service mode
 
 ### XML parser data
+
 Parser data will be stored in a xml file. Every parameter will have a numerical prefix easily interpretable in the code, e.g. parameter="00:Speed", type="01:Update". The string after **:** will be disregarded by the parser and can be appended solely to improve human readability.
-To be included in the logs, a frame needs to have a logger attribute, which text will be timestamped and sent to logs
+To be included in the logs, a frame needs to have a logger attribute, which text will be timestamped and sent to logs.
 
 **A table with numerical prefixes for parts is appended to the repo as input.ods**
 
 An error frame will have a type, format and logger attribute; the payload is the error code.
 An update frame will have a type, parameter, format and logger attributes; the payload is the updated data.
-A navigation frame will have a type and corresponding button/dial; button frames will have no (or have a 0) payload; the dial frames' payload will indicate their new position .
+
 
 ##### Example XML document
 ```xml
@@ -56,6 +59,8 @@ Entering the service mode will require all buttons to be pressed.
 Entering the dv mission select will require both upper buttons to be pressed.
 Exiting a window will always be done with one and the same button.
 Steering hints will appear on all screens except main.
+
+Multiple button presses will be registered on the stm side.
 
 ### Service Mode panel
 
@@ -96,11 +101,18 @@ List of all parameters that can be changed within this window:
 1. APPS Curve
 2. Traction Control
 3. Energy regain
+4. Fan setting
+5. Max power
 
 
 **Please do note that some parameters can be changed in motion via the dials and therefore do not require entering this mode. See below.**
 
 ### Parameters change confirmation window
+
+**This mode is being reworked. Left only for reference**
+
+![Driving parameters change confimration](https://i.ibb.co/Q6Smkvd/Screenshot-from-2022-02-16-16-14-44.png)
+
 
 If a dial is turned, a confirmation window will appear. The driver can choose to accept or reject a change. Only after accepting a frame is sent to the bus causing the actual change.
 
@@ -110,12 +122,14 @@ If a dial is turned, a confirmation window will appear. The driver can choose to
 ### Classes
 
 ![Classes diagram](https://i.ibb.co/dG70Szd/Screenshot-from-2022-02-14-14-37-06.png)
+*Will probably be changed*
 
 The app will connect to CAN via system kernel and can-utils. A bash script will prepare the interface and launch the app on system startup.
 
 ### Incoming frame handling algorithm
+
 ![Incoming frame handling algorithm](https://i.ibb.co/SBYKQHN/Frame-Handling.jpg)
-### Button press probing algorithm
-![Button press probing algorithm](https://i.ibb.co/KDQXmd2/Probing-algorithm.jpg)
+
 ### Window choice/navigation algorithm
+
 *Work in progress*

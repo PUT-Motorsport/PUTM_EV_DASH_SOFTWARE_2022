@@ -5,21 +5,20 @@ CanHandler::CanHandler(QObject *parent)
 {
     if (!QCanBus::instance()->plugins().contains("socketcan"))
         Logger::add("Cansockets plugin missing");
-
+    Logger::loadXML(frameParserInfo, xmlFile);
 }
 
 void CanHandler::connect()
 {
-    loadXML();
     QString errorString;
     canDevice = QCanBus::instance()->createDevice(QStringLiteral("socketcan"),
-                                                  QStringLiteral("vcan0"), &errorString);
+                                                  QStringLiteral("vcan0"), &errorString);   //remember to change before building for pi
     if (!canDevice) {
-        Logger::add("Can Device creation failed: " + errorString);
+        Logger::add("App Error: Can Device creation failed: " + errorString);
         return;
     }
     if (!canDevice->connectDevice()) {
-        Logger::add("Can Device created, but failed to connect");
+        Logger::add("Fatal app Error: Can Device created, but failed to connect");
         return;
     }
     else
@@ -27,55 +26,87 @@ void CanHandler::connect()
     QObject::connect(canDevice, &QCanBusDevice::framesReceived, this, &CanHandler::onCanFrameReceived);
 }
 
-void CanHandler::onCanFrameReceived() const
+void CanHandler::send(QCanBusFrame const &toSend) const
+{
+    if (not(canDevice->state() == QCanBusDevice::CanBusDeviceState::ConnectedState)) {
+        Logger::add("App Error: Attempted to send a frame to can which isn't open");
+        return;
+    }
+    if (not(canDevice->writeFrame(toSend))) {
+        Logger::add("CAN Error: CAN is connected, but failed to relay a message");
+    }
+}
+
+void CanHandler::onCanFrameReceived()
 {
     QCanBusFrame newFrame = canDevice->readFrame();
     Logger::addCAN(newFrame.toString());
     //first phase of parsing, looking for correct handoff
     int frameID = newFrame.frameId();
-    QByteArray payload = newFrame.payload();
-    switch (frameID) {
-    case FrameType::update:
-        parseUpdate(frameID, payload);
-        break;
+    QDomNode currentSearch = frameParserInfo.firstChild();
+    while (not(currentSearch.isNull())) {
+        QDomElement element = currentSearch.toElement();
+        if (element.attribute("id").toInt() == frameID)
+            break;
+        currentSearch = currentSearch.nextSibling();
+   }
+    if (currentSearch.isNull()) {
+        Logger::add("App Error: Search failed: no frame with corresponding ID");
+        return;
+    }
+    QDomElement passableElement = currentSearch.toElement();
+    int frameType = passableElement.attribute("type").split(":").at(0).toInt();
+    switch (static_cast<FrameType>(frameType)) {
     case FrameType::error:
-        parseError(frameID, payload);
+        parseError(newFrame, passableElement);    //will this get deleted before I access it??? (possible bug)
+        break;
+    case FrameType::update:
+        parseUpdate(newFrame, passableElement);
         break;
     case FrameType::navigation:
-        parseNavigation(frameID, payload);
+        parseNavigation(newFrame);
         break;
+    default:
+        Logger::add("App Error: Parser failure: Wrong argument");
     }
 }
 
-void CanHandler::loadXML()
+void CanHandler::parseError(QCanBusFrame const &toParse, QDomElement const &parserInfo)
 {
-    QDomDocument xmlDocument("xmlDocument");
-    QFile file(xmlFile);
-    if (!file.open(QIODevice::ReadOnly)) {
-        Logger::add("XML file could not be opened");
-        return;
+    QString errorDesc = parserInfo.attribute("logger");
+    if (errorDesc != "")
+        Logger::add(errorDesc);
+    int errorCode = frameValue(toParse.payload());
+    emit raiseError(errorCode, errorDesc);
+    return;
+}
+
+void CanHandler::parseNavigation(QCanBusFrame const &toParse)
+{
+    int pressedInt = static_cast<int>(frameValue(toParse.payload()));
+    emit navigation(static_cast<Navigation>(pressedInt));
+    return;
+}
+
+void CanHandler::parseUpdate(QCanBusFrame const &toParse, QDomElement const &parserInfo)
+{
+    //take the numerical prefix and cast it to a parameter:
+    Parameter updated = static_cast<Parameter>(parserInfo.attribute("parameter").split(":").at(0).toInt());
+    qreal newValue = frameValue(toParse.payload());
+    emit updateGUI(updated, newValue);
+    return;
+}
+
+qreal CanHandler::frameValue(QByteArray data) const
+{
+    //probably a way to find values with a multiplier
+    bool conversionStatus;
+    QString bytesString = QLatin1String(data.toHex().toUpper());
+    qDebug() << bytesString;
+    qreal frameValue = bytesString.toInt(&conversionStatus);
+    if (not(conversionStatus)) {
+        qDebug() << "App Error: Variable conversion failed";
+        return -1;
     }
-    if (!xmlDocument.setContent(&file)) {
-        Logger::add("XML file opened, but internal parsing failed");
-        file.close();
-        return;
-    }
-    file.close();   //file loaded and can be closed
-    frameParserInfo = xmlDocument.documentElement();
-
-}
-
-void CanHandler::parseError(int id, QByteArray payload) const
-{
-    return;
-}
-
-void CanHandler::parseNavigation(int id, QByteArray payload) const
-{
-    return;
-}
-
-void CanHandler::parseUpdate(int id, QByteArray payload) const
-{
-    return;
+    return frameValue;
 }

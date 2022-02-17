@@ -16,22 +16,24 @@ class CanHandler : public QObject
 public:
     explicit CanHandler(QObject *parent = nullptr);
     void connect();
-    void send();    //where should the frame characteristics be loaded from file???
+    void send(QCanBusFrame const &toSend) const;
 signals:
-    void updateGUI(struct Update update);
-    void raiseError(struct Error error);
-    void navigation(Button pressed);
+    void updateGUI(Parameter param, qreal newValue);
+    void raiseError(int errorCode, QString const &errorDesc);
+    void navigation(Navigation pressed);
 private slots:
-    void onCanFrameReceived() const;
+    void onCanFrameReceived();
 private:
-    void loadXML();
+
     QDomElement frameParserInfo;
-    QString const xmlFile = QStringLiteral("test.xml");
+    QString const xmlFile = QStringLiteral("incomingFrames.xml");
     QCanBusDevice * canDevice;
 
-    void parseError(int id, QByteArray payload) const;
-    void parseNavigation(int id, QByteArray payload) const;
-    void parseUpdate(int id, QByteArray payload) const;
+    void parseError(QCanBusFrame const &toParse, QDomElement const &parserInfo);
+    void parseNavigation(QCanBusFrame const &toParse);
+    void parseUpdate(QCanBusFrame const &toParse, QDomElement const &parserInfo);
+
+    qreal frameValue(QByteArray toCast) const;
 };
 
 #endif // CANHANDLER_H

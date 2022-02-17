@@ -15,7 +15,7 @@ class ServiceMode : public QDialog
 public:
     explicit ServiceMode(QWidget *parent = nullptr);
     ~ServiceMode();
-    void update(Parameter param, qreal value);
+    void updateData(Parameter param, qreal value);
 
 private:
     Ui::ServiceMode *ui;

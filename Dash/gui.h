@@ -21,9 +21,9 @@ public:
     ~GUI();
 public slots:
 
-    void updateGUI(Update update);
-    void raiseError(Error error);
-    void navigate(Button button);
+    void updateGUI(Parameter param, qreal newValue);
+    void raiseError(int errorCode, QString errorText);
+    void navigate(Navigation button);
 
 signals:
 private:
@@ -40,6 +40,9 @@ private:
     DvSelect * dvSelect;
     ServiceMode * serviceMode;
     ChangeConfirm * changeConfirm;
+    
+    const QList<Parameter> onMainWindow = {Parameter::Speed, Parameter::Power, Parameter::CoolantTemp,
+                                          Parameter::SOC, Parameter::RPM};
 };
 
 #endif // GUI_H

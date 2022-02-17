@@ -4,7 +4,13 @@ GUI::GUI(QObject *parent)
     : QObject{parent}
 {
     canHandler = new CanHandler();
+    //connect all canhandler slots
+    QObject::connect(canHandler, &CanHandler::updateGUI, this, &GUI::updateGUI);
+    QObject::connect(canHandler, &CanHandler::navigation, this, &GUI::navigate);
+    QObject::connect(canHandler, &CanHandler::raiseError, this, &GUI::raiseError);
+
     canHandler->connect();
+
     currentWindow = Window::Main;
     mainWindow = new MainWindow();
     logs = new Logs();
@@ -15,7 +21,7 @@ GUI::GUI(QObject *parent)
     changeConfirm = new ChangeConfirm();
     currentWindowPtr = nullptr;
     mainWindow->show();
-    changeWindow(Window::CAN);
+//    changeWindow(Window::Driving);  //use this line for testing
 
 }
 
@@ -30,23 +36,28 @@ GUI::~GUI()
     delete serviceMode;
 }
 
-void GUI::updateGUI(Update update)
+void GUI::updateGUI(Parameter param, qreal newValue)
+{
+    if (onMainWindow.contains(param))
+        mainWindow->updateData(param, newValue);
+    else
+        serviceMode->updateData(param, newValue);
+    return;
+}
+
+void GUI::raiseError(int errorCode, QString errorString)
 {
     return;
 }
 
-void GUI::raiseError(Error error)
-{
-    return;
-}
-
-void GUI::navigate(Button button)
+void GUI::navigate(Navigation button)
 {
     return;
 }
 
 void GUI::changeWindow(Window newWindow)
 {
+    //to be rewritten (or at least rethought) after gui is confirmed
     if (currentWindowPtr == nullptr) {
         mainWindow->hide();
     }

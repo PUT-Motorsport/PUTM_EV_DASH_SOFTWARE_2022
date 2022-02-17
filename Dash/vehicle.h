@@ -1,19 +1,11 @@
 #ifndef VEHICLE_H
 #define VEHICLE_H
 #include <QString>
-enum Parameter{Speed, RPM, SOC, Power, BmshvVoltage, BmslvVoltage,
+enum class Parameter{Speed, RPM, SOC, Power, BmshvVoltage, BmslvVoltage,
               InverterTemp, EngineTemp, CoolantTemp, BmshvTemp, BmslvTemp, APPS};
-enum Status{Working, InError, Unresolved};
+enum class Status{Working, InError, Unresolved};    //probably not needed
 enum class Window{Main, CAN, DV, Driving, Logs, ServiceMode, ChangeConfirm};    //will be used to decide GUI calls redirection
-enum Button{A, B, X, Y, LeftDial, RightDial};
-enum FrameType{error, update, navigation};
-struct Update {
-    Parameter parameter;
-    double value;
-};
-struct Error {
-    QString part;
-    int errorCode;
-};
+enum class Navigation{A, B, X, Y, LeftDial, RightDial};
+enum class FrameType{error, update, navigation};
 
 #endif // VEHICLE_H

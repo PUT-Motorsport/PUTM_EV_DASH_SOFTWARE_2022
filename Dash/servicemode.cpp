@@ -13,7 +13,7 @@ ServiceMode::~ServiceMode()
     delete ui;
 }
 
-void ServiceMode::update(Parameter param, qreal value)
+void ServiceMode::updateData(Parameter param, qreal value)
 {
     QString valueStr = QString::number(value);
     switch(param) {

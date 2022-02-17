@@ -18,9 +18,4 @@
     <frame id="104" type="00:Error" logger="Data acquisition card error"></frame>
 
     <frame id="200" type="02:Navigation" navigation="00:Button A"></frame>
-    <frame id="201" type="02:Navigation" navigation="01:Button B"></frame>
-    <frame id="202" type="02:Navigation" navigation="02:Button X"></frame>
-    <frame id="203" type="02:Navigation" navigation="03:Button Y"></frame>
-    <frame id="204" type="02:Navigation" navigation="04:Left Dial"></frame>
-    <frame id="205" type="02:Navigation" navigation="05:Right Dial"></frame>
 </canFrames>
