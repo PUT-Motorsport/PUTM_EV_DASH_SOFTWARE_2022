@@ -3,8 +3,6 @@
 
 #include <QDialog>
 
-#include <QKeyEvent>
-
 #include "guicomponent.h"
 
 #include "logger.h"
@@ -24,8 +22,7 @@ public:
     ~DrivingSelect();
     void navigate(Navigation pressed) override;
     void raiseError(int errorCode, QString const &errorMessage) override;
-protected:
-    void keyPressEvent(QKeyEvent *event) override;      //testing purposes only
+
 private:
     Ui::DrivingSelect *ui;
     Setting current;

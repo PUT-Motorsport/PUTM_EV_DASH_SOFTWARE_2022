@@ -21,7 +21,7 @@ public:
 
 private:
     Ui::Logs *ui;
-    QString const pathToLogs = QStringLiteral("");
+    QString const pathToLogs = QStringLiteral("");  //TODO
 };
 
 #endif // LOGS_H

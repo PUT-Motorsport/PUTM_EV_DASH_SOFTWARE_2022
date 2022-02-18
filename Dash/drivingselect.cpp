@@ -20,6 +20,8 @@ void DrivingSelect::navigate(Navigation pressed)
     case Navigation::X:
         changeHighlight();
         break;
+    case Navigation::Y:
+        this->done(QDialog::Accepted);
     default:
         return; //TODO: rest of the buttons
     }
@@ -28,11 +30,6 @@ void DrivingSelect::navigate(Navigation pressed)
 void DrivingSelect::raiseError(int errorCode, const QString &errorMessage)
 {
     ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
-}
-
-void DrivingSelect::keyPressEvent(QKeyEvent *event)
-{
-    changeHighlight();
 }
 
 void DrivingSelect::changeHighlight()

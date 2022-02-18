@@ -9,7 +9,7 @@
     <frame id="08" type="01:Update" parameter="07:Engine Temperature"></frame>
     <frame id="09" type="01:Update" parameter="08:Coolant Temperature"></frame>
     <frame id="10" type="01:Update" parameter="09:BMSHV Temperature"></frame>
-    <frame id="11" type="01:Update" parameter="00:BMSLV Temperature"></frame>
+    <frame id="11" type="01:Update" parameter="10:BMSLV Temperature"></frame>
 
     <frame id="100" type="00:Error" logger="Engine error"></frame>
     <frame id="101" type="00:Error" logger="Resolver error"></frame>

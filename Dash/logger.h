@@ -6,31 +6,15 @@
 #include <QFile>
 #include <QDomDocument>
 
-#if 0   //commented out due to qt-specific linker issue, walkaround below
-namespace Logger {
-void open() {
-    //will open log files
-}
-void close() {
-    //will close log files
-}
-void add(QString logMessage) {
-    qDebug() << logMessage;
-    //will add to log file
-}
-void addCAN() {
-    //will add to can logger file
-}
-}
-#else
+enum class LogType {Error, Critical, AppError, Normal};
+
 class Logger {
 public:
-    static void loadXML(QDomElement &target, QString fileName);
+    static void loadXML(QDomElement &target, QString const &fileName);
 
     static void open();
-    static void add(QString message);   //should there be a way to log errors differently?
+    static void add(QString const &message, LogType type = LogType::Normal);   //should there be a way to log errors differently?
     static void addCAN(QString canFrame);
     static void close();
 };
-#endif
 #endif // LOGGER_H

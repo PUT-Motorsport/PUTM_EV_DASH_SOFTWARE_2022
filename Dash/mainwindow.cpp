@@ -3,7 +3,7 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow), subwindowShown(nullptr),
+    , subwindowShown(nullptr), ui(new Ui::MainWindow),
       canStatus(Status::Unresolved), errorCounter(0)
 {
     ui->setupUi(this);
@@ -17,10 +17,12 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(canHandler, &CanHandler::updateGUI, this, &MainWindow::updateData);
     QObject::connect(canHandler, &CanHandler::navigation, this, &MainWindow::navigate);
 
+
     dvSelect = new DvSelect();
     serviceMode = new ServiceMode();
-    navigate(Navigation::B);
-    raiseError(123, "Engine");
+
+    QObject::connect(dvSelect, &DvSelect::finished, this, &MainWindow::reopen);
+    QObject::connect(serviceMode, &ServiceMode::finished, this, &MainWindow::reopen);
 }
 
 MainWindow::~MainWindow()
@@ -85,6 +87,12 @@ void MainWindow::navigate(Navigation pressed)
         }
     }
     else subwindowShown->navigate(pressed);
+}
+
+void MainWindow::reopen()
+{
+    subwindowShown = nullptr;
+    this->show();
 }
 
 

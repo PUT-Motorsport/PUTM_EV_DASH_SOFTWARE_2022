@@ -9,6 +9,10 @@ ServiceMode::ServiceMode(QWidget *parent) :
     driving = new DrivingSelect();
     canRaw = new CanRaw();
     logs = new Logs();
+
+    QObject::connect(driving, &DrivingSelect::finished, this, &ServiceMode::reopen);
+    QObject::connect(canRaw, &CanRaw::finished, this, &ServiceMode::reopen);
+    QObject::connect(logs, &Logs::finished, this, &ServiceMode::reopen);
 }
 
 ServiceMode::~ServiceMode()
@@ -54,28 +58,32 @@ void ServiceMode::updateData(Parameter param, qreal value)
 
 void ServiceMode::navigate(Navigation pressed)
 {
-    switch (pressed) {
+    if (subwindowShown == nullptr) {
+        switch (pressed) {
+        case Navigation::X:
+            subwindowShown = canRaw;
+            this->hide();
+            canRaw->show();
+            break;
+        case Navigation::B:
+            this->done(QDialog::Accepted);
+            break;
+        case Navigation::Y:
+            subwindowShown = logs;
+            this->hide();
+            logs->show();
+            break;
         case Navigation::A:
-        subwindowShown = canRaw;
-        canRaw->exec();
-        subwindowShown = nullptr;
-        break;
-    case Navigation::B:
-        this->done(QDialog::Accepted);
-        break;
-    case Navigation::X:
-        subwindowShown = logs;
-        logs->exec();
-        subwindowShown = nullptr;
-        break;
-    case Navigation::Y:
-        subwindowShown = driving;
-        driving->exec();
-        subwindowShown = nullptr;
-        break;
-    default:
-        return;     //suppresses a warning, no real use
+            subwindowShown = driving;
+            this->hide();
+            driving->show();
+            break;
+        default:
+            return;     //suppresses a warning, no real use
+        }
     }
+    else
+        subwindowShown->navigate(pressed);
 }
 
 void ServiceMode::raiseError(int errorCode, const QString &errorMessage)
@@ -85,4 +93,10 @@ void ServiceMode::raiseError(int errorCode, const QString &errorMessage)
     }
     else
         subwindowShown->raiseError(errorCode, errorMessage);
+}
+
+void ServiceMode::reopen()
+{
+    subwindowShown = nullptr;
+    this->show();
 }

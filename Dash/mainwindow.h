@@ -22,18 +22,22 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+    GUIComponent * subwindowShown;      //ensures two-way communication between classes
 public slots:
     void updateData(Parameter param, qreal value);
     void raiseError(int errorCode, QString const &errorMessage);  //TODO: add data types and implementation
     void navigate(Navigation pressed);
+
+private slots:
+    void reopen();
+
 private:
     Ui::MainWindow *ui;
 
     CanHandler * canHandler;
     DvSelect * dvSelect;
     ServiceMode * serviceMode;
-
-    GUIComponent * subwindowShown;
 
     Status canStatus;
     void updateCANStatus(Status newStatus);

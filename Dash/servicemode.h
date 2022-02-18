@@ -32,6 +32,8 @@ private:
     Logs * logs;
     CanRaw * canRaw;
     GUIComponent * subwindowShown;
+private slots:
+    void reopen();
 };
 
 #endif // SERVICEMODE_H
