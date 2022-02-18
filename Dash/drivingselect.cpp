@@ -14,6 +14,22 @@ DrivingSelect::~DrivingSelect()
     delete ui;
 }
 
+void DrivingSelect::navigate(Navigation pressed)
+{
+    switch (pressed) {
+    case Navigation::X:
+        changeHighlight();
+        break;
+    default:
+        return; //TODO: rest of the buttons
+    }
+}
+
+void DrivingSelect::raiseError(int errorCode, const QString &errorMessage)
+{
+    ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
+}
+
 void DrivingSelect::keyPressEvent(QKeyEvent *event)
 {
     changeHighlight();

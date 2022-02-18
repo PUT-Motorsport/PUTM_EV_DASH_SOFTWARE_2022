@@ -15,7 +15,7 @@ class CanHandler : public QObject
     Q_OBJECT
 public:
     explicit CanHandler(QObject *parent = nullptr);
-    void connect();
+    bool connect();
     void send(QCanBusFrame const &toSend) const;
 signals:
     void updateGUI(Parameter param, qreal newValue);
@@ -33,7 +33,7 @@ private:
     void parseNavigation(QCanBusFrame const &toParse);
     void parseUpdate(QCanBusFrame const &toParse, QDomElement const &parserInfo);
 
-    qreal frameValue(QByteArray toCast) const;
+    qreal frameValue(QByteArray const &toCast) const;
 };
 
 #endif // CANHANDLER_H

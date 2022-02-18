@@ -12,3 +12,13 @@ DvSelect::~DvSelect()
 {
     delete ui;
 }
+
+void DvSelect::navigate(Navigation pressed)
+{
+    //
+}
+
+void DvSelect::raiseError(int errorCode, const QString &errorMessage)
+{
+ //
+}

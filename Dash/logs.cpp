@@ -12,3 +12,13 @@ Logs::~Logs()
 {
     delete ui;
 }
+
+void Logs::navigate(Navigation pressed)
+{
+    this->done(QDialog::Accepted);
+}
+
+void Logs::raiseError(int errorCode, const QString &errorMessage)
+{
+    ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
+}

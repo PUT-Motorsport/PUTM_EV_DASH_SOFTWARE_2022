@@ -3,14 +3,20 @@
 
 ServiceMode::ServiceMode(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::ServiceMode)
+    ui(new Ui::ServiceMode), subwindowShown(nullptr)
 {
     ui->setupUi(this);
+    driving = new DrivingSelect();
+    canRaw = new CanRaw();
+    logs = new Logs();
 }
 
 ServiceMode::~ServiceMode()
 {
     delete ui;
+    delete driving;
+    delete canRaw;
+    delete logs;
 }
 
 void ServiceMode::updateData(Parameter param, qreal value)
@@ -44,4 +50,39 @@ void ServiceMode::updateData(Parameter param, qreal value)
     default:
         Logger::add("Service mode received a wrong argument.");
     }
+}
+
+void ServiceMode::navigate(Navigation pressed)
+{
+    switch (pressed) {
+        case Navigation::A:
+        subwindowShown = canRaw;
+        canRaw->exec();
+        subwindowShown = nullptr;
+        break;
+    case Navigation::B:
+        this->done(QDialog::Accepted);
+        break;
+    case Navigation::X:
+        subwindowShown = logs;
+        logs->exec();
+        subwindowShown = nullptr;
+        break;
+    case Navigation::Y:
+        subwindowShown = driving;
+        driving->exec();
+        subwindowShown = nullptr;
+        break;
+    default:
+        return;     //suppresses a warning, no real use
+    }
+}
+
+void ServiceMode::raiseError(int errorCode, const QString &errorMessage)
+{
+    if (subwindowShown == nullptr) {
+        ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
+    }
+    else
+        subwindowShown->raiseError(errorCode, errorMessage);
 }

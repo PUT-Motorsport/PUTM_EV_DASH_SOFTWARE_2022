@@ -8,22 +8,23 @@ CanHandler::CanHandler(QObject *parent)
     Logger::loadXML(frameParserInfo, xmlFile);
 }
 
-void CanHandler::connect()
+bool CanHandler::connect()
 {
     QString errorString;
     canDevice = QCanBus::instance()->createDevice(QStringLiteral("socketcan"),
                                                   QStringLiteral("vcan0"), &errorString);   //remember to change before building for pi
     if (!canDevice) {
         Logger::add("App Error: Can Device creation failed: " + errorString);
-        return;
+        return false;
     }
     if (!canDevice->connectDevice()) {
         Logger::add("Fatal app Error: Can Device created, but failed to connect");
-        return;
+        return false;
     }
     else
         Logger::add("Can Device created successfully");
     QObject::connect(canDevice, &QCanBusDevice::framesReceived, this, &CanHandler::onCanFrameReceived);
+    return true;
 }
 
 void CanHandler::send(QCanBusFrame const &toSend) const
@@ -74,18 +75,16 @@ void CanHandler::onCanFrameReceived()
 void CanHandler::parseError(QCanBusFrame const &toParse, QDomElement const &parserInfo)
 {
     QString errorDesc = parserInfo.attribute("logger");
-    if (errorDesc != "")
-        Logger::add(errorDesc);
     int errorCode = frameValue(toParse.payload());
+    if (errorDesc != "")
+        Logger::add(QString::number(errorCode) + errorDesc);
     emit raiseError(errorCode, errorDesc);
-    return;
 }
 
 void CanHandler::parseNavigation(QCanBusFrame const &toParse)
 {
     int pressedInt = static_cast<int>(frameValue(toParse.payload()));
     emit navigation(static_cast<Navigation>(pressedInt));
-    return;
 }
 
 void CanHandler::parseUpdate(QCanBusFrame const &toParse, QDomElement const &parserInfo)
@@ -94,10 +93,9 @@ void CanHandler::parseUpdate(QCanBusFrame const &toParse, QDomElement const &par
     Parameter updated = static_cast<Parameter>(parserInfo.attribute("parameter").split(":").at(0).toInt());
     qreal newValue = frameValue(toParse.payload());
     emit updateGUI(updated, newValue);
-    return;
 }
 
-qreal CanHandler::frameValue(QByteArray data) const
+qreal CanHandler::frameValue(QByteArray const &data) const
 {
     //probably a way to find values with a multiplier
     bool conversionStatus;

@@ -139,7 +139,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Coolant: 56 °C</string>
+    <string>Coolant: n/a °C</string>
    </property>
   </widget>
   <widget class="QLabel" name="enginetemp">
@@ -157,7 +157,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Engine: 56 °C</string>
+    <string>Engine: n/a °C</string>
    </property>
   </widget>
   <widget class="QLabel" name="invertertemp">
@@ -175,7 +175,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Inverter: 56 °C</string>
+    <string>Inverter: n/a °C</string>
    </property>
   </widget>
   <widget class="QLabel" name="bmslvtemp">
@@ -193,7 +193,7 @@
     </font>
    </property>
    <property name="text">
-    <string>BMSLV: 56 °C</string>
+    <string>BMSLV: n/a °C</string>
    </property>
   </widget>
   <widget class="QLabel" name="bmshvtemp">
@@ -211,7 +211,7 @@
     </font>
    </property>
    <property name="text">
-    <string>BMSHV: 56 °C</string>
+    <string>BMSHV: n/a °C</string>
    </property>
   </widget>
   <widget class="QLabel" name="subtitle">
@@ -247,7 +247,7 @@
     </font>
    </property>
    <property name="text">
-    <string>APPS Value: 68%</string>
+    <string>APPS Value: n/a%</string>
    </property>
   </widget>
   <widget class="QLabel" name="bmshvvoltage">
@@ -265,7 +265,7 @@
     </font>
    </property>
    <property name="text">
-    <string>BMSHV: 415V</string>
+    <string>BMSHV: n/aV</string>
    </property>
   </widget>
   <widget class="QLabel" name="bmslvvoltage">
@@ -283,7 +283,31 @@
     </font>
    </property>
    <property name="text">
-    <string>BMSLV: 25V</string>
+    <string>BMSLV: n/aV</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="error">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>240</y>
+     <width>431</width>
+     <height>131</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>30</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color:red;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
  </widget>

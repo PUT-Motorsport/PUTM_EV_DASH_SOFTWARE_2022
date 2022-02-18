@@ -3,6 +3,8 @@ The software for a Raspberry-Pi powered dash display. (Will be) Written in Qt 6.
 ### Dependencies
 This app uses the external library `libsocketcan`; please ensure that the `libsocketcan-dev` package is installed.
 
+The app will connect to CAN via system kernel and can-utils. A bash script will prepare the interface and launch the app on system startup.
+
 ### Proposed GUI look
 ![Main screen](https://i.ibb.co/T18HSnz/Screenshot-from-2022-02-14-14-29-39.png)
 ![Raw CAN data](https://i.ibb.co/0X1P8kq/Screenshot-from-2022-02-16-16-20-33.png)
@@ -118,13 +120,6 @@ If a dial is turned, a confirmation window will appear. The driver can choose to
 
 - The left dial changes the ?.
 - The right dial changes the ?.
-
-### Classes
-
-![Classes diagram](https://i.ibb.co/dG70Szd/Screenshot-from-2022-02-14-14-37-06.png)
-*Will probably be changed*
-
-The app will connect to CAN via system kernel and can-utils. A bash script will prepare the interface and launch the app on system startup.
 
 ### Incoming frame handling algorithm
 

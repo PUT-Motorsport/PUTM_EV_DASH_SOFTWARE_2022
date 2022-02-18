@@ -40,7 +40,7 @@
      <number>6000</number>
     </property>
     <property name="value">
-     <number>4350</number>
+     <number>0</number>
     </property>
     <property name="format">
      <string>%v</string>
@@ -61,7 +61,7 @@
      </font>
     </property>
     <property name="text">
-     <string>124</string>
+     <string>n/a</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -103,7 +103,7 @@
      </font>
     </property>
     <property name="text">
-     <string>SOC: 67%</string>
+     <string>SOC: n/a%</string>
     </property>
    </widget>
    <widget class="QLabel" name="temperature">
@@ -121,7 +121,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Temp: 56 °C</string>
+     <string>Temp: n/a °C</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -160,7 +160,7 @@
      </font>
     </property>
     <property name="text">
-     <string>00:01:45.34</string>
+     <string>00:00:00.00</string>
     </property>
    </widget>
    <widget class="QLabel" name="bestTime">
@@ -178,7 +178,7 @@
      </font>
     </property>
     <property name="text">
-     <string>00:03:27.45</string>
+     <string>00:00:00.00</string>
     </property>
    </widget>
    <widget class="QLabel" name="labelBest">
@@ -214,38 +214,17 @@
      </font>
     </property>
     <property name="text">
-     <string>CAN connected</string>
+     <string>Waiting for CAN</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="warnings">
+   <widget class="QLabel" name="errorCounter">
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>160</y>
-      <width>241</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>26</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>No warnings</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QLabel" name="errors">
-    <property name="geometry">
-     <rect>
-      <x>550</x>
-      <y>210</y>
+      <y>150</y>
       <width>241</width>
       <height>41</height>
      </rect>
@@ -265,9 +244,9 @@
    <widget class="QLabel" name="power">
     <property name="geometry">
      <rect>
-      <x>260</x>
+      <x>240</x>
       <y>280</y>
-      <width>281</width>
+      <width>311</width>
       <height>61</height>
      </rect>
     </property>
@@ -277,10 +256,34 @@
      </font>
     </property>
     <property name="text">
-     <string>Power: 45 kW</string>
+     <string>Power: n/a kW</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="error">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>781</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>40</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: red;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
   </widget>

@@ -15,7 +15,6 @@ SOURCES += \
     changeconfirm.cpp \
     drivingselect.cpp \
     dvselect.cpp \
-    gui.cpp \
     logger.cpp \
     logs.cpp \
     main.cpp \
@@ -28,7 +27,7 @@ HEADERS += \
     changeconfirm.h \
     drivingselect.h \
     dvselect.h \
-    gui.h \
+    guicomponent.h \
     logger.h \
     logs.h \
     mainwindow.h \

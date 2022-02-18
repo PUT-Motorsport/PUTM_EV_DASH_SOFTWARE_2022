@@ -12,3 +12,13 @@ CanRaw::~CanRaw()
 {
     delete ui;
 }
+
+void CanRaw::navigate(Navigation pressed)
+{
+    this->done(QDialog::Accepted);
+}
+
+void CanRaw::raiseError(int errorCode, const QString &errorMessage)
+{
+    ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
+}

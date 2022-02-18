@@ -2,8 +2,14 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+
+#include "guicomponent.h"
+
+#include "canhandler.h"
 #include "vehicle.h"
 #include "logger.h"
+#include "dvselect.h"
+#include "servicemode.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,16 +24,21 @@ public:
     ~MainWindow();
 public slots:
     void updateData(Parameter param, qreal value);
-    void raiseError();  //add data types and implementation
+    void raiseError(int errorCode, QString const &errorMessage);  //TODO: add data types and implementation
+    void navigate(Navigation pressed);
 private:
     Ui::MainWindow *ui;
-    int speed;
-    int temperature;
-    int rpm;
-    int soc;
-    int power;
+
+    CanHandler * canHandler;
+    DvSelect * dvSelect;
+    ServiceMode * serviceMode;
+
+    GUIComponent * subwindowShown;
+
     Status canStatus;
-    QStringList warnings, erorrs;
+    void updateCANStatus(Status newStatus);
+
+    int errorCounter;
 
 };
 #endif // MAINWINDOW_H
