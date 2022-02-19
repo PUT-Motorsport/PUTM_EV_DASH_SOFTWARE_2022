@@ -26,7 +26,7 @@ private slots:
 private:
 
     QDomElement frameParserInfo;
-    QString const xmlFile = QStringLiteral("incomingFrames.xml");
+    QString const xmlFile = QStringLiteral("ProgramData/incomingFrames.xml");
     QCanBusDevice * canDevice;
 
     void parseError(QCanBusFrame const &toParse, QDomElement const &parserInfo);

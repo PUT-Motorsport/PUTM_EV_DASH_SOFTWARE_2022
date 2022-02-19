@@ -10,6 +10,7 @@
 
 #include "vehicle.h"
 #include "logger.h"
+#include "canhandler.h"
 
 namespace Ui {
 class ServiceMode;
@@ -20,7 +21,7 @@ class ServiceMode : public QDialog, public GUIComponent
     Q_OBJECT
 
 public:
-    explicit ServiceMode(QWidget *parent = nullptr);
+    explicit ServiceMode(CanHandler * can, QWidget *parent = nullptr);
     ~ServiceMode();
     void updateData(Parameter param, qreal value);
     void navigate(Navigation pressed) override;

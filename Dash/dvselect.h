@@ -20,7 +20,7 @@ class DvSelect : public QDialog, public GUIComponent
     Q_OBJECT
 
 public:
-    explicit DvSelect(CanHandler * can, QWidget *parent = nullptr);  //needs to be able to send frames
+    explicit DvSelect(CanHandler * can, QWidget *parent = nullptr);
     ~DvSelect();
 
     void navigate(Navigation pressed) override;
@@ -31,7 +31,7 @@ private:
     void sendCANframe();//TODO
 
     Ui::DvSelect *ui;
-    QString const pathToXML = QStringLiteral("dv.xml");
+    QString const pathToXML = QStringLiteral("ProgramData/dv.xml");
     QDomElement missionsFile;
     QStringList missionNames;
     int missionCount;

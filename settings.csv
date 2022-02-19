@@ -1,0 +1,9 @@
+Regain,60,70,80,90
+TractionControl,1,2,3,4,5
+MaxPower,40,50,60,70,80
+FanSetting,1,2,3,4,5,6
+RegainId,500,Payloads,60,70,80,90
+TractionID,600,Payloads,1,2,3,4,5
+PowerID,700,Payloads,40,50,60,70,80
+FanID,800,Payloads,1,2,3,4,5,6
+AppsID,900,Payloads,1,2,3,4

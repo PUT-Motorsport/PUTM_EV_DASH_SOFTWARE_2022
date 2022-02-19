@@ -1,5 +1,6 @@
 # Dash Software
 The software for a Raspberry-Pi powered dash display. (Will be) Written in Qt 6.2.3 on Ubuntu 21, targeted for Raspberry Pi OS 11.
+**Will be updated soon to include newest features**
 ### Dependencies
 This app uses the external library `libsocketcan`; please ensure that the `libsocketcan-dev` package is installed.
 

@@ -1,12 +1,12 @@
 #include "servicemode.h"
 #include "ui_servicemode.h"
 
-ServiceMode::ServiceMode(QWidget *parent) :
+ServiceMode::ServiceMode(CanHandler * can, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ServiceMode), subwindowShown(nullptr)
 {
     ui->setupUi(this);
-    driving = new DrivingSelect();
+    driving = new DrivingSelect(can);
     canRaw = new CanRaw();
     logs = new Logs();
 
