@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(canHandler, &CanHandler::navigation, this, &MainWindow::navigate);
 
 
-    dvSelect = new DvSelect();
+    dvSelect = new DvSelect(canHandler);
     serviceMode = new ServiceMode();
 
     QObject::connect(dvSelect, &DvSelect::finished, this, &MainWindow::reopen);
