@@ -27,15 +27,19 @@ bool CanHandler::connect()
     return true;
 }
 
-void CanHandler::send(QCanBusFrame const &toSend) const
+bool CanHandler::send(QCanBusFrame const &toSend)
 {
     if (not(canDevice->state() == QCanBusDevice::CanBusDeviceState::ConnectedState)) {
         Logger::add("Attempted to send a frame to can which isn't open", LogType::Critical);
-        return;
+        emit raiseError(0, "Can isn't open");
+        return false;
     }
     if (not(canDevice->writeFrame(toSend))) {
         Logger::add("CAN is connected, but failed to relay a message", LogType::Critical);
+        emit raiseError(0, "CAN connected, but failed to relay a message");
+        return false;
     }
+    return true;
 }
 
 void CanHandler::onCanFrameReceived()

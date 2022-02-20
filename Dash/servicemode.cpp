@@ -90,6 +90,9 @@ void ServiceMode::raiseError(int errorCode, const QString &errorMessage)
 {
     if (subwindowShown == nullptr) {
         ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
+        QTimer::singleShot(3000, [this] () {
+                ui->error->setText("");
+            });
     }
     else
         subwindowShown->raiseError(errorCode, errorMessage);

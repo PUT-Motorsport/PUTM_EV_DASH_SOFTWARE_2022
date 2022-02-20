@@ -2,7 +2,7 @@
 #define CANRAW_H
 
 #include <QDialog>
-
+#include <QTimer>
 #include "guicomponent.h"
 
 namespace Ui {

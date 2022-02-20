@@ -16,7 +16,7 @@ class CanHandler : public QObject
 public:
     explicit CanHandler(QObject *parent = nullptr);
     bool connect();
-    void send(QCanBusFrame const &toSend) const;
+    bool send(QCanBusFrame const &toSend);
 signals:
     void updateGUI(Parameter param, qreal newValue);
     void raiseError(int errorCode, QString const &errorDesc);

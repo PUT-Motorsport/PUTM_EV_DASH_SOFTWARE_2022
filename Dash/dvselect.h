@@ -5,6 +5,7 @@
 #include <QCanBusDevice>
 #include <QCanBusFrame>
 #include <QDomDocument>
+#include <QTimer>
 
 #include "logger.h"
 

@@ -2,6 +2,7 @@
 #define LOGS_H
 
 #include <QDialog>
+#include <QTimer>
 
 #include "guicomponent.h"
 

@@ -49,6 +49,9 @@ void DvSelect::navigate(Navigation pressed)
 void DvSelect::raiseError(int errorCode, const QString &errorMessage)
 {
     ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
+    QTimer::singleShot(3000, [this] () {
+            ui->error->setText("");
+        });
 }
 
 void DvSelect::toggleMission(int direction)
@@ -91,6 +94,17 @@ void DvSelect::sendCANframe()
     canFrame.setPayload(QByteArray::fromHex(payloadStr.toUtf8()));
     canFrame.setFrameType(QCanBusFrame::FrameType::DataFrame);
 
-    can->send(canFrame);
-    Logger::add("Sent dv can frame " + element.attribute("description"));
+    if (can->send(canFrame)) {
+        Logger::add("Sent dv can frame " + element.attribute("description"));
+        ui->sent->setText("Sent!");
+        QTimer::singleShot(1000, [this] () {
+                ui->sent->setText("");
+            });
+    }
+    else {
+        ui->sent->setText("NOT Sent!");
+        QTimer::singleShot(1000, [this] () {
+                ui->sent->setText("");
+            });
+    }
 }

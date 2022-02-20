@@ -2,6 +2,7 @@
 #define SERVICEMODE_H
 
 #include <QDialog>
+#include <QTimer>
 
 #include "guicomponent.h"
 #include "drivingselect.h"

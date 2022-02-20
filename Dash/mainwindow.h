@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTimer>
+#include <QElapsedTimer>
 
 #include "guicomponent.h"
 
@@ -33,6 +35,16 @@ private slots:
     void reopen();
 
 private:
+
+    void updateBestTime();
+    void resetTimer();
+
+    int m_speed;        //kept so that a change can start a timer
+    QTime best;
+    QElapsedTimer * elapsedTimer;
+    bool timerStarted;
+    QTimer updateTimer;     //will call the gui to update timer
+
     Ui::MainWindow *ui;
 
     CanHandler * canHandler;

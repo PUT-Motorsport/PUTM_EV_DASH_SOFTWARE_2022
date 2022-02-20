@@ -121,11 +121,36 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
+  <widget class="QLabel" name="sent">
+   <property name="geometry">
+    <rect>
+     <x>590</x>
+     <y>110</y>
+     <width>191</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>50</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color:red;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
   <zorder>hint</zorder>
   <zorder>mission</zorder>
   <zorder>title</zorder>
   <zorder>hint2</zorder>
   <zorder>error</zorder>
+  <zorder>sent</zorder>
  </widget>
  <resources/>
  <connections/>
