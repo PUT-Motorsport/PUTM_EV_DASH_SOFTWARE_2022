@@ -3,7 +3,7 @@
 
 DrivingSelect::DrivingSelect(CanHandler * can, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::DrivingSelect), current(Setting::Regain), can(can), valuesFile("ProgramData/settings.csv")
+    ui(new Ui::DrivingSelect), current(Setting::Regain), can(can), valuesFile("../ProgramData/settings.csv")
 {
     ui->setupUi(this);
     ui->regain->setStyleSheet("color: red;");

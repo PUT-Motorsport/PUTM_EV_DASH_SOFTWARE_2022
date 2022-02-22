@@ -7,6 +7,9 @@ MainWindow::MainWindow(QWidget *parent)
       timerStarted(false), ui(new Ui::MainWindow), canStatus(Status::Unresolved), errorCounter(0)
 {
     ui->setupUi(this);
+
+    Logger::open();
+
     canHandler = new CanHandler();
     if (canHandler->connect())
         ui->can->setText("CAN Connected");
@@ -35,6 +38,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    Logger::close();
+
     delete ui;
     delete canHandler;
     delete dvSelect;

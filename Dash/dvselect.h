@@ -32,7 +32,7 @@ private:
     void sendCANframe();//TODO
 
     Ui::DvSelect *ui;
-    QString const pathToXML = QStringLiteral("ProgramData/dv.xml");
+    QString const pathToXML = QStringLiteral("../ProgramData/dv.xml");
     QDomElement missionsFile;
     QStringList missionNames;
     int missionCount;
