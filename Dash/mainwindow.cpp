@@ -3,7 +3,7 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , subwindowShown(nullptr), m_speed(0),
+    , subwindowShown(nullptr), interruptSubwindowShown(nullptr), m_speed(0),
       timerStarted(false), ui(new Ui::MainWindow), canStatus(Status::Unresolved), errorCounter(0)
 {
     ui->setupUi(this);
@@ -19,13 +19,15 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(canHandler, &CanHandler::raiseError, this, &MainWindow::raiseError);
     QObject::connect(canHandler, &CanHandler::updateGUI, this, &MainWindow::updateData);
     QObject::connect(canHandler, &CanHandler::navigation, this, &MainWindow::navigate);
-
+    QObject::connect(canHandler, &CanHandler::getConfirmation, this, &MainWindow::getConfirmation);
 
     dvSelect = new DvSelect(canHandler);        //needs to send frames
     serviceMode = new ServiceMode(canHandler);
+    changeConfirm = new ChangeConfirm(canHandler);
 
     QObject::connect(dvSelect, &DvSelect::finished, this, &MainWindow::reopen);
     QObject::connect(serviceMode, &ServiceMode::finished, this, &MainWindow::reopen);
+    QObject::connect(changeConfirm, &ChangeConfirm::finished, this, &MainWindow::reopen);
 
     elapsedTimer = new QElapsedTimer();
 
@@ -45,6 +47,7 @@ MainWindow::~MainWindow()
     delete dvSelect;
     delete serviceMode;
     delete elapsedTimer;
+    delete changeConfirm;
 }
 
 void MainWindow::updateData(Parameter param, qreal value)
@@ -77,7 +80,7 @@ void MainWindow::updateData(Parameter param, qreal value)
     }
 }
 
-void MainWindow::raiseError(int errorCode, QString const &errorMessage)
+void MainWindow::raiseError(QString const &errorMessage, int errorCode)
 {
     if (subwindowShown == nullptr) {
         ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
@@ -87,7 +90,7 @@ void MainWindow::raiseError(int errorCode, QString const &errorMessage)
             });
     }
     else {
-        subwindowShown->raiseError(errorCode, errorMessage);
+        subwindowShown->raiseError(errorMessage, errorCode);
     }
 }
 
@@ -96,7 +99,7 @@ void MainWindow::navigate(Navigation pressed)
     if (subwindowShown == nullptr) {
         switch (pressed) {
         case Navigation::A:
-            subwindowShown = dvSelect;  //TODO: A function to reset the subwindow shown
+            subwindowShown = dvSelect;
             this->hide();
             dvSelect->show();
             break;
@@ -118,10 +121,23 @@ void MainWindow::navigate(Navigation pressed)
     else subwindowShown->navigate(pressed);
 }
 
+void MainWindow::getConfirmation(const QDomElement &data, QString value)
+{
+    interruptSubwindowShown = subwindowShown;
+    subwindowShown = changeConfirm;
+    changeConfirm->toConfirm(data, value);      //prepare the subwindow
+    this->hide();
+    changeConfirm->show();
+}
+
 void MainWindow::reopen()
 {
-    subwindowShown = nullptr;
-    this->show();
+    if (interruptSubwindowShown == nullptr) {   //if changeconfirm didn't trigger the change
+        this->show();
+        subwindowShown = nullptr;
+    }
+
+    interruptSubwindowShown = nullptr;
 }
 
 void MainWindow::updateBestTime()

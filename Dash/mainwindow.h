@@ -12,6 +12,7 @@
 #include "logger.h"
 #include "dvselect.h"
 #include "servicemode.h"
+#include "changeconfirm.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -26,10 +27,12 @@ public:
     ~MainWindow();
 
     GUIComponent * subwindowShown;      //ensures two-way communication between classes
+    GUIComponent * interruptSubwindowShown;     //allows to store previously open window if change confirmation "interrupts"
 public slots:
     void updateData(Parameter param, qreal value);
-    void raiseError(int errorCode, QString const &errorMessage);  //TODO: add data types and implementation
+    void raiseError(QString const &errorMessage, int errorCode = -1);
     void navigate(Navigation pressed);
+    void getConfirmation(QDomElement const &data, QString value);
 
 private slots:
     void reopen();
@@ -50,6 +53,8 @@ private:
     CanHandler * canHandler;
     DvSelect * dvSelect;
     ServiceMode * serviceMode;
+
+    ChangeConfirm * changeConfirm;
 
     Status canStatus;
     void updateCANStatus(Status newStatus);

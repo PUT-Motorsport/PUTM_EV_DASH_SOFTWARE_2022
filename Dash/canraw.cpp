@@ -18,7 +18,7 @@ void CanRaw::navigate(Navigation pressed)
     this->done(QDialog::Accepted);
 }
 
-void CanRaw::raiseError(int errorCode, const QString &errorMessage)
+void CanRaw::raiseError(QString const &errorMessage, int errorCode)
 {
     ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
     QTimer::singleShot(3000, [this] () {

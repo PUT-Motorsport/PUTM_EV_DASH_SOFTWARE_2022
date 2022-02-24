@@ -31,12 +31,12 @@ bool CanHandler::send(QCanBusFrame const &toSend)
 {
     if (not(canDevice->state() == QCanBusDevice::CanBusDeviceState::ConnectedState)) {
         Logger::add("Attempted to send a frame to can which isn't open", LogType::Critical);
-        emit raiseError(0, "Can isn't open");
+        emit raiseError("Can isn't open");
         return false;
     }
     if (not(canDevice->writeFrame(toSend))) {
         Logger::add("CAN is connected, but failed to relay a message", LogType::Critical);
-        emit raiseError(0, "CAN connected, but failed to relay a message");
+        emit raiseError("CAN connected, but failed to relay a message");
         return false;
     }
     return true;
@@ -51,7 +51,7 @@ void CanHandler::onCanFrameReceived()
     QDomNode currentSearch = frameParserInfo.firstChild();
     while (not(currentSearch.isNull())) {
         QDomElement element = currentSearch.toElement();
-        if (element.attribute("id").toInt() == frameID)
+        if (element.attribute("id").toInt(nullptr, 16) == frameID)
             break;
         currentSearch = currentSearch.nextSibling();
    }
@@ -71,6 +71,9 @@ void CanHandler::onCanFrameReceived()
     case FrameType::navigation:
         parseNavigation(newFrame);
         break;
+    case FrameType::confirmation:
+        parseConfirmation(newFrame, passableElement);
+        break;
     default:
         Logger::add("Parser failure: Wrong argument", LogType::AppError);
     }
@@ -84,7 +87,7 @@ void CanHandler::parseError(QCanBusFrame const &toParse, QDomElement const &pars
         Logger::add(QString::number(errorCode) + errorDesc, LogType::Error);
     else
         Logger::add("Unknown error, ref number " + QString::number(errorCode), LogType::Critical);
-    emit raiseError(errorCode, errorDesc);
+    emit raiseError(errorDesc, errorCode);
 }
 
 void CanHandler::parseNavigation(QCanBusFrame const &toParse)
@@ -103,6 +106,12 @@ void CanHandler::parseUpdate(QCanBusFrame const &toParse, QDomElement const &par
     }
     qreal newValue = frameValue(toParse.payload());
     emit updateGUI(updated, newValue);
+}
+
+void CanHandler::parseConfirmation(const QCanBusFrame &toParse, const QDomElement &parserInfo)
+{
+    QString value = QString::number(frameValue(toParse.payload()));
+    emit getConfirmation(parserInfo, value);
 }
 
 qreal CanHandler::frameValue(QByteArray const &data) const

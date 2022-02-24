@@ -18,7 +18,7 @@ void Logs::navigate(Navigation pressed)
     this->done(QDialog::Accepted);
 }
 
-void Logs::raiseError(int errorCode, const QString &errorMessage)
+void Logs::raiseError(const QString &errorMessage, int errorCode)
 {
     ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
     QTimer::singleShot(3000, [this] () {

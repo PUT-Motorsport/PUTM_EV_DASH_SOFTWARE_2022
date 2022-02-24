@@ -25,11 +25,11 @@ public:
     ~DvSelect();
 
     void navigate(Navigation pressed) override;
-    void raiseError(int errorCode, QString const &errorMessage) override;
+    void raiseError(QString const &errorMessage, int errorCode = -1) override;
 
 private:
     void toggleMission(int direction);
-    void sendCANframe();//TODO
+    void sendCANframe();
 
     Ui::DvSelect *ui;
     QString const pathToXML = QStringLiteral("../ProgramData/dv.xml");

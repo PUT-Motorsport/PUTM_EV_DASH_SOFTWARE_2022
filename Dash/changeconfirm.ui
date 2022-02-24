@@ -38,7 +38,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>80</y>
+     <y>70</y>
      <width>781</width>
      <height>61</height>
     </rect>
@@ -49,7 +49,7 @@
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color: rgb(224, 27, 36)</string>
+    <string notr="true">color: rgb(46, 194, 126)</string>
    </property>
    <property name="text">
     <string>Energy regain</string>
@@ -85,7 +85,7 @@
      <x>10</x>
      <y>180</y>
      <width>781</width>
-     <height>181</height>
+     <height>141</height>
     </rect>
    </property>
    <property name="font">
@@ -94,7 +94,7 @@
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color: rgb(224, 27, 36)</string>
+    <string notr="true">color: rgb(46, 194, 126)</string>
    </property>
    <property name="text">
     <string>90%</string>
@@ -109,7 +109,7 @@
      <x>0</x>
      <y>300</y>
      <width>801</width>
-     <height>151</height>
+     <height>71</height>
     </rect>
    </property>
    <property name="font">
@@ -118,7 +118,31 @@
     </font>
    </property>
    <property name="text">
-    <string>Press X  to confirm or any other to dismiss.</string>
+    <string>Press A  to confirm or any other to dismiss.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="error">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>360</y>
+     <width>781</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>68</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: red;</string>
+   </property>
+   <property name="text">
+    <string/>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>

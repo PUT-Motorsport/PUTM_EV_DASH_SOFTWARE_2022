@@ -46,7 +46,7 @@ void DvSelect::navigate(Navigation pressed)
     }
 }
 
-void DvSelect::raiseError(int errorCode, const QString &errorMessage)
+void DvSelect::raiseError(const QString &errorMessage, int errorCode)
 {
     ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
     QTimer::singleShot(3000, [this] () {
@@ -57,7 +57,7 @@ void DvSelect::raiseError(int errorCode, const QString &errorMessage)
 void DvSelect::toggleMission(int direction)
 {
     if (missionNames.length() == 0) {
-        raiseError(1, "File missing");
+        raiseError("File missing");
         return;
     }
     currentMission += direction;
@@ -75,7 +75,7 @@ void DvSelect::sendCANframe()
         iterator = iterator.nextSibling();      //move the document tree branch to the correct mission
     }
     if (iterator.isNull()) {
-        raiseError(1, "File Error");
+        raiseError("File Error");
         Logger::add("File error while sending dv can frame", LogType::Error);
         return;
     }
@@ -84,7 +84,7 @@ void DvSelect::sendCANframe()
     if (element.attribute("frameID") != "")
         frameID = element.attribute("frameID").toInt();
     else {
-        raiseError(1, "Can Sender Error");  //inform the user live
+        raiseError("Can Sender Error");  //inform the user live
         Logger::add("Can dv frame couldn't be sent", LogType::Error);
         return;
     }

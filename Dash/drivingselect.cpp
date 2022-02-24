@@ -36,7 +36,7 @@ void DrivingSelect::navigate(Navigation pressed)
     }
 }
 
-void DrivingSelect::raiseError(int errorCode, const QString &errorMessage)
+void DrivingSelect::raiseError(const QString &errorMessage, int errorCode)
 {
     ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
     QTimer::singleShot(3000, [this] () {
@@ -48,7 +48,7 @@ void DrivingSelect::changeHighlight()
 {
 
     if (current == Setting::Apps)
-        current = Setting::Regain;      //TODO: Make it so that if a change is skipped, its value returns to the correct one
+        current = Setting::Regain;
     else
         current = static_cast<Setting>(static_cast<int>(current) + 1);
 
@@ -97,7 +97,7 @@ void DrivingSelect::sendCANFrame()
 
     frame.setFrameId(payloads.at(static_cast<int>(current)).at(1).toInt());
 
-    switch (current) {      //TODO: Documentation
+    switch (current) {
     case Setting::Regain:
         payloadString = payloads.at(0).at(2 +   //a shift by 3 items to skip descrpitions
                                           regainValues.indexOf(ui->regainValue->text()));
@@ -144,7 +144,7 @@ void DrivingSelect::changeValue()
     switch (current) {
     case Setting::Regain:
         //find the index of current setting, add one, display
-        index = regainValues.indexOf(ui->regainValue->text()) + 1;      //FIXME? Two dimensional list to declutter?
+        index = regainValues.indexOf(ui->regainValue->text()) + 1;
         if (index >= regainValues.length())
             index = 1;
         ui->regainValue->setText(regainValues.at(index));

@@ -18,9 +18,12 @@ public:
     bool connect();
     bool send(QCanBusFrame const &toSend);
 signals:
+
     void updateGUI(Parameter param, qreal newValue);
-    void raiseError(int errorCode, QString const &errorDesc);
+    void raiseError(QString const &errorMessage, int errorCode = -1);
     void navigation(Navigation pressed);
+    void getConfirmation(QDomElement const &data, QString value);
+
 private slots:
     void onCanFrameReceived();
 private:
@@ -32,6 +35,7 @@ private:
     void parseError(QCanBusFrame const &toParse, QDomElement const &parserInfo);
     void parseNavigation(QCanBusFrame const &toParse);
     void parseUpdate(QCanBusFrame const &toParse, QDomElement const &parserInfo);
+    void parseConfirmation(QCanBusFrame const &toParse, QDomElement const &parserInfo);
 
     qreal frameValue(QByteArray const &toCast) const;
 };

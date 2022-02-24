@@ -21,10 +21,10 @@ class DrivingSelect : public QDialog, public GUIComponent
     Q_OBJECT
 
 public:
-    explicit DrivingSelect(CanHandler * can, QWidget *parent = nullptr);  //TODO: CAN support
+    explicit DrivingSelect(CanHandler * can, QWidget *parent = nullptr);
     ~DrivingSelect();
     void navigate(Navigation pressed) override;
-    void raiseError(int errorCode, QString const &errorMessage) override;
+    void raiseError(QString const &errorMessage, int errorCode = -1) override;
 
 private:
     void changeHighlight();

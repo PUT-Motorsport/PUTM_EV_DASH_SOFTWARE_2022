@@ -86,7 +86,7 @@ void ServiceMode::navigate(Navigation pressed)
         subwindowShown->navigate(pressed);
 }
 
-void ServiceMode::raiseError(int errorCode, const QString &errorMessage)
+void ServiceMode::raiseError(const QString &errorMessage, int errorCode)
 {
     if (subwindowShown == nullptr) {
         ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
@@ -95,7 +95,7 @@ void ServiceMode::raiseError(int errorCode, const QString &errorMessage)
             });
     }
     else
-        subwindowShown->raiseError(errorCode, errorMessage);
+        subwindowShown->raiseError(errorMessage, errorCode);
 }
 
 void ServiceMode::reopen()

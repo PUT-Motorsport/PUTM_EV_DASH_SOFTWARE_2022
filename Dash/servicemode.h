@@ -26,7 +26,7 @@ public:
     ~ServiceMode();
     void updateData(Parameter param, qreal value);
     void navigate(Navigation pressed) override;
-    void raiseError(int errorCode, QString const &errorMessage) override;
+    void raiseError(QString const &errorMessage, int errorCode = -1) override;
 
 private:
     Ui::ServiceMode *ui;

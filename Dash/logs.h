@@ -18,7 +18,7 @@ public:
     explicit Logs(QWidget *parent = nullptr);
     ~Logs();
     void navigate(Navigation pressed) override;
-    void raiseError(int errorCode, QString const &errorMessage) override;
+    void raiseError(QString const &errorMessage, int errorCode = -1) override;
 
 private:
     Ui::Logs *ui;

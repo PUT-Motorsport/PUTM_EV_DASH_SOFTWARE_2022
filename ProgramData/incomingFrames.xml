@@ -17,5 +17,9 @@
     <frame id="103" type="00:Error" logger="Steering wheel error"></frame>
     <frame id="104" type="00:Error" logger="Data acquisition card error"></frame>
 
-    <frame id="200" type="02:Navigation" navigation="00:Button A"></frame>
+    <frame id="200" type="02:Navigation"></frame>
+    
+    <frame id="255" type="03:Confirmation" description="Setting1" sendID="100"></frame> 
+    <frame id="256" type="03:Confirmation" description="Setting2" sendID="100"></frame> 
+    
 </canFrames>
