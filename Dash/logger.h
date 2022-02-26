@@ -13,10 +13,13 @@ public:
     static void loadXML(QDomElement &target, QString const &fileName);
 
     static void open();
-    static void add(QString const &message, LogType type = LogType::Normal);   //should there be a way to log errors differently?
+    static void add(QString const &message, LogType type = LogType::Normal);    //should this class be a singleton?
     static void addCAN(QString canFrame);
     static void close();
 
+    static QString logLine; //for loading lines from external functions
+    static QString canLine;
+private:
     static QString const canLogName;
     static QString const logName;
 

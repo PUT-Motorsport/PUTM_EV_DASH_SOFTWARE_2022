@@ -3,6 +3,9 @@
 QString const Logger::canLogName = QStringLiteral("can.txt");   //TODO: Move to a different subdirectory
 QString const Logger::logName = QStringLiteral("log.txt");
 
+QString Logger::logLine;
+QString Logger::canLine;
+
 QFile Logger::canLog;
 QFile Logger::log;
 QTextStream Logger::canStream;
@@ -50,30 +53,30 @@ void Logger::open()
 
 void Logger::add(const QString &message, LogType type)
 {
+    logLine = QTime().currentTime().toString();
     switch (type) {
     case LogType::Normal:
-        qDebug() << QTime().currentTime().toString() + ' ' + message;
-        logStream << QTime().currentTime().toString() + ' ' + message + '\n';
         break;
     case LogType::AppError:
-        qDebug() << QTime().currentTime().toString() +  " @App Error@ " + message;
-        logStream << QTime().currentTime().toString() +  " @App Error@ " + message + '\n';
+        logLine += " @App Error@ ";
         break;
     case LogType::Error:
-        qDebug() << QTime().currentTime().toString() + " !Error! " + message;
-        logStream << QTime().currentTime().toString() +  " !Error! " + message + '\n';
+        logLine += " !Error! ";
         break;
     case LogType::Critical:
-        qDebug() << QTime().currentTime().toString() + " !!Fatal Error!! " + message;
-        logStream << QTime().currentTime().toString() + " !!Fatal Error!! " + message + '\n';
+        logLine += " !!!Critical Error!!! ";
         break;
     }
+    logLine += message;
+    qDebug() << logLine;
+    logStream << logLine << '\n';
 }
 
 void Logger::addCAN(QString canFrame)
 {
-    qDebug() << QTime().currentTime().toString() + " Can: " + canFrame;
-    canStream << QTime().currentTime().toString() + ' ' + canFrame + '\n';
+    canLine = QTime().currentTime().toString() + ' ' + canFrame;
+    qDebug() << canLine;
+    canStream << canLine + '\n';
 }
 
 void Logger::close()

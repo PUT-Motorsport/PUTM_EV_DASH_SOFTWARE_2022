@@ -24,6 +24,7 @@ bool CanHandler::connect()
     else
         Logger::add("Can Device created successfully");
     QObject::connect(canDevice, &QCanBusDevice::framesReceived, this, &CanHandler::onCanFrameReceived);
+    QObject::connect(canDevice, &QCanBusDevice::errorOccurred, this, &CanHandler::onCanErrorOcurred);
     return true;
 }
 
@@ -77,6 +78,11 @@ void CanHandler::onCanFrameReceived()
     default:
         Logger::add("Parser failure: Wrong argument", LogType::AppError);
     }
+}
+
+void CanHandler::onCanErrorOcurred()
+{
+    emit raiseError("Can bus error");
 }
 
 void CanHandler::parseError(QCanBusFrame const &toParse, QDomElement const &parserInfo)

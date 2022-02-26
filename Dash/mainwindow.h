@@ -56,9 +56,6 @@ private:
 
     ChangeConfirm * changeConfirm;
 
-    Status canStatus;
-    void updateCANStatus(Status newStatus);
-
     int errorCounter;
 
 };

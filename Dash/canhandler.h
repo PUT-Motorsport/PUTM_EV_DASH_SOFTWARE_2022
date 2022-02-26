@@ -26,6 +26,7 @@ signals:
 
 private slots:
     void onCanFrameReceived();
+    void onCanErrorOcurred();   //TODO: handling of can errors
 private:
 
     QDomElement frameParserInfo;

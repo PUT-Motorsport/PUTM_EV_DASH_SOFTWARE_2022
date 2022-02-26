@@ -6,15 +6,19 @@ CanRaw::CanRaw(QWidget *parent) :
     ui(new Ui::CanRaw)
 {
     ui->setupUi(this);
+    refreshTimer = new QTimer();
+    QObject::connect(refreshTimer, &QTimer::timeout, this, &CanRaw::sniff);
 }
 
 CanRaw::~CanRaw()
 {
     delete ui;
+    delete refreshTimer;
 }
 
 void CanRaw::navigate(Navigation pressed)
 {
+    refreshTimer->stop();
     this->done(QDialog::Accepted);
 }
 
@@ -23,5 +27,27 @@ void CanRaw::raiseError(QString const &errorMessage, int errorCode)
     ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
     QTimer::singleShot(3000, [this] () {
             ui->error->setText("");
-        });
+    });
 }
+
+void CanRaw::startSniffing()
+{
+    refreshTimer->start(refreshTime);
+}
+
+void CanRaw::sniff()
+{
+    if (currentLines > maxLines) {
+        ui->textLogs->clear();
+        currentLines = 0;
+    }
+
+    if (newLine == Logger::canLine)
+        return;
+
+    newLine = Logger::canLine;      //FIXME: Probably not the cleanest way to do it
+    ui->textLogs->append(newLine);
+    currentLines++;
+}
+
+

@@ -4,7 +4,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , subwindowShown(nullptr), interruptSubwindowShown(nullptr), m_speed(0),
-      timerStarted(false), ui(new Ui::MainWindow), canStatus(Status::Unresolved), errorCounter(0)
+      timerStarted(false), ui(new Ui::MainWindow), errorCounter(0)
 {
     ui->setupUi(this);
 
@@ -92,6 +92,7 @@ void MainWindow::raiseError(QString const &errorMessage, int errorCode)
     else {
         subwindowShown->raiseError(errorMessage, errorCode);
     }
+    ui->errorCounter->setText(QString::number(errorCounter) + " errorr(s)");
 }
 
 void MainWindow::navigate(Navigation pressed)

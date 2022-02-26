@@ -63,6 +63,7 @@ void ServiceMode::navigate(Navigation pressed)
         case Navigation::X:
             subwindowShown = canRaw;
             this->hide();
+            canRaw->startSniffing();
             canRaw->show();
             break;
         case Navigation::B:
@@ -71,6 +72,7 @@ void ServiceMode::navigate(Navigation pressed)
         case Navigation::Y:
             subwindowShown = logs;
             this->hide();
+            logs->startSniffing();
             logs->show();
             break;
         case Navigation::A:

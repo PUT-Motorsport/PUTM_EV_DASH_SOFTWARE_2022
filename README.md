@@ -78,6 +78,8 @@ From the service mode window, the driver can access three additional windows:
 
 This window can display the CAN log while the app is running.
 
+**Right now, the app is able only to sniff the data from the static class logger. A way to load data from the files will be found**
+
 ![Raw CAN data](https://i.ibb.co/0X1P8kq/Screenshot-from-2022-02-16-16-20-33.png)
 
 ### App and vehicle logs
@@ -101,6 +103,20 @@ All values, frame ids and payloads are loaded from a .csv file.
 The current parameter is displayed in red and can be toggled with the "A" button. Pressing "X" changes the current value. The "Y" button confirms the change and sends a frame with corresponing id and payload. If the driver switches to another parameter or the window is closed before confirming the change, the settings' values are reset to display accurate data.
 
 ![Driving parameters selection](https://i.ibb.co/GCKG50j/Screenshot-from-2022-02-17-10-30-38.png)
+
+### Driving parameters change confirmation window
+
+If the driver changes the value of one of the steering wheel dials, this window will appear. It will load all parameters from a .xml file:
+- the description of setting changed
+- the id of the confirmation frame
+
+This type of frames has a new type "03:Confirmation".
+
+The payload of these frames is treated as a new value of the setting and is set to the outgoing frame.
+
+If the driver accepts or rejects the change, this window is closed immediately.
+
+If a frame could not be sent, this window stays open for as long as the driver rejects the change or the frame is finally sent.
 
 ##### Complete windows' schematic
 
