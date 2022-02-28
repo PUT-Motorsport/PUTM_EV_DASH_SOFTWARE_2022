@@ -1,9 +1,9 @@
 #include "changeconfirm.h"
 #include "ui_changeconfirm.h"
 
-ChangeConfirm::ChangeConfirm(CanHandler * can, QWidget *parent) :
+ChangeConfirm::ChangeConfirm(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::ChangeConfirm), can(can)
+    ui(new Ui::ChangeConfirm)
 {
     ui->setupUi(this);
 }
@@ -35,13 +35,13 @@ void ChangeConfirm::navigate(Navigation pressed)
     frame.setFrameId(data.attribute("sendID").toInt(&conversion, 16));
     if (not(conversion)) {
         raiseError("New frame parsing failed");
-        Logger::add("Outgoing frame id parsing failed", LogType::Critical);
+        logger.add("Outgoing frame id parsing failed", LogType::Critical);
     }
     QString payloadStr = QString::number(value.toInt(), 16);
     frame.setPayload(QByteArray::fromHex(payloadStr.toUtf8()));
     frame.setFrameType(QCanBusFrame::FrameType::DataFrame);
 
-    if (can->send(frame))
+    if (canHandler.send(frame))
         this->done(QDialog::Accepted);
     else {
         raiseError("NOT SENT");

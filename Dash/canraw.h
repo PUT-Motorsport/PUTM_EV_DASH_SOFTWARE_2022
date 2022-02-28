@@ -4,7 +4,6 @@
 #include <QDialog>
 #include <QTimer>
 #include "guicomponent.h"
-#include "logger.h"
 
 namespace Ui {
 class CanRaw;

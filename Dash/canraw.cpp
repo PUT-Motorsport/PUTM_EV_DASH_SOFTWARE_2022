@@ -42,10 +42,10 @@ void CanRaw::sniff()
         currentLines = 0;
     }
 
-    if (newLine == Logger::canLine)
+    if (newLine == logger.canLine)
         return;
 
-    newLine = Logger::canLine;      //FIXME: Probably not the cleanest way to do it
+    newLine = logger.canLine;      //FIXME: Probably not the cleanest way to do it
     ui->textLogs->append(newLine);
     currentLines++;
 }

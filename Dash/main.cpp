@@ -1,7 +1,10 @@
-#include "mainwindow.h" //remove later
-
+#include "mainwindow.h"
+#include "logger.h"
 #include <QApplication>
 #include <QFile>
+
+Logger logger;
+CanHandler canHandler;
 
 int main(int argc, char *argv[])
 {

@@ -17,7 +17,7 @@ class ChangeConfirm : public QDialog, public GUIComponent
     Q_OBJECT
 
 public:
-    explicit ChangeConfirm(CanHandler * can, QWidget *parent = nullptr);
+    explicit ChangeConfirm(QWidget *parent = nullptr);
     ~ChangeConfirm();
     void toConfirm(QDomElement const &data, QString const &value);
     void navigate(Navigation pressed) override;
@@ -26,7 +26,6 @@ public:
 private:
     Ui::ChangeConfirm *ui;
     QDomElement data;
-    CanHandler * can;
     QString value;
 };
 

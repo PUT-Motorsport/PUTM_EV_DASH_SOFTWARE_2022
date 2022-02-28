@@ -8,22 +8,19 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    Logger::open();
-
-    canHandler = new CanHandler();
-    if (canHandler->connect())
+    if (canHandler.connect())
         ui->can->setText("CAN Connected");
     else
         ui->can->setText("CAN error");
 
-    QObject::connect(canHandler, &CanHandler::raiseError, this, &MainWindow::raiseError);
-    QObject::connect(canHandler, &CanHandler::updateGUI, this, &MainWindow::updateData);
-    QObject::connect(canHandler, &CanHandler::navigation, this, &MainWindow::navigate);
-    QObject::connect(canHandler, &CanHandler::getConfirmation, this, &MainWindow::getConfirmation);
+    QObject::connect(&canHandler, &CanHandler::raiseError, this, &MainWindow::raiseError);
+    QObject::connect(&canHandler, &CanHandler::updateGUI, this, &MainWindow::updateData);
+    QObject::connect(&canHandler, &CanHandler::navigation, this, &MainWindow::navigate);
+    QObject::connect(&canHandler, &CanHandler::getConfirmation, this, &MainWindow::getConfirmation);
 
-    dvSelect = new DvSelect(canHandler);        //needs to send frames
-    serviceMode = new ServiceMode(canHandler);
-    changeConfirm = new ChangeConfirm(canHandler);
+    dvSelect = new DvSelect();
+    serviceMode = new ServiceMode();
+    changeConfirm = new ChangeConfirm();
 
     QObject::connect(dvSelect, &DvSelect::finished, this, &MainWindow::reopen);
     QObject::connect(serviceMode, &ServiceMode::finished, this, &MainWindow::reopen);
@@ -40,10 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    Logger::close();
-
     delete ui;
-    delete canHandler;
     delete dvSelect;
     delete serviceMode;
     delete elapsedTimer;
@@ -144,7 +138,7 @@ void MainWindow::reopen()
 void MainWindow::updateBestTime()
 {
     QTime time = QTime::fromMSecsSinceStartOfDay(elapsedTimer->elapsed());
-    Logger::add("Finished a lap in " + time.toString("hh:mm:ss:zzz"));
+    logger.add("Finished a lap in " + time.toString("hh:mm:ss:zzz"));
     if (best == QTime(0,0,0) or best > time) {
         best = time;
     }

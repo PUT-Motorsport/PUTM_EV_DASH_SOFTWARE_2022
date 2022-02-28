@@ -7,8 +7,6 @@
 #include <QDomDocument>
 #include <QTimer>
 
-#include "logger.h"
-
 #include "guicomponent.h"
 #include "canhandler.h"
 
@@ -21,7 +19,7 @@ class DvSelect : public QDialog, public GUIComponent
     Q_OBJECT
 
 public:
-    explicit DvSelect(CanHandler * can, QWidget *parent = nullptr);
+    explicit DvSelect(QWidget *parent = nullptr);
     ~DvSelect();
 
     void navigate(Navigation pressed) override;
@@ -38,7 +36,6 @@ private:
     int missionCount;
     int currentMission;
 
-    CanHandler * can;
 };
 
 #endif // DVSELECT_H

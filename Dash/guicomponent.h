@@ -2,6 +2,10 @@
 #define GUICOMPONENT_H
 
 #include "vehicle.h"
+#include "logger.h"
+#include "canhandler.h"
+extern Logger logger;
+extern CanHandler canHandler;
 
 class GUIComponent
 {

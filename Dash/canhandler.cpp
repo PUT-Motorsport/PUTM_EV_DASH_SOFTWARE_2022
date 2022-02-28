@@ -1,11 +1,18 @@
 #include "canhandler.h"
 
 CanHandler::CanHandler(QObject *parent)
-    : QObject{parent}
+    : QObject{parent}, heartbeatTimer(new QTimer())
 {
     if (!QCanBus::instance()->plugins().contains("socketcan"))
-        Logger::add("Cansockets plugin missing", LogType::AppError);
-    Logger::loadXML(frameParserInfo, xmlFile);
+        ::logger.add("Cansockets plugin missing", LogType::AppError);
+    logger.loadXML(frameParserInfo, xmlFile);
+
+}
+
+CanHandler::~CanHandler()
+{
+    delete heartbeatTimer;
+    delete canDevice;
 }
 
 bool CanHandler::connect()
@@ -14,29 +21,34 @@ bool CanHandler::connect()
     canDevice = QCanBus::instance()->createDevice(QStringLiteral("socketcan"),
                                                   QStringLiteral("vcan0"), &errorString);   //remember to change before building for pi
     if (!canDevice) {
-        Logger::add("Can Device creation failed: " + errorString, LogType::Critical);
+        logger.add("Can Device creation failed: " + errorString, LogType::Critical);
         return false;
     }
     if (!canDevice->connectDevice()) {
-        Logger::add("Can Device created, but failed to connect", LogType::Critical);
+        logger.add("Can Device created, but failed to connect", LogType::Critical);
         return false;
     }
     else
-        Logger::add("Can Device created successfully");
+        logger.add("Can Device created successfully");
     QObject::connect(canDevice, &QCanBusDevice::framesReceived, this, &CanHandler::onCanFrameReceived);
     QObject::connect(canDevice, &QCanBusDevice::errorOccurred, this, &CanHandler::onCanErrorOcurred);
+
+    //start heartbeat timer
+    QObject::connect(heartbeatTimer, &QTimer::timeout, this, &CanHandler::heartbeat);
+    heartbeatTimer->start(1000 / heartbeatFrequency);
+
     return true;
 }
 
 bool CanHandler::send(QCanBusFrame const &toSend)
 {
     if (not(canDevice->state() == QCanBusDevice::CanBusDeviceState::ConnectedState)) {
-        Logger::add("Attempted to send a frame to can which isn't open", LogType::Critical);
+        logger.add("Attempted to send a frame to can which isn't open", LogType::Critical);
         emit raiseError("Can isn't open");
         return false;
     }
     if (not(canDevice->writeFrame(toSend))) {
-        Logger::add("CAN is connected, but failed to relay a message", LogType::Critical);
+        logger.add("CAN is connected, but failed to relay a message", LogType::Critical);
         emit raiseError("CAN connected, but failed to relay a message");
         return false;
     }
@@ -46,7 +58,7 @@ bool CanHandler::send(QCanBusFrame const &toSend)
 void CanHandler::onCanFrameReceived()
 {
     QCanBusFrame newFrame = canDevice->readFrame();
-    Logger::addCAN(newFrame.toString());
+    logger.addCAN(newFrame.toString());
     //first phase of parsing, looking for correct handoff
     int frameID = newFrame.frameId();
     QDomNode currentSearch = frameParserInfo.firstChild();
@@ -57,7 +69,7 @@ void CanHandler::onCanFrameReceived()
         currentSearch = currentSearch.nextSibling();
    }
     if (currentSearch.isNull()) {
-        Logger::add("Search failed: no frame with corresponding ID", LogType::AppError);
+        logger.add("Search failed: no frame with corresponding ID", LogType::AppError);
         return;
     }
     QDomElement passableElement = currentSearch.toElement();
@@ -76,7 +88,7 @@ void CanHandler::onCanFrameReceived()
         parseConfirmation(newFrame, passableElement);
         break;
     default:
-        Logger::add("Parser failure: Wrong argument", LogType::AppError);
+        logger.add("Parser failure: Wrong argument", LogType::AppError);
     }
 }
 
@@ -85,14 +97,27 @@ void CanHandler::onCanErrorOcurred()
     emit raiseError("Can bus error");
 }
 
+void CanHandler::heartbeat()
+{
+    QCanBusFrame frame;
+    frame.setFrameType(QCanBusFrame::FrameType::DataFrame);
+    frame.setFrameId(heartbeatID);
+    if (heartbeatType == HeartbeatType::Normal)
+        frame.setPayload(QByteArray("12345"));
+    else
+        frame.setPayload(QByteArray("54321"));
+    if (not(canDevice->writeFrame(frame)))
+            logger.add("Heartbeat failed", LogType::AppError);
+}
+
 void CanHandler::parseError(QCanBusFrame const &toParse, QDomElement const &parserInfo)
 {
     QString errorDesc = parserInfo.attribute("logger");
     int errorCode = frameValue(toParse.payload());
     if (errorDesc != "")
-        Logger::add(QString::number(errorCode) + errorDesc, LogType::Error);
+        logger.add(QString::number(errorCode) + errorDesc, LogType::Error);
     else
-        Logger::add("Unknown error, ref number " + QString::number(errorCode), LogType::Critical);
+        logger.add("Unknown error, ref number " + QString::number(errorCode), LogType::Critical);
     emit raiseError(errorDesc, errorCode);
 }
 
@@ -108,7 +133,7 @@ void CanHandler::parseUpdate(QCanBusFrame const &toParse, QDomElement const &par
     Parameter updated = static_cast<Parameter>(parserInfo.attribute("parameter").split(":").at(0).toInt());
     QString logInfo = parserInfo.attribute("logger");
     if (logInfo != "") {
-        Logger::add(logInfo);
+        logger.add(logInfo);
     }
     qreal newValue = frameValue(toParse.payload());
     emit updateGUI(updated, newValue);

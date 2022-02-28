@@ -9,7 +9,6 @@
 
 #include "canhandler.h"
 #include "vehicle.h"
-#include "logger.h"
 #include "dvselect.h"
 #include "servicemode.h"
 #include "changeconfirm.h"
@@ -50,7 +49,6 @@ private:
 
     Ui::MainWindow *ui;
 
-    CanHandler * canHandler;
     DvSelect * dvSelect;
     ServiceMode * serviceMode;
 

@@ -32,6 +32,17 @@ void Logs::raiseError(const QString &errorMessage, int errorCode)
 
 void Logs::startSniffing()
 {
+    logger.forceFlush();
+    QFile log("log.txt");
+    if (not(log.open(QIODevice::ReadOnly | QIODevice::Text)))
+            qDebug() << "Failed to open log as read only";
+    qDebug() << "Lines: " << logger.logLinesCount;
+    if ((logger.logLinesCount - 10) > 0)
+        log.seek(logger.logLinesCount - 10);
+    while (not(log.atEnd())) {
+        qDebug() << "Appended";
+        ui->textLogs->append(log.readLine().split('\n').at(0));
+    }
     refreshTimer->start(refreshTime);
 }
 
@@ -41,9 +52,9 @@ void Logs::sniff()
         currentLines = 0;
         ui->textLogs->setText("");
     }
-    if (newLine == Logger::logLine)
+    if (newLine == logger.logLine)
         return;
-    newLine = Logger::logLine;
+    newLine = logger.logLine;
     ui->textLogs->append(newLine);
     currentLines++;
 }

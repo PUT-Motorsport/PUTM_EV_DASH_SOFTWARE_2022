@@ -1,12 +1,12 @@
 #include "servicemode.h"
 #include "ui_servicemode.h"
 
-ServiceMode::ServiceMode(CanHandler * can, QWidget *parent) :
+ServiceMode::ServiceMode(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ServiceMode), subwindowShown(nullptr)
 {
     ui->setupUi(this);
-    driving = new DrivingSelect(can);
+    driving = new DrivingSelect();
     canRaw = new CanRaw();
     logs = new Logs();
 
@@ -52,7 +52,7 @@ void ServiceMode::updateData(Parameter param, qreal value)
         ui->invertertemp->setText("Inverter: " + valueStr + " °C");
         break;
     default:
-        Logger::add("Service mode received a wrong argument.");
+        logger.add("Service mode received a wrong argument.");
     }
 }
 

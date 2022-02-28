@@ -10,24 +10,26 @@ enum class LogType {Error, Critical, AppError, Normal};
 
 class Logger {
 public:
-    static void loadXML(QDomElement &target, QString const &fileName);
+    Logger();
+    ~Logger();
+    void forceFlush();
+    void loadXML(QDomElement &target, QString const &fileName);
+    void open();
+    void add(QString const &message, LogType type = LogType::Normal);    //should this class be a singleton?
+    void addCAN(QString canFrame);
 
-    static void open();
-    static void add(QString const &message, LogType type = LogType::Normal);    //should this class be a singleton?
-    static void addCAN(QString canFrame);
-    static void close();
-
-    static QString logLine; //for loading lines from external functions
-    static QString canLine;
+    QString logLine; //for loading lines from external functions
+    QString canLine;
+    unsigned int logLinesCount;
 private:
-    static QString const canLogName;
-    static QString const logName;
+    QString const canLogName;
+    QString const logName;
 
-    static QFile canLog;
-    static QFile log;
+    QFile canLog;
+    QFile log;
 
-    static QTextStream canStream;
-    static QTextStream logStream;
+    QTextStream canStream;
+    QTextStream logStream;
 };
 
 #endif // LOGGER_H

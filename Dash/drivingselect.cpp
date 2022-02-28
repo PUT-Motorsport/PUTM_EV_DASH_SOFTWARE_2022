@@ -1,9 +1,9 @@
 #include "drivingselect.h"
 #include "ui_drivingselect.h"
 
-DrivingSelect::DrivingSelect(CanHandler * can, QWidget *parent) :
+DrivingSelect::DrivingSelect(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::DrivingSelect), current(Setting::Regain), can(can), valuesFile("../ProgramData/settings.csv")
+    ui(new Ui::DrivingSelect), current(Setting::Regain), valuesFile("../ProgramData/settings.csv")
 {
     ui->setupUi(this);
     ui->regain->setStyleSheet("color: red;");
@@ -85,7 +85,7 @@ void DrivingSelect::changeHighlight()
         ui->regainValue->setStyleSheet(red);
         break;
     default:
-        Logger::add("changeHighlight received a wrong argument");
+        logger.add("changeHighlight received a wrong argument");
     }
 }
 
@@ -127,7 +127,7 @@ void DrivingSelect::sendCANFrame()
         return;
     }
     qDebug() << "Payload " << payloadString;
-    if (not(can->send(frame))) {
+    if (not(canHandler.send(frame))) {
         resetToCurrent();
     }
     else {
@@ -171,14 +171,14 @@ void DrivingSelect::changeValue()
         changeAppsCurve();
         break; //TODO after curve graphics are created
     default:
-        Logger::add("Driving Select changeValue() error", LogType::AppError);
+        logger.add("Driving Select changeValue() error", LogType::AppError);
     }
 }
 
 void DrivingSelect::loadSettings()
 {
     if (not(valuesFile.open(QIODevice::ReadOnly))) {
-        Logger::add(valuesFile.errorString(), LogType::AppError);
+        logger.add(valuesFile.errorString(), LogType::AppError);
         return;
     }
     QRegularExpression spliter(",|\n");

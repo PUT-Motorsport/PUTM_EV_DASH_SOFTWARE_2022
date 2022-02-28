@@ -21,7 +21,7 @@ class DrivingSelect : public QDialog, public GUIComponent
     Q_OBJECT
 
 public:
-    explicit DrivingSelect(CanHandler * can, QWidget *parent = nullptr);
+    explicit DrivingSelect(QWidget *parent = nullptr);
     ~DrivingSelect();
     void navigate(Navigation pressed) override;
     void raiseError(QString const &errorMessage, int errorCode = -1) override;
@@ -36,7 +36,6 @@ private:
 
     Ui::DrivingSelect *ui;
     Setting current;
-    CanHandler * can;
     QFile valuesFile;
 
     QStringList regainValues;

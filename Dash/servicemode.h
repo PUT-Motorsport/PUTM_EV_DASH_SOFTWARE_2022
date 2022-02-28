@@ -22,7 +22,7 @@ class ServiceMode : public QDialog, public GUIComponent
     Q_OBJECT
 
 public:
-    explicit ServiceMode(CanHandler * can, QWidget *parent = nullptr);
+    explicit ServiceMode(QWidget *parent = nullptr);
     ~ServiceMode();
     void updateData(Parameter param, qreal value);
     void navigate(Navigation pressed) override;

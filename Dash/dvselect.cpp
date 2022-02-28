@@ -1,12 +1,12 @@
 #include "dvselect.h"
 #include "ui_dvselect.h"
 
-DvSelect::DvSelect(CanHandler * can, QWidget *parent) :
+DvSelect::DvSelect(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::DvSelect), missionCount(0), currentMission(0), can(can)
+    ui(new Ui::DvSelect), missionCount(0), currentMission(0)
 {
     ui->setupUi(this);
-    Logger::loadXML(missionsFile, pathToXML);
+    logger.loadXML(missionsFile, pathToXML);
     //load mission names
     QDomNode iterator = missionsFile.firstChild();
     while (not(iterator.isNull())) {
@@ -76,7 +76,7 @@ void DvSelect::sendCANframe()
     }
     if (iterator.isNull()) {
         raiseError("File Error");
-        Logger::add("File error while sending dv can frame", LogType::Error);
+        logger.add("File error while sending dv can frame", LogType::Error);
         return;
     }
     QDomElement element = iterator.toElement();
@@ -85,7 +85,7 @@ void DvSelect::sendCANframe()
         frameID = element.attribute("frameID").toInt();
     else {
         raiseError("Can Sender Error");  //inform the user live
-        Logger::add("Can dv frame couldn't be sent", LogType::Error);
+        logger.add("Can dv frame couldn't be sent", LogType::Error);
         return;
     }
     QString payloadStr = element.attribute("framePayload");
@@ -94,17 +94,15 @@ void DvSelect::sendCANframe()
     canFrame.setPayload(QByteArray::fromHex(payloadStr.toUtf8()));
     canFrame.setFrameType(QCanBusFrame::FrameType::DataFrame);
 
-    if (can->send(canFrame)) {
-        Logger::add("Sent dv can frame " + element.attribute("description"));
+    if (canHandler.send(canFrame)) {
+        logger.add("Sent dv can frame " + element.attribute("description"));
+        canHandler.setHeartbeat(HeartbeatType::Driverless);
         ui->sent->setText("Sent!");
-        QTimer::singleShot(1000, [this] () {
-                ui->sent->setText("");
-            });
     }
     else {
         ui->sent->setText("NOT Sent!");
-        QTimer::singleShot(1000, [this] () {
-                ui->sent->setText("");
-            });
     }
+    QTimer::singleShot(1000, [this] () {
+            ui->sent->setText("");
+        });
 }

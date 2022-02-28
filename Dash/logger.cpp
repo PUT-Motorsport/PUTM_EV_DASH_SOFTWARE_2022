@@ -1,54 +1,62 @@
 #include "logger.h"
 
-QString const Logger::canLogName = QStringLiteral("can.txt");   //TODO: Move to a different subdirectory
-QString const Logger::logName = QStringLiteral("log.txt");
+Logger::Logger(): canLogName("can.txt"), logName("log.txt")
+{
+    open();
+    add("Started at " + QTime().currentTime().toString());
+    addCAN("Started at " + QTime().currentTime().toString());
+}
 
-QString Logger::logLine;
-QString Logger::canLine;
+Logger::~Logger()
+{
+    qDebug() << "Logger file closed";
+    canLog.rename(QTime().currentTime().toString() + "-can.txt");
+    log.rename(QTime().currentTime().toString() + "-log.txt");
+    canLog.close();
+    log.close();
+}
 
-QFile Logger::canLog;
-QFile Logger::log;
-QTextStream Logger::canStream;
-QTextStream Logger::logStream;
+void Logger::forceFlush()
+{
+    log.close();
+    if (not(log.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)))
+        qDebug() << "Failed to open log file";
+    logStream.setDevice(&log);
+}
 
 void Logger::loadXML(QDomElement &target, QString const &fileName)
 {
     QDomDocument xmlDocument("xmlDocument");
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly)) {
-        Logger::add("XML file could not be opened", LogType::AppError);
+        add("XML file could not be opened", LogType::AppError);
         return;
     }
     if (!xmlDocument.setContent(&file)) {
-        Logger::add("XML file opened, but internal parsing failed", LogType::AppError);
+        add("XML file opened, but internal parsing failed", LogType::AppError);
         file.close();
         return;
     }
     file.close();   //file loaded and can be closed
-    Logger::add("xml File loaded.");
+    add("xml File loaded.");
     target = xmlDocument.documentElement();
 
 }
 
 void Logger::open()
 {
-    qDebug() << "Logger file created";
 
-    Logger::canLog.setFileName(canLogName);
+    canLog.setFileName(canLogName);
 
-    if (not(Logger::canLog.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)))
+    if (not(canLog.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)))
         qDebug() << "Failed to open can log file";
-    Logger::canStream.setDevice(&Logger::canLog);
+    canStream.setDevice(&canLog);
 
-    log.setFileName(Logger::logName);
+    log.setFileName(logName);
 
     if (not(log.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)))
         qDebug() << "Failed to open log file";
     logStream.setDevice(&log);
-
-    QString header = "...System started at: " + QTime().currentTime().toString() + "...";
-    logStream << header;
-    canStream << header;
 }
 
 void Logger::add(const QString &message, LogType type)
@@ -70,6 +78,7 @@ void Logger::add(const QString &message, LogType type)
     logLine += message;
     qDebug() << logLine;
     logStream << logLine << '\n';
+    logLinesCount++;
 }
 
 void Logger::addCAN(QString canFrame)
@@ -77,13 +86,4 @@ void Logger::addCAN(QString canFrame)
     canLine = QTime().currentTime().toString() + ' ' + canFrame;
     qDebug() << canLine;
     canStream << canLine + '\n';
-}
-
-void Logger::close()
-{
-    qDebug() << "Logger file closed";
-    canLog.rename(QTime().currentTime().toString() + "-can.txt");
-    log.rename(QTime().currentTime().toString() + "-log.txt");
-    canLog.close();
-    log.close();
 }
