@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <chrono>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , subwindowShown(nullptr), interruptSubwindowShown(nullptr), m_speed(0),
@@ -33,6 +35,17 @@ MainWindow::MainWindow(QWidget *parent)
         ui->currentTime->setText(time.toString("hh:mm:ss:zzz"));
     });
     best.setHMS(0,0,0);
+
+#if 1
+    auto start = std::chrono::high_resolution_clock::now();
+    for (std::size_t iter = 0; iter < 300000; iter++) {
+        canHandler.onCanFrameReceived();
+    }
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+
+    qDebug() << duration.count() << Qt::endl;
+#endif
 }
 
 MainWindow::~MainWindow()

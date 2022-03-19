@@ -34,8 +34,8 @@ bool CanHandler::connect()
     QObject::connect(canDevice, &QCanBusDevice::errorOccurred, this, &CanHandler::onCanErrorOcurred);
 
     //start heartbeat timer
-    QObject::connect(heartbeatTimer, &QTimer::timeout, this, &CanHandler::heartbeat);
-    heartbeatTimer->start(1000 / heartbeatFrequency);
+//    QObject::connect(heartbeatTimer, &QTimer::timeout, this, &CanHandler::heartbeat);
+//    heartbeatTimer->start(1000 / heartbeatFrequency);
 
     return true;
 }
@@ -57,7 +57,30 @@ bool CanHandler::send(QCanBusFrame const &toSend)
 
 void CanHandler::onCanFrameReceived()
 {
+#if 0
     QCanBusFrame newFrame = canDevice->readFrame();
+#else
+    QCanBusFrame newFrame;
+    static int call;
+    switch (call % 3) {
+    case 0:
+        newFrame.setFrameId(1 + call % 5);
+        newFrame.setPayload(QByteArray("12"));
+        break;
+    case 1:
+        newFrame.setFrameId(0x100);
+        newFrame.setPayload(QByteArray("12"));
+        break;
+    case 2:
+        newFrame.setFrameId(0x200);
+        newFrame.setPayload(QByteArray(1, static_cast<char>(1)));
+        break;
+    default:
+        qDebug() << "Cos nie dziala";
+    }
+    call++;
+
+#endif
     logger.addCAN(newFrame.toString());
     //first phase of parsing, looking for correct handoff
     int frameID = newFrame.frameId();

@@ -76,7 +76,7 @@ void Logger::add(const QString &message, LogType type)
         break;
     }
     logLine += message;
-    qDebug() << logLine;
+//    qDebug() << logLine;
     logStream << logLine << '\n';
     logLinesCount++;
 }
@@ -84,6 +84,6 @@ void Logger::add(const QString &message, LogType type)
 void Logger::addCAN(QString canFrame)
 {
     canLine = QTime().currentTime().toString() + ' ' + canFrame;
-    qDebug() << canLine;
+//    qDebug() << canLine;
     canStream << canLine + '\n';
 }

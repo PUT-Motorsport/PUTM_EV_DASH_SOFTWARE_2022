@@ -33,13 +33,12 @@ signals:
     void navigation(Navigation pressed);
     void getConfirmation(QDomElement const &data, QString value);
 
-private slots:
+public slots:       //revert after testing
 
     void onCanFrameReceived();
     void onCanErrorOcurred();   //TODO: handling of can errors
 
 private:
-
     HeartbeatType heartbeatType;
     void heartbeat();
     QTimer *heartbeatTimer;
