@@ -8,15 +8,10 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    if (canHandler.connect())
+    if (canHandler.connected())
         ui->can->setText("CAN Connected");
     else
         ui->can->setText("CAN error");
-
-    QObject::connect(&canHandler, &CanHandler::raiseError, this, &MainWindow::raiseError);
-    QObject::connect(&canHandler, &CanHandler::updateGUI, this, &MainWindow::updateData);
-    QObject::connect(&canHandler, &CanHandler::navigation, this, &MainWindow::navigate);
-    QObject::connect(&canHandler, &CanHandler::getConfirmation, this, &MainWindow::getConfirmation);
 
     dvSelect = new DvSelect();
     serviceMode = new ServiceMode();

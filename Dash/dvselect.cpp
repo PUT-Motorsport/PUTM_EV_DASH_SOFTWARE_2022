@@ -96,7 +96,7 @@ void DvSelect::sendCANframe()
 
     if (canHandler.send(canFrame)) {
         logger.add("Sent dv can frame " + element.attribute("description"));
-        canHandler.setHeartbeat(HeartbeatType::Driverless);
+        canHandler.setHeartbeat(Dash_states::Driverless);
         ui->sent->setText("Sent!");
     }
     else {

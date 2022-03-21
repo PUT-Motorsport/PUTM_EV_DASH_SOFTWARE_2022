@@ -15,6 +15,7 @@ SOURCES += \
     changeconfirm.cpp \
     drivingselect.cpp \
     dvselect.cpp \
+    guihandler.cpp \
     logger.cpp \
     logs.cpp \
     main.cpp \
@@ -22,12 +23,18 @@ SOURCES += \
     servicemode.cpp
 
 HEADERS += \
+    CanHeaders/PM08-CANBUS-APPS.hpp \
+    CanHeaders/PM08-CANBUS-BMSLV.hpp \
+    CanHeaders/PM08-CANBUS-DASH.hpp \
+    CanHeaders/PM08-CANBUS-LAPTIMER.hpp \
+    CanHeaders/PM08-CANBUS-TC.hpp \
     canhandler.h \
     canraw.h \
     changeconfirm.h \
     drivingselect.h \
     dvselect.h \
     guicomponent.h \
+    guihandler.h \
     logger.h \
     logs.h \
     mainwindow.h \

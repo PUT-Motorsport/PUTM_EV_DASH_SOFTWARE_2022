@@ -27,7 +27,7 @@ void ServiceMode::updateData(Parameter param, qreal value)
 {
     QString valueStr = QString::number(value);
     switch(param) {
-    case Parameter::APPS:
+    case Parameter::Apps:
         ui->apps->setText("APPS Value: " + valueStr + '%');
         break;
     case Parameter::BmshvTemp:
