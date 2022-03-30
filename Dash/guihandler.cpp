@@ -1,12 +1,13 @@
 #include "guihandler.h"
 
-GUIHandler::GUIHandler(): mainWindow(), canData(canHandler.getCanData()),
+using json = nlohmann::json;
+
+GUIHandler::GUIHandler(): mainWindow(), asyncCanData(canHandler.getCanData()),
     updateTimer(new QTimer())
 {
     canHandler.connect();
 
-    //will be used to control gui updates from another thread
-    QObject::connect(updateTimer, &QTimer::timeout, this, &GUIHandler::update);
+    QObject::connect(updateTimer, &QTimer::timeout, this, &GUIHandler::startAsync);
     updateTimer->start(1000 / frequency);
     mainWindow.show();
 }
@@ -16,23 +17,55 @@ GUIHandler::~GUIHandler()
     delete updateTimer;
 }
 
-void GUIHandler::update()
+void GUIHandler::updateGUI()
 {
-    canData.canDataMtx.lock();
-//    CanData canDataCopy = canData;  //fixme: add constructor
-    canData.canDataMtx.unlock();
+    asyncCanData.mtx.lock();
+    canData = static_cast<CanData>(asyncCanData);    //casting to parent because mutexes can't be copied
+    asyncCanData.mtx.unlock();
 
-    if (canData.apps_main.data.device_state not_eq Apps_states::Normal_operation)
-        handleError();
-    if (canData.bms_lv_main.data.device_state not_eq BMS_LV_states::Normal)
-        handleError();
-    if (canData.ts_main.data.device_state not_eq TS_states::OK)
-        handleError();
-    //all devices
-    mainWindow.updateData(Parameter::Speed, canData.ts_main.data.vehicle_speed);    //fixme: better way to access all data
+    checkErrors();
+    getUpdates();
+
 }
 
-void GUIHandler::handleError()
+void GUIHandler::checkErrors()
+{
+    for (auto const device: canData.frameArray) {
+        const uint8_t  * const state = reinterpret_cast<uint8_t *>(device->dataPtr) +
+                device->dlc - sizeof(uint8_t);
+        if (*state not_eq 0)
+            mainWindow.raiseError(QString::fromStdString(device->name) + " error");
+    }
+}
+
+void GUIHandler::getUpdates()
+{
+    //TS
+    mainWindow.updateData(Parameter::Speed, canData.ts_main.data.vehicle_speed);
+    mainWindow.updateData(Parameter::CoolantTemp, canData.ts_main.data.vehicle_speed);
+    //BMS LV
+    mainWindow.updateData(Parameter::SOC, canData.bms_lv_main.data.soc);
+    mainWindow.updateData(Parameter::BmslvTemp, canData.bms_lv_main.data.temp_avg);
+    mainWindow.updateData(Parameter::BmslvVoltage, canData.bms_lv_main.data.voltage_sum);
+
+    //...
+}
+
+void GUIHandler::getNavigation()
 {
     return;
+}
+
+void GUIHandler::generateJSON()
+{
+//todo
+    return;
+}
+
+void GUIHandler::startAsync()
+{
+    //todo
+
+//    QThread thread(&GUIHandler::updateGUI);
+//    th.detach();
 }

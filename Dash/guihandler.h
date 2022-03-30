@@ -3,8 +3,8 @@
 #include "vehicle.h"
 #include "canhandler.h"
 #include "mainwindow.h"
-#include <QTimer>
-#include <QObject>
+#include "lib/json.hpp"
+#include <QThread>
 
 class GUIHandler: public QObject
 {
@@ -12,14 +12,20 @@ class GUIHandler: public QObject
 public:
     GUIHandler();
     ~GUIHandler();
-private slots:
-    void update();
-
 private:
-    void handleError();
+    void updateGUI();
+
+    void checkErrors();
+    void getUpdates();
+    void getNavigation();
+
+    void generateJSON();
+
+    void startAsync();
 
     MainWindow mainWindow;
-    CanData const &canData;
+    AsyncCanData const &asyncCanData;
+    CanData canData;
     QTimer * updateTimer;
     static constexpr int frequency = 30;
 };

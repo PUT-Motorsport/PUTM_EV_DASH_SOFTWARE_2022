@@ -9,7 +9,7 @@ QLabel {
 }
 
 QProgressBar {
-    background-color: #009fb7;
+    background-color: white;
     color: #272727;
     text-align: center;
 }

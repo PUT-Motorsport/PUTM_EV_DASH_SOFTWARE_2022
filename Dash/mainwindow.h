@@ -29,7 +29,7 @@ public:
     GUIComponent * interruptSubwindowShown;     //allows to store previously open window if change confirmation "interrupts"
 public slots:
     void updateData(Parameter param, qreal value);
-    void raiseError(QString const &errorMessage, int errorCode = -1);
+    void raiseError(QString const &errorMessage, int errorCode = -1);       //TODO: remove error codes functionality
     void navigate(Navigation pressed);
     void getConfirmation(QDomElement const &data, QString value);
 

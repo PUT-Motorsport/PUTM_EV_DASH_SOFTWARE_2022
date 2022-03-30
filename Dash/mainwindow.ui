@@ -30,6 +30,7 @@
     </property>
     <property name="font">
      <font>
+      <family>URW Gothic</family>
       <pointsize>26</pointsize>
      </font>
     </property>
@@ -57,6 +58,7 @@
     </property>
     <property name="font">
      <font>
+      <family>URW Gothic</family>
       <pointsize>116</pointsize>
      </font>
     </property>
@@ -78,6 +80,7 @@
     </property>
     <property name="font">
      <font>
+      <family>URW Gothic</family>
       <pointsize>45</pointsize>
      </font>
     </property>
@@ -99,11 +102,15 @@
     </property>
     <property name="font">
      <font>
+      <family>URW Gothic</family>
       <pointsize>34</pointsize>
      </font>
     </property>
     <property name="text">
-     <string>SOC: n/a%</string>
+     <string>n/a%</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
    <widget class="QLabel" name="temperature">
@@ -117,14 +124,15 @@
     </property>
     <property name="font">
      <font>
+      <family>URW Gothic</family>
       <pointsize>34</pointsize>
      </font>
     </property>
     <property name="text">
-     <string>Temp: n/a °C</string>
+     <string>n/a °C</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
    <widget class="QLabel" name="labelCurrent">
@@ -138,6 +146,7 @@
     </property>
     <property name="font">
      <font>
+      <family>URW Gothic</family>
       <pointsize>26</pointsize>
      </font>
     </property>
@@ -156,6 +165,7 @@
     </property>
     <property name="font">
      <font>
+      <family>URW Gothic</family>
       <pointsize>41</pointsize>
      </font>
     </property>
@@ -174,6 +184,7 @@
     </property>
     <property name="font">
      <font>
+      <family>URW Gothic</family>
       <pointsize>41</pointsize>
      </font>
     </property>
@@ -192,6 +203,7 @@
     </property>
     <property name="font">
      <font>
+      <family>URW Gothic</family>
       <pointsize>26</pointsize>
      </font>
     </property>
@@ -210,6 +222,7 @@
     </property>
     <property name="font">
      <font>
+      <family>URW Gothic</family>
       <pointsize>26</pointsize>
      </font>
     </property>
@@ -217,7 +230,7 @@
      <string>Waiting for CAN</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
    <widget class="QLabel" name="errorCounter">
@@ -231,6 +244,7 @@
     </property>
     <property name="font">
      <font>
+      <family>URW Gothic</family>
       <pointsize>26</pointsize>
      </font>
     </property>
@@ -252,11 +266,12 @@
     </property>
     <property name="font">
      <font>
+      <family>URW Gothic</family>
       <pointsize>34</pointsize>
      </font>
     </property>
     <property name="text">
-     <string>Power: n/a kW</string>
+     <string>n/a kW</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -273,6 +288,7 @@
     </property>
     <property name="font">
      <font>
+      <family>URW Gothic</family>
       <pointsize>40</pointsize>
      </font>
     </property>

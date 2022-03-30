@@ -1,6 +1,8 @@
 QT       += core gui
 QT += xml
 QT += serialbus
+QT += concurrent
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
@@ -24,10 +26,14 @@ SOURCES += \
 
 HEADERS += \
     CanHeaders/PM08-CANBUS-APPS.hpp \
+    CanHeaders/PM08-CANBUS-AQCARD.hpp \
     CanHeaders/PM08-CANBUS-BMSLV.hpp \
     CanHeaders/PM08-CANBUS-DASH.hpp \
     CanHeaders/PM08-CANBUS-LAPTIMER.hpp \
+    CanHeaders/PM08-CANBUS-SF.hpp \
+    CanHeaders/PM08-CANBUS-STEERINGWHEEL.hpp \
     CanHeaders/PM08-CANBUS-TC.hpp \
+    CanHeaders/PM08-CANBUS-TELEMETRY.hpp \
     canhandler.h \
     canraw.h \
     changeconfirm.h \
@@ -35,6 +41,7 @@ HEADERS += \
     dvselect.h \
     guicomponent.h \
     guihandler.h \
+    lib/json.hpp \
     logger.h \
     logs.h \
     mainwindow.h \

@@ -8,12 +8,13 @@ Written in Qt 6.2.3 on Ubuntu 21, targeted for Raspberry Pi OS 11.
 
 ##### External dependencies
 
-The app uses an external library called `libsocketcan`, which can be installed in a `libsocketcan-dev` package.
-The app connects to the system CAN interface. A script will open the interface and launch the app on raspberry pi system startup.
+The app uses an external library `libsocketcan`, which can be installed in a `libsocketcan-dev` package.
+
+The app also uses the [Nlohmanns's json library](https://github.com/nlohmann/json). Licensed under MIT, available in the project files in \Dash\lib.
 
 ## CAN bus connection
 
-The app attempts to connect to the system CAN bus interface on startup. If the connection is successful, a `QObject connection` is created and a function `onFramesReceived()` is called every time a new frame is available. The frame is then parsed into one of three types: Update, Error and Navigation and a signal is sent to the GUI to inform about required changes. 
+The app attempts to connect to the system CAN bus interface on startup. If the connection is successful, a `QObject connection` is created and a function `onFramesReceived()` is called every time a new frame is available. *See concurrency diagram below*.
 
 ### Data logging
 
@@ -41,21 +42,7 @@ and has a lap timer. The timer starts automatically as soon as vehicle movement 
 
 From the main window, two additional subwindows can be opened: the driverless mission select window and the service mode window.
 
-![Main Window](https://i.ibb.co/T18HSnz/Screenshot-from-2022-02-14-14-29-39.png)
-
-### Driverless mission selection window
-
-The driverless mission selection window reads the missions' description, frame id and payload from a .xml file. All descriptions are then displayed and the driver can choose a mission using the "X" and "Y" buttons. Pressing "A" will accept a mission and a CAN frame with corresponding id and payload is relayed over the bus. A text "Sent!" will be displayed if the frame was sent successfully.
-
-![Driverless mission selection](https://i.ibb.co/pW8ZNhq/Screenshot-from-2022-02-14-14-30-48.png)
-
-##### Example xml file entry
-
-```xml
-<dvMissions>
-    <mission description="Mission 1" frameID="101" framePayload="0000"></mission>
-</dvMissions>
-```
+![Main Window](https://i.ibb.co/YLY0d7P/vision1.jpg)
 
 ### Service mode window
 
@@ -72,7 +59,22 @@ From the service mode window, the driver can access three additional windows:
 - App and vehicle log window
 - Driving parameters selection window
 
-![Service Mode](https://i.ibb.co/M9Fy0jH/Screenshot-from-2022-02-15-15-23-28.png)
+![Service Mode](https://i.ibb.co/yfw9P51/version2service.jpg)
+
+
+### Driverless mission selection window
+
+The driverless mission selection window reads the missions' description, frame id and payload from a .xml file. All descriptions are then displayed and the driver can choose a mission using the "X" and "Y" buttons. Pressing "A" will accept a mission and a CAN frame with corresponding id and payload is relayed over the bus. A text "Sent!" will be displayed if the frame was sent successfully.
+
+![Driverless mission selection](https://i.ibb.co/pW8ZNhq/Screenshot-from-2022-02-14-14-30-48.png)
+
+##### Example xml file entry
+
+```xml
+<dvMissions>
+    <mission description="Mission 1" frameID="101" framePayload="0000"></mission>
+</dvMissions>
+```
 
 ### Raw CAN data window
 
@@ -135,6 +137,12 @@ This design choice means that every window needs to exist at all times and be di
 
 This structure also means that some navigation data will need to be passed up to three times before affecting a window, but it allows for the navigation logic to be encapsulated within specific window (rather than having one class managing all windows and containing most of their logic). Moreover, it allows new features or windows to be added easily, as they contain their own logic.
 
-### Incoming frame handling algorithm  
-  
-![Incoming frame handling algorithm](https://i.ibb.co/XX954xT/frame-algorithm.jpg)
+### Incoming frame handling/Concurrent operation diagram
+
+![Diagram](https://i.ibb.co/0BG4SZD/Dash-Concurrency-Diagram-Page-1-drawio.png)  
+
+The shared memory is a collection of data structures present on the CAN bus. The main GUI thread reads from can and does a `memcpy` into the shared resources. (As a relatively low cost operation, it can be computed on the main GUI thread).
+
+Then, every screen refresh cycle, that data is being interpreted on a secondary thread.Parameters are updated, errors checked and navigation processed.
+
+Copies are made so that shared memory is locked for a short period of time (GUI calls take a long time to process). This way, if a 3rd process is needed (e.g. faster JSON updates), no major code changes are neccessary.

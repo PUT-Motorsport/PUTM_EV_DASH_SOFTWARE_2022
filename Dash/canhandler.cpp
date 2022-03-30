@@ -43,6 +43,8 @@ void CanHandler::onCanFrameReceived()
 {
     QCanBusFrame frame = canDevice->readFrame();
 
+    logger.addCAN(frame.toString());
+
     for (auto dev: canData.frameArray) {
         if (dev->id == frame.frameId()) {
             std::memcpy(dev->dataPtr, frame.payload().constData(), dev->dlc);

@@ -21,13 +21,13 @@ public:
     bool connected() { return m_connected; }
     bool send(QCanBusFrame const &toSend);
     void setHeartbeat(Dash_states newState) { heartBeatState = newState; }
-    CanData const & getCanData() { return canData; }
+    AsyncCanData const & getCanData() { return canData; }
 private slots:
     void onCanFrameReceived();
     void onCanErrorOcurred();
 private:
     QCanBusDevice *canDevice;
-    CanData canData;
+    AsyncCanData canData;
 
     bool m_connected;
 
