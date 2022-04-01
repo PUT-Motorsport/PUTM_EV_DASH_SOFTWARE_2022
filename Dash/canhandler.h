@@ -17,11 +17,16 @@ class CanHandler : public QObject{
 public:
     CanHandler(QObject *parent = nullptr);
     ~CanHandler();
+
     bool connect();
     bool connected() { return m_connected; }
+
     bool send(QCanBusFrame const &toSend);
     void setHeartbeat(Dash_states newState) { heartBeatState = newState; }
-    AsyncCanData const & getCanData() { return canData; }
+
+    AsyncCanData const &getCanData() { return canData; }
+    void startNewDataCycle();
+
 private slots:
     void onCanFrameReceived();
     void onCanErrorOcurred();

@@ -2,19 +2,31 @@
 
 using json = nlohmann::json;
 
-GUIHandler::GUIHandler(): mainWindow(), asyncCanData(canHandler.getCanData()),
-    updateTimer(new QTimer())
+GUIHandler::GUIHandler(): tcpSocket(new QTcpSocket()), mainWindow(),
+    asyncCanData(canHandler.getCanData()), updateTimer(new QTimer())
 {
     canHandler.connect();
 
     QObject::connect(updateTimer, &QTimer::timeout, this, &GUIHandler::startAsync);
     updateTimer->start(1000 / frequency);
     mainWindow.show();
+
+    //prepare socket
+    tcpSocket->connectToHost("127.0.0.1", 631);
+
+    if (tcpSocket->state() == QAbstractSocket::ConnectedState)
+        qDebug() << "Socket connected";
+    else
+        qDebug() << "Socket error";
+
+    //testing
+    generateJSON();
 }
 
 GUIHandler::~GUIHandler()
 {
     delete updateTimer;
+    delete tcpSocket;
 }
 
 void GUIHandler::updateGUI()
@@ -23,19 +35,32 @@ void GUIHandler::updateGUI()
     canData = static_cast<CanData>(asyncCanData);    //casting to parent because mutexes can't be copied
     asyncCanData.mtx.unlock();
 
+    verifyData();
     checkErrors();
     getUpdates();
 
 }
 
+void GUIHandler::verifyData()
+{
+    for (std::size_t iter = 0; iter < CanData::numberOfFrames; iter++) {
+        if (cyclesMissed.at(iter) >= canData.mainFrames.at(iter)->maxNumberOfCyclesMissed) {
+            mainWindow.raiseError(QString::fromStdString("Device " +
+                                 canData.mainFrames.at(iter)->name + " missed too many cycles"));
+        }
+        canHandler.startNewDataCycle();
+    }
+}
+
 void GUIHandler::checkErrors()
 {
-    for (auto const device: canData.frameArray) {
+    for (auto const device: canData.mainFrames) {
         const uint8_t  * const state = reinterpret_cast<uint8_t *>(device->dataPtr) +
                 device->dlc - sizeof(uint8_t);
         if (*state not_eq 0)
             mainWindow.raiseError(QString::fromStdString(device->name) + " error");
     }
+
 }
 
 void GUIHandler::getUpdates()
@@ -56,10 +81,22 @@ void GUIHandler::getNavigation()
     return;
 }
 
-void GUIHandler::generateJSON()
+void GUIHandler::generateJSON() const
 {
-//todo
-    return;
+    json test;
+    test["speed"] = 123;
+    test["rpm"] = 1234;
+    test["soc"] = 56;
+    test["errors"] = false;
+
+    char * data = new char[sizeof(test)];
+    std::memcpy(data, &test, sizeof(test));
+
+    if (tcpSocket->write(data) == -1) {
+        logger.add("Data sending failed");
+    }
+    delete[] data;
+    data = nullptr;
 }
 
 void GUIHandler::startAsync()
