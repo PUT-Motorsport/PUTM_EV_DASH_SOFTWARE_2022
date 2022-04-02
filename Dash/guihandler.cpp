@@ -2,8 +2,8 @@
 
 using json = nlohmann::json;
 
-GUIHandler::GUIHandler(): tcpSocket(new QTcpSocket()), mainWindow(),
-    asyncCanData(canHandler.getCanData()), updateTimer(new QTimer())
+GUIHandler::GUIHandler(): retryTimer(new QTimer()), tcpSocket(new QTcpSocket()),
+    mainWindow(), asyncCanData(canHandler.getCanData()), updateTimer(new QTimer())
 {
     canHandler.connect();
 
@@ -11,13 +11,12 @@ GUIHandler::GUIHandler(): tcpSocket(new QTcpSocket()), mainWindow(),
     updateTimer->start(1000 / frequency);
     mainWindow.show();
 
-    //prepare socket
-    tcpSocket->connectToHost("127.0.0.1", 631);
+    connectTcpSocket();
+//    QObject::connect(tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)), //qt issue
+//    this, SLOT(socketError(QAbstractSocketError &error)));
 
-    if (tcpSocket->state() == QAbstractSocket::ConnectedState)
-        qDebug() << "Socket connected";
-    else
-        qDebug() << "Socket error";
+    for (auto &item: cyclesMissed)
+        item = 0;   //initialize the array
 
     //testing
     generateJSON();
@@ -26,7 +25,27 @@ GUIHandler::GUIHandler(): tcpSocket(new QTcpSocket()), mainWindow(),
 GUIHandler::~GUIHandler()
 {
     delete updateTimer;
+    delete retryTimer;
     delete tcpSocket;
+}
+
+void GUIHandler::socketError(const QAbstractSocket::SocketError &error) const
+{
+    logger.add("Connection with localhost lost. Reason: " + QString::number(error) + ". Retrying.");
+
+}
+
+void GUIHandler::connectTcpSocket()
+{
+    tcpSocket->connectToHost(hostname, portNumber); //fixme: may not establish the connection before it is checked
+
+
+    if (tcpSocket->state() == QAbstractSocket::ConnectedState) {
+        logger.add("Socket connection established.");
+        return;
+    }
+    logger.add("Socket connection failed.");
+    retryTimer->start(retryTime);
 }
 
 void GUIHandler::updateGUI()
@@ -43,18 +62,28 @@ void GUIHandler::updateGUI()
 
 void GUIHandler::verifyData()
 {
-    for (std::size_t iter = 0; iter < CanData::numberOfFrames; iter++) {
-        if (cyclesMissed.at(iter) >= canData.mainFrames.at(iter)->maxNumberOfCyclesMissed) {
+#if DATA_TIMEOUT_CHECK
+    qDebug() << "Verified devices";
+    for (std::size_t iter = 0; iter < canData.hasDeviceStatus.size(); iter++) {
+        if (canData.hasDeviceStatus.at(iter)->maxNumberOfCyclesMissed == 0)
+            continue;   //if max number of cycles missed is -1, no data check should be performed
+
+        if (cyclesMissed.at(iter) >= canData.hasDeviceStatus.at(iter)->maxNumberOfCyclesMissed) {
             mainWindow.raiseError(QString::fromStdString("Device " +
-                                 canData.mainFrames.at(iter)->name + " missed too many cycles"));
+                                 canData.hasDeviceStatus.at(iter)->name + " missed too many cycles"));
         }
-        canHandler.startNewDataCycle();
+        cyclesMissed.at(iter)++;
     }
+    canHandler.startNewDataCycle();
+#else
+    return;
+#endif
+
 }
 
 void GUIHandler::checkErrors()
 {
-    for (auto const device: canData.mainFrames) {
+    for (auto const device: canData.hasDeviceStatus) {
         const uint8_t  * const state = reinterpret_cast<uint8_t *>(device->dataPtr) +
                 device->dlc - sizeof(uint8_t);
         if (*state not_eq 0)
@@ -101,8 +130,5 @@ void GUIHandler::generateJSON() const
 
 void GUIHandler::startAsync()
 {
-    //todo
-
-//    QThread thread(&GUIHandler::updateGUI);
-//    th.detach();
+    std::future<void> future =  std::async(std::launch::async, &GUIHandler::updateGUI, this);
 }

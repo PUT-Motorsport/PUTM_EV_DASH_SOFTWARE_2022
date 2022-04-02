@@ -17,6 +17,5 @@ struct __attribute__ ((packed)) Telemetry_Main{
 
 const uint16_t TELEMETRY_MAIN_CAN_ID = 0;
 const uint8_t TELEMETRY_MAIN_CAN_DLC = sizeof(Telemetry_Main);
-
+const uint8_t TELEMETRY_MAIN_FREQUENCY = 1;
 #endif
-

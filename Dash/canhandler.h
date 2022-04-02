@@ -4,9 +4,7 @@
 #include <QCanBus>
 #include <QCanBusDevice>
 #include <QCanBusFrame>
-
-#include <array>
-
+#include <QTimer>
 #include "vehicle.h"
 #include "logger.h"
 
@@ -19,7 +17,7 @@ public:
     ~CanHandler();
 
     bool connect();
-    bool connected() { return m_connected; }
+    inline bool connected();
 
     bool send(QCanBusFrame const &toSend);
     void setHeartbeat(Dash_states newState) { heartBeatState = newState; }
@@ -34,8 +32,13 @@ private:
     QCanBusDevice *canDevice;
     AsyncCanData canData;
 
-    bool m_connected;
+    QTimer * retryTimer;    //todo
+    static constexpr auto retryTime = 200;
 
     //heartbeat
+    void heartbeat();
+
     Dash_states heartBeatState;
+    QTimer * heartbeatTimer;
+    static constexpr auto hearbeatFrequency = 10;
 };

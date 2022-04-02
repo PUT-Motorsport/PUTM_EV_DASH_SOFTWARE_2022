@@ -1,21 +1,25 @@
 #include "canhandler.h"
 
-CanHandler::CanHandler(QObject *parent): QObject(parent), m_connected(false)
+CanHandler::CanHandler(QObject *parent): QObject(parent),
+    heartbeatTimer(new QTimer())
 {
     if (!QCanBus::instance()->plugins().contains("socketcan"))
         logger.add("Cansockets plugin missing", LogType::AppError);
 
+    QObject::connect(heartbeatTimer, &QTimer::timeout, this, &CanHandler::heartbeat);
 }
 
 CanHandler::~CanHandler() {
     delete canDevice;
+    delete heartbeatTimer;
 }
 
 bool CanHandler::connect()
 {
     QString errorString;
     canDevice = QCanBus::instance()->createDevice(QStringLiteral("socketcan"),
-                                                  QStringLiteral("vcan0"), &errorString);   //remember to change before building for pi
+                                                  QStringLiteral("vcan0"), &errorString);
+    //todo: remember to change before building for pi
     if (!canDevice) {
         logger.add("Can Device creation failed: " + errorString, LogType::Critical);
         return false;
@@ -29,13 +33,23 @@ bool CanHandler::connect()
     QObject::connect(canDevice, &QCanBusDevice::framesReceived, this, &CanHandler::onCanFrameReceived);
     QObject::connect(canDevice, &QCanBusDevice::errorOccurred, this, &CanHandler::onCanErrorOcurred);
 
-    m_connected = true;
+    return true;
+}
 
+inline bool CanHandler::connected()
+{
+//    return canDevice->state() == QCanBusDevice::ConnectedState;   //fixme: SIGSEGV
     return true;
 }
 
 bool CanHandler::send(const QCanBusFrame &toSend)
 {
+    if (not(connected()))
+        return false;
+
+    if (canDevice->writeFrame(toSend))
+        return true;
+
     return false;
 }
 
@@ -65,4 +79,20 @@ void CanHandler::onCanErrorOcurred()
     logger.add("Can Error detected: " + error);
 }
 
+void CanHandler::heartbeat() {
+    QCanBusFrame heartbeatFrame;
+    heartbeatFrame.setFrameId(DASH_MAIN_CAN_ID);
 
+    Dash_Main dash_main;
+    dash_main.device_state = this->heartBeatState;
+
+    char * data = new char[sizeof(Dash_Main)];
+
+    std::memcpy(data, &dash_main, sizeof(Dash_Main));
+
+    heartbeatFrame.setPayload(data);
+
+    send(heartbeatFrame);
+
+    delete[] data;
+}

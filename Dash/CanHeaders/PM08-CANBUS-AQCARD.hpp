@@ -23,8 +23,10 @@ struct __attribute__ ((packed)) AQ_name{
 
 const uint16_t AQ_MAIN_CAN_ID = 0;
 const uint8_t AQ_MAIN_CAN_DLC = sizeof(AQ_main);
+const uint8_t AQ_MAIN_FREQUENCY = 100;
 const uint16_t AQ_NAME_CAN_ID = 0;
 const uint8_t AQ_NAME_CAN_DLC = sizeof(AQ_name);
+const uint8_t AQ_NAME_FREQUENCY = 0;
 
 #endif
 

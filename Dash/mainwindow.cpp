@@ -69,17 +69,18 @@ void MainWindow::updateData(Parameter param, qreal value)
     }
 }
 
-void MainWindow::raiseError(QString const &errorMessage, int errorCode)
+void MainWindow::raiseError(QString const &errorMessage, LogType errorType)
 {
+    logger.add(errorMessage, errorType);
     if (subwindowShown == nullptr) {
-        ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
+        ui->error->setText("Error " + errorMessage);
         errorCounter++;
         QTimer::singleShot(3000, [this] () {
                 ui->error->setText("");
             });
     }
     else {
-        subwindowShown->raiseError(errorMessage, errorCode);
+        subwindowShown->raiseError(errorMessage);
     }
     ui->errorCounter->setText(QString::number(errorCounter) + " errorr(s)");
 }

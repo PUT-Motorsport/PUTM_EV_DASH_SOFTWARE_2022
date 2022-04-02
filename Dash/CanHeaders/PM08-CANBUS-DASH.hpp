@@ -24,8 +24,9 @@ struct __attribute__ ((packed)) Dash_StateChange{
 
 const uint16_t DASH_MAIN_CAN_ID = 3;
 const uint8_t DASH_MAIN_CAN_DLC = sizeof(Dash_Main);
+const uint8_t DASH_MAIN_FREQUENCY = 10;
 const uint16_t DASH_STATECHANGE_CAN_ID = 4;
 const uint8_t DASH_STATECHANGE_CAN_DLC = sizeof(Dash_StateChange);
+const uint8_t DASH_STATECHANGE_FREQUENCY = 0;
 
 #endif
-

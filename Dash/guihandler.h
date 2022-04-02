@@ -6,6 +6,9 @@
 #include "lib/json.hpp"
 #include <QtNetwork>
 #include <QThread>
+#include <QtConcurrent>
+
+#define DATA_TIMEOUT_CHECK false
 
 class GUIHandler: public QObject
 {
@@ -14,9 +17,17 @@ public:
     GUIHandler();
     ~GUIHandler();
 private slots:
-//    void socketError(QAbstractSocket::SocketError const &error) const;  //todo
+    void socketError(QAbstractSocket::SocketError const &error) const;
 
 private:
+    void connectTcpSocket();
+    QTimer * retryTimer;
+    static constexpr auto retryTime = 500;
+
+    QTcpSocket * tcpSocket;
+    QString const hostname = "127.0.0.1";
+    static constexpr int portNumber = 631;
+
     void updateGUI();
 
     void verifyData();
@@ -27,10 +38,6 @@ private:
     void generateJSON() const;
 
     void startAsync();
-
-    QTcpSocket * tcpSocket;
-    QString const hostname = "127.0.0.1";
-    static constexpr int portNumber = 1234;
 
     MainWindow mainWindow;
     AsyncCanData const &asyncCanData;
