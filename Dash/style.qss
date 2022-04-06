@@ -9,13 +9,13 @@ QLabel {
 }
 
 QProgressBar {
-    background-color: white;
+    background-color: #272727;
     color: #272727;
     text-align: center;
 }
 
 QProgressBar::chunk {
-    background-color: #fe4e00;
+    background-color: white;
 }
 
 QTextBrowser {

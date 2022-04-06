@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QTimer>
 #include <QElapsedTimer>
+#include <QRandomGenerator>
 
 #include "guicomponent.h"
 
@@ -46,6 +47,12 @@ private:
     QElapsedTimer * elapsedTimer;
     bool timerStarted;
     QTimer updateTimer;     //will call the gui to update timer
+
+    QTimer * mockUpdateTimer;
+    void mockUpdate();
+    static constexpr auto mockUpdateTime = 100;
+    bool valuesGrow;
+    bool rpmIncrease;
 
     Ui::MainWindow *ui;
 

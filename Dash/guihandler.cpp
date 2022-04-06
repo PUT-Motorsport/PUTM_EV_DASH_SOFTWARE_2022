@@ -5,21 +5,21 @@ using json = nlohmann::json;
 GUIHandler::GUIHandler(): retryTimer(new QTimer()), tcpSocket(new QTcpSocket()),
     mainWindow(), asyncCanData(canHandler.getCanData()), updateTimer(new QTimer())
 {
-    canHandler.connect();
+//    canHandler.connect();
 
-    QObject::connect(updateTimer, &QTimer::timeout, this, &GUIHandler::startAsync);
-    updateTimer->start(1000 / frequency);
+//    QObject::connect(updateTimer, &QTimer::timeout, this, &GUIHandler::startAsync);
+//    updateTimer->start(1000 / frequency);
     mainWindow.show();
 
-    connectTcpSocket();
+//    connectTcpSocket();
 //    QObject::connect(tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)), //qt issue
 //    this, SLOT(socketError(QAbstractSocketError &error)));
 
-    for (auto &item: cyclesMissed)
-        item = 0;   //initialize the array
+//    for (auto &item: cyclesMissed)
+//        item = 0;   //initialize the array
 
-    //testing
-    generateJSON();
+//    //testing
+//    generateJSON();
 }
 
 GUIHandler::~GUIHandler()
