@@ -25,8 +25,8 @@ public:
     explicit ServiceMode(QWidget *parent = nullptr);
     ~ServiceMode();
     void updateData(Parameter param, qreal value);
-    void navigate(Navigation pressed) override;
-    void raiseError(QString const &errorMessage, int errorCode = -1) override;
+    void navigate(buttonStates navigation) override;
+    void raiseError(QString const &errorMessage) override;
 
 private:
     Ui::ServiceMode *ui;

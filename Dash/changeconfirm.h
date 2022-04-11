@@ -20,8 +20,8 @@ public:
     explicit ChangeConfirm(QWidget *parent = nullptr);
     ~ChangeConfirm();
     void toConfirm(QDomElement const &data, QString const &value);
-    void navigate(Navigation pressed) override;
-    void raiseError(QString const &errorMessage, int errorCode = -1) override;
+    void navigate(buttonStates navigation) override;
+    void raiseError(QString const &errorMessage) override;
 
 private:
     Ui::ChangeConfirm *ui;

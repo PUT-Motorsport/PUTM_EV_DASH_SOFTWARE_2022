@@ -23,8 +23,8 @@ class DrivingSelect : public QDialog, public GUIComponent
 public:
     explicit DrivingSelect(QWidget *parent = nullptr);
     ~DrivingSelect();
-    void navigate(Navigation pressed) override;
-    void raiseError(QString const &errorMessage, int errorCode = -1) override;
+    void navigate(buttonStates navigation) override;
+    void raiseError(QString const &errorMessage) override;
 
 private:
     void changeHighlight();

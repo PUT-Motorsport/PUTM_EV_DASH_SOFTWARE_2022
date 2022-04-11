@@ -30,7 +30,7 @@ public:
 public slots:
     void updateData(Parameter param, qreal value);
     void raiseError(QString const &errorMessage, LogType errorType = LogType::Error);       //TODO: remove error codes functionality
-    void navigate(Navigation pressed);
+    void navigate(buttonStates navigation);
     void getConfirmation(QDomElement const &data, QString value);
 
 private slots:

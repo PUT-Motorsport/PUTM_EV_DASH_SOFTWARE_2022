@@ -22,8 +22,8 @@ public:
     explicit DvSelect(QWidget *parent = nullptr);
     ~DvSelect();
 
-    void navigate(Navigation pressed) override;
-    void raiseError(QString const &errorMessage, int errorCode = -1) override;
+    void navigate(buttonStates navigation) override;
+    void raiseError(QString const &errorMessage) override;
 
 private:
     void toggleMission(int direction);

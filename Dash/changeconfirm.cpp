@@ -22,9 +22,9 @@ void ChangeConfirm::toConfirm(const QDomElement &confirmData, const QString &new
     value = newValue;
 }
 
-void ChangeConfirm::navigate(Navigation pressed)
+void ChangeConfirm::navigate(buttonStates navigation)
 {
-    if (pressed != Navigation::A) {
+    if (navigation not_eq buttonStates::button1) {
         this->done(QDialog::Accepted);
         return;
     }
@@ -53,9 +53,9 @@ void ChangeConfirm::navigate(Navigation pressed)
     ui->newValue->setText("");
 }
 
-void ChangeConfirm::raiseError(const QString &errorMessage, int errorCode)
+void ChangeConfirm::raiseError(const QString &errorMessage)
 {
-    ui->error->setText("Error: " + QString::number(errorCode) + ": " + errorMessage);
+    ui->error->setText("Error: " + errorMessage);
 
     QTimer::singleShot(2000, [this] () {
         ui->error->setText("");

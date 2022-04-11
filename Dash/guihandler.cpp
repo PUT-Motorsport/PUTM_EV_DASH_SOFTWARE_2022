@@ -1,7 +1,5 @@
 #include "guihandler.h"
 
-using json = nlohmann::json;
-
 GUIHandler::GUIHandler(): retryTimer(new QTimer()), tcpSocket(new QTcpSocket()),
     mainWindow(), asyncCanData(canHandler.getCanData()), updateTimer(new QTimer())
 {
@@ -83,7 +81,7 @@ void GUIHandler::verifyData()
 
 void GUIHandler::checkErrors()
 {
-    for (auto const device: canData.hasDeviceStatus) {
+    for (auto const device: canData.synchronousFrames) {
         const uint8_t  * const state = reinterpret_cast<uint8_t *>(device->dataPtr) +
                 device->dlc - sizeof(uint8_t);
         if (*state not_eq 0)
@@ -105,27 +103,42 @@ void GUIHandler::getUpdates()
     //...
 }
 
-void GUIHandler::getNavigation()
+void GUIHandler::handleAsyncFrames()
 {
-    return;
+    while (not(asyncCanData.queue.empty())) {
+
+
+        asyncCanData.mtx.lock();
+    }
 }
 
-void GUIHandler::generateJSON() const
+void GUIHandler::generateJSON()
 {
-    json test;
-    test["speed"] = 123;
-    test["rpm"] = 1234;
-    test["soc"] = 56;
-    test["errors"] = false;
 
-    char * data = new char[sizeof(test)];
-    std::memcpy(data, &test, sizeof(test));
+    //timestamp: posix time
+    telemetry["timestamp"] = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now().time_since_epoch()).count();
+//    telemetry["APPS"] = {{"pedal_position", canData.apps.data.pedal_position},
+//                         {"position_diff", canData.apps.data.position_diff},
+//                         {"state"}, static_cast<int>(canData.apps.data.device_state)};
+//    telemetry["BMS LV"] = {{"voltage_sum", canData.bms_lv_main.data.voltage_sum},
+//                          {"soc", canData.bms_lv_main.data.soc},
+//                          {"temp_avg", canData.bms_lv_main.data.temp_avg},
+//                          {"current", canData.bms_lv_main.data.current},
+//                          {"state", static_cast<int>(canData.bms_lv_main.data.device_state)},
+//                          {"temp1", canData.bms_lv_temperature.data.temp_1},
+//                          {"temp2", canData.bms_lv_temperature.data.temp_2},
+//                          {"temp3", canData.bms_lv_temperature.data.temp_3},
+//                          {"temp4", canData.bms_lv_temperature.data.temp_4},
+//                          {"temp5", canData.bms_lv_temperature.data.temp_5},
+//                          {"temp6", canData.bms_lv_temperature.data.temp_6},
+//                          {"temp7", canData.bms_lv_temperature.data.temp_7},
+//                          {"temp8", canData.bms_lv_temperature.data.temp_8}};
 
-    if (tcpSocket->write(data) == -1) {
+
+    if (tcpSocket->write(reinterpret_cast<char *>(&telemetry), sizeof(telemetry)) == -1) {
         logger.add("Data sending failed");
     }
-    delete[] data;
-    data = nullptr;
 }
 
 void GUIHandler::startAsync()

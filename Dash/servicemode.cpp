@@ -56,26 +56,26 @@ void ServiceMode::updateData(Parameter param, qreal value)
     }
 }
 
-void ServiceMode::navigate(Navigation pressed)
+void ServiceMode::navigate(buttonStates navigation)
 {
     if (subwindowShown == nullptr) {
-        switch (pressed) {
-        case Navigation::X:
+        switch (navigation) {
+        case buttonStates::button1:
             subwindowShown = canRaw;
             this->hide();
             canRaw->startSniffing();
             canRaw->show();
             break;
-        case Navigation::B:
+        case buttonStates::button2:
             this->done(QDialog::Accepted);
             break;
-        case Navigation::Y:
+        case buttonStates::button3:
             subwindowShown = logs;
             this->hide();
             logs->startSniffing();
             logs->show();
             break;
-        case Navigation::A:
+        case buttonStates::button4:
             subwindowShown = driving;
             this->hide();
             driving->show();
@@ -85,19 +85,19 @@ void ServiceMode::navigate(Navigation pressed)
         }
     }
     else
-        subwindowShown->navigate(pressed);
+        subwindowShown->navigate(navigation);
 }
 
-void ServiceMode::raiseError(const QString &errorMessage, int errorCode)
+void ServiceMode::raiseError(const QString &errorMessage)
 {
     if (subwindowShown == nullptr) {
-        ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
+        ui->error->setText("Error: " + errorMessage);
         QTimer::singleShot(3000, [this] () {
                 ui->error->setText("");
             });
     }
     else
-        subwindowShown->raiseError(errorMessage, errorCode);
+        subwindowShown->raiseError(errorMessage);
 }
 
 void ServiceMode::reopen()

@@ -16,15 +16,15 @@ Logs::~Logs()
     delete refreshTimer;
 }
 
-void Logs::navigate(Navigation pressed)
+void Logs::navigate(buttonStates navigation)
 {
     refreshTimer->stop();
     this->done(QDialog::Accepted);
 }
 
-void Logs::raiseError(const QString &errorMessage, int errorCode)
+void Logs::raiseError(const QString &errorMessage)
 {
-    ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
+    ui->error->setText("Error: " + errorMessage);
     QTimer::singleShot(3000, [this] () {
             ui->error->setText("");
     });

@@ -1,4 +1,4 @@
-//Generated on Mon Mar 28 16:20:15 2022
+//Generated on Thu Apr  7 17:02:54 2022
 #ifndef TELEMETRY
 #define TELEMETRY
 
@@ -18,4 +18,6 @@ struct __attribute__ ((packed)) Telemetry_Main{
 const uint16_t TELEMETRY_MAIN_CAN_ID = 0;
 const uint8_t TELEMETRY_MAIN_CAN_DLC = sizeof(Telemetry_Main);
 const uint8_t TELEMETRY_MAIN_FREQUENCY = 1;
+
 #endif
+

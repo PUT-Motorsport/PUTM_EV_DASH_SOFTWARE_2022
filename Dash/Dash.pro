@@ -27,12 +27,13 @@ SOURCES += \
 
 HEADERS += \
     CanHeaders/PM08-CANBUS-APPS.hpp \
-    CanHeaders/PM08-CANBUS-AQCARD.hpp \
-    CanHeaders/PM08-CANBUS-BMSLV.hpp \
+    CanHeaders/PM08-CANBUS-AQ_CARD.hpp \
+    CanHeaders/PM08-CANBUS-BMS_HV.hpp \
+    CanHeaders/PM08-CANBUS-BMS_LV.hpp \
     CanHeaders/PM08-CANBUS-DASH.hpp \
-    CanHeaders/PM08-CANBUS-LAPTIMER.hpp \
+    CanHeaders/PM08-CANBUS-LAP_TIMER.hpp \
     CanHeaders/PM08-CANBUS-SF.hpp \
-    CanHeaders/PM08-CANBUS-STEERINGWHEEL.hpp \
+    CanHeaders/PM08-CANBUS-STEERING_WHEEL.hpp \
     CanHeaders/PM08-CANBUS-TC.hpp \
     CanHeaders/PM08-CANBUS-TELEMETRY.hpp \
     canhandler.h \

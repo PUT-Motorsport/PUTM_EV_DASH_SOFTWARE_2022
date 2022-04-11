@@ -17,8 +17,8 @@ class Logs : public QDialog, public GUIComponent
 public:
     explicit Logs(QWidget *parent = nullptr);       //TODO: find a way to load the log files instead of sniffing them
     ~Logs();
-    void navigate(Navigation pressed) override;
-    void raiseError(QString const &errorMessage, int errorCode = -1) override;
+    void navigate(buttonStates navigation) override;
+    void raiseError(QString const &errorMessage) override;
 
     void startSniffing();
 private:

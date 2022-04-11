@@ -8,6 +8,8 @@
 #include <QThread>
 #include <QtConcurrent>
 
+#include <chrono>
+
 #define DATA_TIMEOUT_CHECK false
 
 class GUIHandler: public QObject
@@ -29,13 +31,16 @@ private:
     static constexpr int portNumber = 631;
 
     void updateGUI();
+    char *data;
+    static constexpr uint8_t jsonSize{};
 
     void verifyData();
     void checkErrors();
     void getUpdates();
-    void getNavigation();
+    void handleAsyncFrames();
 
-    void generateJSON() const;
+    void generateJSON();
+    nlohmann::json telemetry;
 
     void startAsync();
 

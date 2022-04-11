@@ -16,15 +16,15 @@ CanRaw::~CanRaw()
     delete refreshTimer;
 }
 
-void CanRaw::navigate(Navigation pressed)
+void CanRaw::navigate(buttonStates navigation)
 {
     refreshTimer->stop();
     this->done(QDialog::Accepted);
 }
 
-void CanRaw::raiseError(QString const &errorMessage, int errorCode)
+void CanRaw::raiseError(QString const &errorMessage)
 {
-    ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
+    ui->error->setText("Error: " + errorMessage);
     QTimer::singleShot(3000, [this] () {
             ui->error->setText("");
     });

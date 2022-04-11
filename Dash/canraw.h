@@ -16,8 +16,8 @@ class CanRaw : public QDialog, public GUIComponent
 public:
     explicit CanRaw(QWidget *parent = nullptr);
     ~CanRaw();
-    void navigate(Navigation pressed) override;
-    void raiseError(QString const &errorMessage, int errorCode = -1) override;
+    void navigate(buttonStates navigation) override;
+    void raiseError(QString const &errorMessage) override;
 
     void startSniffing();
 private:

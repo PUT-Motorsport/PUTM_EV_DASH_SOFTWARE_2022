@@ -55,7 +55,7 @@ bool CanHandler::send(const QCanBusFrame &toSend)
 
 void CanHandler::startNewDataCycle()
 {
-    for (auto &device: canData.frameArray)
+    for (auto &device: canData.synchronousFrames)
         device->hasBeenUpdated = false;
 }
 
@@ -65,12 +65,21 @@ void CanHandler::onCanFrameReceived()
 
     logger.addCAN(frame.toString());
 
-    for (auto dev: canData.frameArray) {
+    for (auto dev: canData.synchronousFrames) {
         if (dev->id == frame.frameId()) {
             std::memcpy(dev->dataPtr, frame.payload().constData(), dev->dlc);
             dev->hasBeenUpdated = true;
+            return;
         }
     }
+
+    for (auto event: canData.asynchronousFrames) {
+        if (event->id == frame.frameId()) {
+            std::memcpy(event->dataPtr, frame.payload().constData(), event->dlc);
+            canData.queue.emplace(event);
+        }
+    }
+
 }
 
 void CanHandler::onCanErrorOcurred()

@@ -15,20 +15,20 @@ DrivingSelect::~DrivingSelect()
     delete ui;
 }
 
-void DrivingSelect::navigate(Navigation pressed)
+void DrivingSelect::navigate(buttonStates navigation)
 {
-    switch (pressed) {
-    case Navigation::X:
+    switch (navigation) {
+    case buttonStates::button1:
         changeValue();
         break;
-    case Navigation::Y:
+    case buttonStates::button2:
         sendCANFrame();
         break;
-    case Navigation::A:
+    case buttonStates::button3:
         resetToCurrent();
         changeHighlight();
         break;
-    case Navigation::B:
+    case buttonStates::button4:
         resetToCurrent();
         this->done(QDialog::Accepted);
     default:
@@ -36,9 +36,9 @@ void DrivingSelect::navigate(Navigation pressed)
     }
 }
 
-void DrivingSelect::raiseError(const QString &errorMessage, int errorCode)
+void DrivingSelect::raiseError(const QString &errorMessage)
 {
-    ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
+    ui->error->setText("Error: " + errorMessage);
     QTimer::singleShot(3000, [this] () {
             ui->error->setText("");
         });

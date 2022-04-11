@@ -1,4 +1,4 @@
-//Generated on Sat Mar 19 12:16:05 2022
+//Generated on Thu Apr  7 17:02:53 2022
 #ifndef BMS_LV
 #define BMS_LV
 
@@ -20,7 +20,7 @@ struct __attribute__ ((packed)) BMS_LV_main{
 	int8_t soc; // state of charge
 	int8_t temp_avg; // in Celsius
 	int8_t current; 
-    BMS_LV_states device_state;
+	BMS_LV_states device_state; 
 };
 
 struct __attribute__ ((packed)) BMS_LV_temperature{
@@ -35,11 +35,11 @@ struct __attribute__ ((packed)) BMS_LV_temperature{
 };
 
 
-const uint16_t BMS_LV_MAIN_CAN_ID = 1;
+const uint16_t BMS_LV_MAIN_CAN_ID = 0;
 const uint8_t BMS_LV_MAIN_CAN_DLC = sizeof(BMS_LV_main);
 const uint8_t BMS_LV_MAIN_FREQUENCY = 100;
-const uint16_t BMS_LV_TEMPERATURE_CAN_ID = 2;
-const uint8_t BMS_LV_TEMPERATRUE_CAN_DLC = sizeof(BMS_LV_temperature);
+const uint16_t BMS_LV_TEMPERATURE_CAN_ID = 0;
+const uint8_t BMS_LV_TEMPERATURE_CAN_DLC = sizeof(BMS_LV_temperature);
 const uint8_t BMS_LV_TEMPERATURE_FREQUENCY = 1;
 
 #endif

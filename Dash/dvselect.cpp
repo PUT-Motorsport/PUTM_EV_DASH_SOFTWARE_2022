@@ -26,19 +26,19 @@ DvSelect::~DvSelect()
     delete ui;
 }
 
-void DvSelect::navigate(Navigation pressed)
+void DvSelect::navigate(buttonStates navigation)
 {
-    switch (pressed) {
-    case Navigation::B:
+    switch (navigation) {
+    case buttonStates::button1:
         this->done(QDialog::Accepted);
         break;
-    case Navigation::A:
+    case buttonStates::button2:
         sendCANframe();
         break;
-    case Navigation::X:
+    case buttonStates::button3:
         toggleMission(-1);
         break;
-    case Navigation::Y:
+    case buttonStates::button4:
         toggleMission(1);
         break;
     default:
@@ -46,9 +46,9 @@ void DvSelect::navigate(Navigation pressed)
     }
 }
 
-void DvSelect::raiseError(const QString &errorMessage, int errorCode)
+void DvSelect::raiseError(const QString &errorMessage)
 {
-    ui->error->setText("Error " + QString::number(errorCode) + ": " + errorMessage);
+    ui->error->setText("Error: " + errorMessage);
     QTimer::singleShot(3000, [this] () {
             ui->error->setText("");
         });

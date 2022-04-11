@@ -85,31 +85,31 @@ void MainWindow::raiseError(QString const &errorMessage, LogType errorType)
     ui->errorCounter->setText(QString::number(errorCounter) + " errorr(s)");
 }
 
-void MainWindow::navigate(Navigation pressed)
+void MainWindow::navigate(buttonStates navigation)
 {
     if (subwindowShown == nullptr) {
-        switch (pressed) {
-        case Navigation::A:
+        switch (navigation) {
+        case buttonStates::button1_4:
             subwindowShown = dvSelect;
             this->hide();
             dvSelect->show();
             break;
-        case Navigation::B:
+        case buttonStates::button2_3:
             subwindowShown = serviceMode;
             this->hide();
             serviceMode->show();
             break;
-        case Navigation::X:
+        case buttonStates::button1:
             updateBestTime();
             break;
-        case Navigation::Y:
+        case buttonStates::button2:
             resetTimer();
             break;
         default:
             return;     //suppresses a warning, no real use
         }
     }
-    else subwindowShown->navigate(pressed);
+    else subwindowShown->navigate(navigation);
 }
 
 void MainWindow::getConfirmation(const QDomElement &data, QString value)
