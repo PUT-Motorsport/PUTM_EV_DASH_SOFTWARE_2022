@@ -112,11 +112,11 @@ void MainWindow::navigate(buttonStates navigation)
     else subwindowShown->navigate(navigation);
 }
 
-void MainWindow::getConfirmation(const QDomElement &data, QString value)
+void MainWindow::getConfirmation(Side side, scrollStates scroll)
 {
-    interruptSubwindowShown = subwindowShown;
+    interruptSubwindowShown = subwindowShown;   //keeps the window that change confirm interrupted
     subwindowShown = changeConfirm;
-    changeConfirm->toConfirm(data, value);      //prepare the subwindow
+    changeConfirm->toConfirm(side, scroll);      //prepare the subwindow
     this->hide();
     changeConfirm->show();
 }

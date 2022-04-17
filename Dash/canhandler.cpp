@@ -59,6 +59,16 @@ void CanHandler::startNewDataCycle()
         device->hasBeenUpdated = false;
 }
 
+DeviceBase *CanHandler::getAsyncFrame()
+{
+    if (asyncFrames.empty())
+        return nullptr;
+
+    auto dev = asyncFrames.front();
+    asyncFrames.pop();
+    return dev;
+}
+
 void CanHandler::onCanFrameReceived()
 {
     QCanBusFrame frame = canDevice->readFrame();
@@ -76,7 +86,6 @@ void CanHandler::onCanFrameReceived()
     for (auto event: canData.asynchronousFrames) {
         if (event->id == frame.frameId()) {
             std::memcpy(event->dataPtr, frame.payload().constData(), event->dlc);
-            canData.queue.emplace(event);
         }
     }
 

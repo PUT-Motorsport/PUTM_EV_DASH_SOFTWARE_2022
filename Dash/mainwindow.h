@@ -27,11 +27,11 @@ public:
 
     GUIComponent * subwindowShown;      //ensures two-way communication between classes
     GUIComponent * interruptSubwindowShown;     //allows to store previously open window if change confirmation "interrupts"
-public slots:
+
     void updateData(Parameter param, qreal value);
     void raiseError(QString const &errorMessage, LogType errorType = LogType::Error);       //TODO: remove error codes functionality
     void navigate(buttonStates navigation);
-    void getConfirmation(QDomElement const &data, QString value);
+    void getConfirmation(Side side, scrollStates scroll);
 
 private slots:
     void reopen();

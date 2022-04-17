@@ -9,6 +9,7 @@
 #include <QtConcurrent>
 
 #include <chrono>
+#include <optional>
 
 #define DATA_TIMEOUT_CHECK false
 
@@ -30,17 +31,16 @@ private:
     QString const hostname = "127.0.0.1";
     static constexpr int portNumber = 631;
 
-    void updateGUI();
-    char *data;
     static constexpr uint8_t jsonSize{};
+    void generateJSON();
+    nlohmann::json telemetry;
 
+    void updateGUI();
     void verifyData();
     void checkErrors();
     void getUpdates();
     void handleAsyncFrames();
 
-    void generateJSON();
-    nlohmann::json telemetry;
 
     void startAsync();
 
@@ -52,5 +52,10 @@ private:
 
     QTimer * updateTimer;
     static constexpr int frequency = 30;
+
+
+    std::optional<scrollStates> scrolls[2];
+    void steeringWheel();
+
 };
 

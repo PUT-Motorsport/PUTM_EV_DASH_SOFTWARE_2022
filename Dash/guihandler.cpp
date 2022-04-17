@@ -105,10 +105,11 @@ void GUIHandler::getUpdates()
 
 void GUIHandler::handleAsyncFrames()
 {
-    while (not(asyncCanData.queue.empty())) {
+    while (auto dev = canHandler.getAsyncFrame()) {
 
-
-        asyncCanData.mtx.lock();
+        if (dev == dynamic_cast<DeviceBase *>(&canData.steering_wheel_event)) { //handling for steerring wheel event
+            steeringWheel();
+        }
     }
 }
 
@@ -144,4 +145,43 @@ void GUIHandler::generateJSON()
 void GUIHandler::startAsync()
 {
     std::future<void> future =  std::async(std::launch::async, &GUIHandler::updateGUI, this);
+}
+
+void GUIHandler::steeringWheel()
+{
+
+    if (canData.steering_wheel_event.data.button not_eq buttonStates::not_pressed) {
+
+        mainWindow.navigate(canData.steering_wheel_event.data.button);
+
+    }
+
+    auto left_scroll = canData.steering_wheel_event.data.l_s_1;
+    auto right_scroll = canData.steering_wheel_event.data.r_s_1;
+
+    //left scroll
+    if (not((scrolls[Side::Left]).has_value())) {
+
+        scrolls[Side::Left].emplace(left_scroll);
+
+    }
+    else if (left_scroll not_eq scrolls[Side::Left]) {
+
+        scrolls[Side::Left] = left_scroll;
+        mainWindow.getConfirmation(left_scroll);
+
+    }
+
+    //right scroll
+    if (not((scrolls[Side::Right]).has_value())) {
+
+        scrolls[Side::Right].emplace(canData.steering_wheel_event.data.r_s_1);
+
+    }
+    else if (left_scroll not_eq scrolls[Side::Right]) {
+
+        scrolls[Side::Right] = right_scroll;
+        mainWindow.getConfirmation(right_scroll);
+
+    }
 }

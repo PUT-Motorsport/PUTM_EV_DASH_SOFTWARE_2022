@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstring> //memcpy
+
 #include <QObject>
 #include <QCanBus>
 #include <QCanBusDevice>
@@ -25,12 +27,15 @@ public:
     AsyncCanData const &getCanData() { return canData; }
     void startNewDataCycle();
 
+    DeviceBase *getAsyncFrame();
+
 private slots:
     void onCanFrameReceived();
     void onCanErrorOcurred();
 private:
     QCanBusDevice *canDevice;
     AsyncCanData canData;
+    std::queue<DeviceBase *> asyncFrames;
 
     QTimer * retryTimer;    //todo
     static constexpr auto retryTime = 200;

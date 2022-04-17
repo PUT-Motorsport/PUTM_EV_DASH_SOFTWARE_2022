@@ -5,6 +5,7 @@
 #include <cstdint>
 
 enum struct buttonStates: uint8_t {
+    not_pressed,
 	button1,	//button1
 	button2,	//button2
 	button3,	//button3

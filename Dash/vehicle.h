@@ -88,7 +88,6 @@ struct CanData{
 
 struct AsyncCanData: public CanData {
     mutable QMutex mtx;
-    std::queue<const DeviceBase *> queue;
 };
 
 //deprecated?
@@ -96,6 +95,6 @@ enum class Parameter{Speed, RPM, SOC, Power, BmshvVoltage, BmslvVoltage,
               InverterTemp, EngineTemp, CoolantTemp, BmshvTemp, BmslvTemp, Apps};
 enum class Status{Working, InError, Unresolved};    //probably not needed
 enum class Window{Main, CAN, DV, Driving, Logs, ServiceMode, ChangeConfirm};    //will be used to decide GUI calls redirection
-enum class FrameType{error, update, navigation, confirmation};
+enum Side{Left, Right};
 
 #endif // VEHICLE_H

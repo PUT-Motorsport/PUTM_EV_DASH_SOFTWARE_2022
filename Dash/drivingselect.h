@@ -36,7 +36,6 @@ private:
 
     Ui::DrivingSelect *ui;
     Setting current;
-    QFile valuesFile;
 
     QStringList regainValues;
     QStringList tractionValues;

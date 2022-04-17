@@ -14,6 +14,8 @@ namespace Ui {
 class DvSelect;
 }
 
+//deprecated
+
 class DvSelect : public QDialog, public GUIComponent
 {
     Q_OBJECT
@@ -30,7 +32,6 @@ private:
     void sendCANframe();
 
     Ui::DvSelect *ui;
-    QString const pathToXML = QStringLiteral("../ProgramData/dv.xml");
     QDomElement missionsFile;
     QStringList missionNames;
     int missionCount;
