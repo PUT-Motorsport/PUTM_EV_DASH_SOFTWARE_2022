@@ -48,6 +48,7 @@ HEADERS += \
     logs.h \
     mainwindow.h \
     servicemode.h \
+    timer.h \
     vehicle.h
 
 FORMS += \

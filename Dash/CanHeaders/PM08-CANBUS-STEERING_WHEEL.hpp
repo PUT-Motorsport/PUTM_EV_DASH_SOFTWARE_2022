@@ -47,7 +47,7 @@ struct __attribute__ ((packed)) Steering_Wheel_event{
 const uint16_t STEERING_WHEEL_MAIN_CAN_ID = 0;
 const uint8_t STEERING_WHEEL_MAIN_CAN_DLC = sizeof(Steering_Wheel_main);
 const uint8_t STEERING_WHEEL_MAIN_FREQUENCY = 100;
-const uint16_t STEERING_WHEEL_EVENT_CAN_ID = 0;
+const uint16_t STEERING_WHEEL_EVENT_CAN_ID = 123;
 const uint8_t STEERING_WHEEL_EVENT_CAN_DLC = sizeof(Steering_Wheel_event);
 const uint8_t STEERING_WHEEL_EVENT_FREQUENCY = 0;
 

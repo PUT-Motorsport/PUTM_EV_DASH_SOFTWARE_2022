@@ -24,25 +24,6 @@ void Logger::forceFlush()
     logStream.setDevice(&log);
 }
 
-void Logger::loadXML(QDomElement &target, QString const &fileName)
-{
-    QDomDocument xmlDocument("xmlDocument");
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly)) {
-        add("XML file could not be opened", LogType::AppError);
-        return;
-    }
-    if (!xmlDocument.setContent(&file)) {
-        add("XML file opened, but internal parsing failed", LogType::AppError);
-        file.close();
-        return;
-    }
-    file.close();   //file loaded and can be closed
-    add("xml File loaded.");
-    target = xmlDocument.documentElement();
-
-}
-
 void Logger::open()
 {
 
@@ -79,6 +60,10 @@ void Logger::add(const QString &message, LogType type)
     qDebug() << logLine;
     logStream << logLine << '\n';
     logLinesCount++;
+
+#ifdef TERMINALOUTPUT
+    std::cout << logline;
+#endif
 }
 
 void Logger::addCAN(QString canFrame)

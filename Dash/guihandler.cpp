@@ -55,6 +55,7 @@ void GUIHandler::updateGUI()
     verifyData();
     checkErrors();
     getUpdates();
+    handleAsyncFrames();
 
 }
 
@@ -72,8 +73,8 @@ void GUIHandler::verifyData()
         }
         cyclesMissed.at(iter)++;
     }
-    canHandler.startNewDataCycle();
 #else
+    canHandler.startNewDataCycle();
     return;
 #endif
 
@@ -93,24 +94,27 @@ void GUIHandler::checkErrors()
 void GUIHandler::getUpdates()
 {
     //TS
-    mainWindow.updateData(Parameter::Speed, canData.ts_main.data.vehicle_speed);
-    mainWindow.updateData(Parameter::CoolantTemp, canData.ts_main.data.vehicle_speed);
+    if (canData.ts_main.hasBeenUpdated == true) {
+        mainWindow.updateData(Parameter::Speed, canData.ts_main.data.vehicle_speed);
+        mainWindow.updateData(Parameter::CoolantTemp, canData.ts_main.data.water_temp);
+    }
     //BMS LV
-    mainWindow.updateData(Parameter::SOC, canData.bms_lv_main.data.soc);
-    mainWindow.updateData(Parameter::BmslvTemp, canData.bms_lv_main.data.temp_avg);
-    mainWindow.updateData(Parameter::BmslvVoltage, canData.bms_lv_main.data.voltage_sum);
-
+    if (canData.bms_lv_main.hasBeenUpdated == true) {
+        mainWindow.updateData(Parameter::SOC, canData.bms_lv_main.data.soc);
+        mainWindow.updateData(Parameter::BmslvTemp, canData.bms_lv_main.data.temp_avg);
+        mainWindow.updateData(Parameter::BmslvVoltage, canData.bms_lv_main.data.voltage_sum);
+    }
     //...
 }
 
 void GUIHandler::handleAsyncFrames()
 {
-    while (auto dev = canHandler.getAsyncFrame()) {
-
-        if (dev == dynamic_cast<DeviceBase *>(&canData.steering_wheel_event)) { //handling for steerring wheel event
-            steeringWheel();
-        }
+    if (canData.asynchronousFrames.at(0)->hasBeenUpdated) {
+        steeringWheel();
+        canData.asynchronousFrames.at(0)->hasBeenUpdated = false;
     }
+    if (canData.asynchronousFrames.at(1)->hasBeenUpdated)
+        ; //lapTimer(); //todo: laptimer support
 }
 
 void GUIHandler::generateJSON()
@@ -144,12 +148,12 @@ void GUIHandler::generateJSON()
 
 void GUIHandler::startAsync()
 {
-    std::future<void> future =  std::async(std::launch::async, &GUIHandler::updateGUI, this);
+    std::future<void> future =  std::async(std::launch::async, &GUIHandler::updateGUI, this);    //std::future destructor awaits result in destructor
 }
 
 void GUIHandler::steeringWheel()
 {
-
+    qDebug() << "steeringWheel() invoked";
     if (canData.steering_wheel_event.data.button not_eq buttonStates::not_pressed) {
 
         mainWindow.navigate(canData.steering_wheel_event.data.button);
@@ -168,7 +172,7 @@ void GUIHandler::steeringWheel()
     else if (left_scroll not_eq scrolls[Side::Left]) {
 
         scrolls[Side::Left] = left_scroll;
-        mainWindow.getConfirmation(left_scroll);
+        mainWindow.getConfirmation(Side::Left, left_scroll);
 
     }
 
@@ -181,7 +185,7 @@ void GUIHandler::steeringWheel()
     else if (left_scroll not_eq scrolls[Side::Right]) {
 
         scrolls[Side::Right] = right_scroll;
-        mainWindow.getConfirmation(right_scroll);
+        mainWindow.getConfirmation(Side::Right, right_scroll);
 
     }
 }

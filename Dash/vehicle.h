@@ -16,12 +16,10 @@
 #include "CanHeaders/PM08-CANBUS-TC.hpp"
 #include "CanHeaders/PM08-CANBUS-TELEMETRY.hpp"
 
-static constexpr auto defaultMaxCyclesMissed = 5;
-
 struct DeviceBase {
     DeviceBase(uint8_t id, uint8_t dlc, std::string const &name,
                uint8_t frequency) : id(id), dlc(dlc),
-        name(name), hasBeenUpdated(true)
+        name(name), hasBeenUpdated(false)
     {
         if (frequency == 0)
             maxNumberOfCyclesMissed = 0;
@@ -50,7 +48,7 @@ public:
 
 struct CanData{
 
-    static constexpr auto numberOfFrames = 20;
+    static constexpr auto numberOfFrames = 19;
 
     Device<Apps_main> apps{ APPS_MAIN_CAN_ID, "Apps", APPS_MAIN_FREQUENCY };
     Device<AQ_main> aq_main{ AQ_MAIN_CAN_ID, "Aq main", AQ_MAIN_FREQUENCY };
@@ -58,8 +56,8 @@ struct CanData{
     Device<BMS_HV_main> bms_hv_main{ BMS_HV_MAIN_CAN_ID, "BMS HV", BMS_HV_MAIN_FREQUENCY };
     Device<BMS_LV_main> bms_lv_main{ BMS_LV_MAIN_CAN_ID, "BMS LV main", BMS_LV_MAIN_FREQUENCY };
     Device<BMS_LV_temperature> bms_lv_temperature{ BMS_LV_TEMPERATURE_CAN_ID, "BMS LV temperatures", BMS_LV_TEMPERATURE_FREQUENCY };
-    Device<Dash_Main> dash_main{ DASH_MAIN_CAN_ID, "Dash Main", DASH_MAIN_FREQUENCY };
-    Device<Dash_StateChange> dash_statechange{ DASH_STATECHANGE_CAN_ID, "Dash StateChange", DASH_STATECHANGE_FREQUENCY };
+//    Device<Dash_Main> dash_main{ DASH_MAIN_CAN_ID, "Dash Main", DASH_MAIN_FREQUENCY };
+//    Device<Dash_StateChange> dash_statechange{ DASH_STATECHANGE_CAN_ID, "Dash StateChange", DASH_STATECHANGE_FREQUENCY };
     Device<Lap_timer_Main> laptimer_main{ LAP_TIMER_MAIN_CAN_ID, "Laptimer", LAP_TIMER_STATECHANGE_FREQUENCY };
     Device<Lap_timer_StateChange> laptimer_statechange{ LAP_TIMER_STATECHANGE_CAN_ID, "Laptimer StateChange", LAP_TIMER_STATECHANGE_FREQUENCY };
     Device<SF_main> sf_main{ SF_MAIN_CAN_ID, "SF main", SF_MAIN_FREQUENCY };
@@ -77,12 +75,12 @@ struct CanData{
 
 
     std::array<DeviceBase *, numberOfFrames> synchronousFrames = { &apps, &aq_main, &aq_air_flow, &bms_hv_main,
-                                        &bms_lv_main, &bms_lv_temperature, &dash_main,
+                                        &bms_lv_main, &bms_lv_temperature,
                                         &laptimer_main, &sf_main, &sf_data_0, &sf_data_1,
                                         &sf_data_2, &sf_data_2, &sf_data_3, &sf_data_4, &sf_data_5, &steering_wheel_main,
                                         &ts_main, &ts_rear_suspension, &telemetry_main };   //todo: not every synchronous frame has a status field
 
-    std::array<const DeviceBase *, 4> asynchronousFrames{&dash_statechange/*?*/,  &laptimer_statechange, &steering_wheel_event};
+    std::array<DeviceBase *, 2> asynchronousFrames{&steering_wheel_event, &laptimer_statechange};
 
 };
 
@@ -90,7 +88,6 @@ struct AsyncCanData: public CanData {
     mutable QMutex mtx;
 };
 
-//deprecated?
 enum class Parameter{Speed, RPM, SOC, Power, BmshvVoltage, BmslvVoltage,
               InverterTemp, EngineTemp, CoolantTemp, BmshvTemp, BmslvTemp, Apps};
 enum class Status{Working, InError, Unresolved};    //probably not needed

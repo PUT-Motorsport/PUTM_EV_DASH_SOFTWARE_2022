@@ -177,34 +177,7 @@ void DrivingSelect::changeValue()
 
 void DrivingSelect::loadSettings()
 {
-    if (not(valuesFile.open(QIODevice::ReadOnly))) {
-        logger.add(valuesFile.errorString(), LogType::AppError);
-        return;
-    }
-    QRegularExpression spliter(",|\n");
-    QByteArray line = valuesFile.readLine();
-    regainValues = QString(line).split(spliter, Qt::SkipEmptyParts);
-    line = valuesFile.readLine();
-    tractionValues = QString(line).split(spliter, Qt::SkipEmptyParts);
-    line = valuesFile.readLine();
-    powerValues = QString(line).split(spliter, Qt::SkipEmptyParts);
-    line = valuesFile.readLine();
-    fanValues = QString(line).split(spliter, Qt::SkipEmptyParts);
-    while (not(valuesFile.atEnd())) {
-        QByteArray line = valuesFile.readLine();    //first dimension will be settings, second - setting values
-        payloads.append(QString(line).split(spliter, Qt::SkipEmptyParts));
-    }
-    assert(payloads.length() == 5);
-    //display the settings for the first time and register their values:
-    ui->regainValue->setText(regainValues.at(1));       //the first item is the description
-    currentSettingsValues.append(regainValues.at(1));
-    ui->tractionValue->setText(tractionValues.at(1));
-    currentSettingsValues.append(tractionValues.at(1));
-    ui->powerValue->setText(powerValues.at(1));
-    currentSettingsValues.append(powerValues.at(1));
-    ui->fanValue->setText(fanValues.at(1));
-    currentSettingsValues.append(fanValues.at(1));
-    assert(currentSettingsValues.length() == 4);
+    return;
 }
 
 void DrivingSelect::changeAppsCurve()

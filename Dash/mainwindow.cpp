@@ -2,9 +2,8 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , subwindowShown(nullptr), interruptSubwindowShown(nullptr), m_speed(0),
-      timerStarted(false), ui(new Ui::MainWindow), errorCounter(0)
+    : QMainWindow(parent) , subwindowShown(nullptr), interruptSubwindowShown(nullptr), m_speed(0),
+      timerStarted(false), updateTimer(new QTimer()), ui(new Ui::MainWindow),  errorCounter(0)
 {
     ui->setupUi(this);
 
@@ -23,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     elapsedTimer = new QElapsedTimer();
 
-    QObject::connect(&updateTimer, &QTimer::timeout, this, [=](){
+    QObject::connect(updateTimer, &QTimer::timeout, this, [=](){
         QTime time = QTime::fromMSecsSinceStartOfDay(elapsedTimer->elapsed());
         ui->currentTime->setText(time.toString("hh:mm:ss:zzz"));
     });
@@ -37,6 +36,7 @@ MainWindow::~MainWindow()
     delete serviceMode;
     delete elapsedTimer;
     delete changeConfirm;
+    delete updateTimer;
 }
 
 void MainWindow::updateData(Parameter param, qreal value)
@@ -46,7 +46,7 @@ void MainWindow::updateData(Parameter param, qreal value)
         ui->speed->setText(QString::number(value));
         if (m_speed == 0 and value != 0 and not(timerStarted)) {
             elapsedTimer->start();
-            updateTimer.start(50);
+            updateTimer->start(50);
             timerStarted = true;
         }
         m_speed = value;
@@ -151,7 +151,7 @@ void MainWindow::resetTimer()
     if (m_speed != 0)
         elapsedTimer->restart();
     else {
-        updateTimer.stop();
+        updateTimer->stop();
         delete elapsedTimer;
         elapsedTimer = new QElapsedTimer();
         timerStarted = false;

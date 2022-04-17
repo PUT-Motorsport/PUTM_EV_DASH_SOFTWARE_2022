@@ -33,6 +33,7 @@ public:
     void navigate(buttonStates navigation);
     void getConfirmation(Side side, scrollStates scroll);
 
+
 private slots:
     void reopen();
 
@@ -45,7 +46,7 @@ private:
     QTime best;
     QElapsedTimer * elapsedTimer;
     bool timerStarted;
-    QTimer updateTimer;     //will call the gui to update timer
+    QTimer * updateTimer;     //will call the gui to update timer
 
     Ui::MainWindow *ui;
 

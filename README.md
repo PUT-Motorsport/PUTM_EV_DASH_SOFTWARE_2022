@@ -44,6 +44,13 @@ From the main window, two additional subwindows can be opened: the driverless mi
 
 ![Main Window](https://i.ibb.co/YLY0d7P/vision1.jpg)
 
+##### Main Window navigation model
+
+1. Pressing buttons 1 and 4 opens Driverless Selection
+2. Pressing buttons 2 and 3 opens Service Mode
+3. Pressing button 1 ends the current lap (until Lap Timer functionality is implemented)
+4. Pressing button 2 resets the lap timer
+
 ### Service mode window
 
 The service mode window displays additional vehicle parameters:

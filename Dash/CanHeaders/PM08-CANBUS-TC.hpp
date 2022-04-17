@@ -37,7 +37,7 @@ struct __attribute__ ((packed)) TS_rear_suspension{
 };
 
 
-const uint16_t TS_MAIN_CAN_ID = 0;
+const uint16_t TS_MAIN_CAN_ID = 10;
 const uint8_t TS_MAIN_CAN_DLC = sizeof(TS_main);
 const uint8_t TS_MAIN_FREQUENCY = 50;
 const uint16_t TS_REAR_SUSPENSION_CAN_ID = 0;

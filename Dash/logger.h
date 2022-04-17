@@ -6,6 +6,8 @@
 #include <QFile>
 #include <QDomDocument>
 
+#include <iostream>
+
 enum class LogType {Error, Critical, AppError, Normal};
 
 class Logger {
@@ -13,7 +15,6 @@ public:
     Logger();
     ~Logger();
     void forceFlush();
-    void loadXML(QDomElement &target, QString const &fileName);
     void open();
     void add(QString const &message, LogType type = LogType::Normal);    //should this class be a singleton?
     void addCAN(QString canFrame);

@@ -49,7 +49,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Raw CAN data - press X</string>
+    <string>Raw CAN data - press 1</string>
    </property>
   </widget>
   <widget class="QLabel" name="hint1">
@@ -67,7 +67,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Logs - press Y</string>
+    <string>Logs - press 3</string>
    </property>
   </widget>
   <widget class="QLabel" name="hint3">
@@ -85,7 +85,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Driving Parameters - press A</string>
+    <string>Driving Parameters - press 2</string>
    </property>
   </widget>
   <widget class="QLabel" name="hint4">
@@ -103,7 +103,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Exit - press B</string>
+    <string>Exit - press 4</string>
    </property>
   </widget>
   <widget class="QLabel" name="subtitle2">

@@ -19,6 +19,7 @@ class GUIHandler: public QObject
 public:
     GUIHandler();
     ~GUIHandler();
+
 private slots:
     void socketError(QAbstractSocket::SocketError const &error) const;
 
@@ -40,7 +41,6 @@ private:
     void checkErrors();
     void getUpdates();
     void handleAsyncFrames();
-
 
     void startAsync();
 

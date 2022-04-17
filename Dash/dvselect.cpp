@@ -6,17 +6,7 @@ DvSelect::DvSelect(QWidget *parent) :
     ui(new Ui::DvSelect), missionCount(0), currentMission(0)
 {
     ui->setupUi(this);
-    logger.loadXML(missionsFile, pathToXML);
     //load mission names
-    QDomNode iterator = missionsFile.firstChild();
-    while (not(iterator.isNull())) {
-        QDomElement element = iterator.toElement();
-        if (element.attribute("description") != "") {
-            missionNames.append(element.attribute("description"));
-            missionCount++;
-        }
-        iterator = iterator.nextSibling();
-   }
    if (missionNames.length() != 0)
        ui->mission->setText(missionNames.at(0));    //display the first mission
 }

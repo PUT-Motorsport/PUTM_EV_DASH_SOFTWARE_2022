@@ -19,7 +19,7 @@ public:
     ~CanHandler();
 
     bool connect();
-    inline bool connected();
+    bool connected();
 
     bool send(QCanBusFrame const &toSend);
     void setHeartbeat(Dash_states newState) { heartBeatState = newState; }
@@ -27,7 +27,6 @@ public:
     AsyncCanData const &getCanData() { return canData; }
     void startNewDataCycle();
 
-    DeviceBase *getAsyncFrame();
 
 private slots:
     void onCanFrameReceived();

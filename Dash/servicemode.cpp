@@ -66,7 +66,7 @@ void ServiceMode::navigate(buttonStates navigation)
             canRaw->startSniffing();
             canRaw->show();
             break;
-        case buttonStates::button2:
+        case buttonStates::button4:
             this->done(QDialog::Accepted);
             break;
         case buttonStates::button3:
@@ -75,7 +75,7 @@ void ServiceMode::navigate(buttonStates navigation)
             logs->startSniffing();
             logs->show();
             break;
-        case buttonStates::button4:
+        case buttonStates::button2:
             subwindowShown = driving;
             this->hide();
             driving->show();
