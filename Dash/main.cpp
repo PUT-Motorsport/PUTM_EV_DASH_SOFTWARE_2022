@@ -1,4 +1,4 @@
-#include "guihandler.h"
+#include "mainwindow.h"
 #include "logger.h"
 #include <QApplication>
 #include <QFile>
@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
     styleSheetFile.open(QFile::ReadOnly);
     QString styleSheet {QLatin1String(styleSheetFile.readAll())};
     a.setStyleSheet(styleSheet);
-    GUIHandler handler;
+    MainWindow w;
+    w.show();
     return a.exec();
 }

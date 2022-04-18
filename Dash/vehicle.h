@@ -48,8 +48,6 @@ public:
 
 struct CanData{
 
-    static constexpr auto numberOfFrames = 19;
-
     Device<Apps_main> apps{ APPS_MAIN_CAN_ID, "Apps", APPS_MAIN_FREQUENCY };
     Device<AQ_main> aq_main{ AQ_MAIN_CAN_ID, "Aq main", AQ_MAIN_FREQUENCY };
     Device<AQ_air_flow> aq_air_flow{ AQ_AIR_FLOW_CAN_ID, "Aq air flow", AQ_AIR_FLOW_FREQUENCY };
@@ -73,19 +71,21 @@ struct CanData{
     Device<TS_rear_suspension> ts_rear_suspension{ TS_REAR_SUSPENSION_CAN_ID , "TS_rear", TS_REAR_SUSPENSION_FREQUENCY};
     Device<Telemetry_Main> telemetry_main{ TELEMETRY_MAIN_CAN_ID, "Telemetry", TELEMETRY_MAIN_FREQUENCY };
 
-
-    std::array<DeviceBase *, numberOfFrames> synchronousFrames = { &apps, &aq_main, &aq_air_flow, &bms_hv_main,
-                                        &bms_lv_main, &bms_lv_temperature,
-                                        &laptimer_main, &sf_main, &sf_data_0, &sf_data_1,
-                                        &sf_data_2, &sf_data_2, &sf_data_3, &sf_data_4, &sf_data_5, &steering_wheel_main,
-                                        &ts_main, &ts_rear_suspension, &telemetry_main };   //todo: not every synchronous frame has a status field
-
-    std::array<DeviceBase *, 2> asynchronousFrames{&steering_wheel_event, &laptimer_statechange};
-
 };
 
 struct AsyncCanData: public CanData {
     mutable QMutex mtx;
+    static constexpr auto numberOfFrames = 19;
+
+    std::array<DeviceBase * const, numberOfFrames> synchronousFrames = { &apps, &aq_main, &aq_air_flow, &bms_hv_main,
+                                        &bms_lv_main, &bms_lv_temperature,
+                                        &laptimer_main, &sf_main, &sf_data_0, &sf_data_1,
+                                        &sf_data_2, &sf_data_2, &sf_data_3, &sf_data_4, &sf_data_5, &steering_wheel_main,
+                                        &ts_main, &ts_rear_suspension, &telemetry_main };
+
+    mutable std::array<DeviceBase * const, 2> asynchronousFrames{&steering_wheel_event, &laptimer_statechange};
+
+    std::array<DeviceBase const * const, 8> statusFrames{&apps, &aq_main, &bms_hv_main, &bms_lv_main, &laptimer_main, &sf_main, &ts_main, &telemetry_main};
 };
 
 enum class Parameter{Speed, RPM, SOC, Power, BmshvVoltage, BmslvVoltage,

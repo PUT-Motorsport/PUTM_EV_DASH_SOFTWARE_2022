@@ -1,13 +1,12 @@
 #include "guihandler.h"
 
 GUIHandler::GUIHandler(): retryTimer(new QTimer()), tcpSocket(new QTcpSocket()),
-    mainWindow(), asyncCanData(canHandler.getCanData()), updateTimer(new QTimer())
+    asyncCanData(canHandler.getCanData()), updateTimer(new QTimer())
 {
     canHandler.connect();
 
-    QObject::connect(updateTimer, &QTimer::timeout, this, &GUIHandler::startAsync);
+    QObject::connect(updateTimer, &QTimer::timeout, this, &GUIHandler::updateGUI);
     updateTimer->start(1000 / frequency);
-    mainWindow.show();
 
     connectTcpSocket();
 //    QObject::connect(tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)), //qt issue
@@ -57,6 +56,8 @@ void GUIHandler::updateGUI()
     getUpdates();
     handleAsyncFrames();
 
+    canHandler.startNewDataCycle();
+
 }
 
 void GUIHandler::verifyData()
@@ -73,47 +74,67 @@ void GUIHandler::verifyData()
         }
         cyclesMissed.at(iter)++;
     }
-#else
-    canHandler.startNewDataCycle();
-    return;
 #endif
 
 }
 
 void GUIHandler::checkErrors()
 {
-    for (auto const device: canData.synchronousFrames) {
-        const uint8_t  * const state = reinterpret_cast<uint8_t *>(device->dataPtr) +
-                device->dlc - sizeof(uint8_t);
-        if (*state not_eq 0)
-            mainWindow.raiseError(QString::fromStdString(device->name) + " error");
-    }
+//    for (auto const device: asyncCanData.synchronousFrames) {
+//        const uint8_t  * const state = reinterpret_cast<uint8_t *>(device->dataPtr) + device->dlc - sizeof(uint8_t);
+//        if (*state not_eq 0 and std::find(errors.begin(), errors.end(), device) == errors.end())
+//            emit error(QString::fromStdString(device->name) + " error");
+//    }
+    //check for new errors
+    for (auto const device: asyncCanData.synchronousFrames) {
+        if (device->hasBeenUpdated) {
 
+            uint8_t const * const state = reinterpret_cast<uint8_t *>(device->dataPtr) + device->dlc - sizeof(uint8_t);
+
+            if (*state not_eq 0 and std::find(errors.begin(), errors.end(), device) == errors.end()) {  //if error is registered for the first time
+                emit error(QString::fromStdString(device->name) + " error");
+                errors.emplace_back(const_cast<DeviceBase *>(device));  //cannot store const objects in vector
+            }
+        }
+    }
+    //check if old errors have been cleared
+
+    for (auto iter = errors.begin(); iter not_eq errors.end(); ++iter) {
+        if ((*iter)->hasBeenUpdated) {
+            uint8_t const * const state = reinterpret_cast<uint8_t *>((*iter)->dataPtr) + (*iter)->dlc - sizeof(uint8_t);
+            if (*state == 0) {
+                errors.erase(iter);
+                iter--; //fix iterator degeneration
+                emit clearError();
+            }
+        }
+    }
+//    qDebug() << errors.size();
 }
 
 void GUIHandler::getUpdates()
 {
     //TS
     if (canData.ts_main.hasBeenUpdated == true) {
-        mainWindow.updateData(Parameter::Speed, canData.ts_main.data.vehicle_speed);
-        mainWindow.updateData(Parameter::CoolantTemp, canData.ts_main.data.water_temp);
+        emit updateData(Parameter::Speed, canData.ts_main.data.vehicle_speed);
+        emit updateData(Parameter::CoolantTemp, canData.ts_main.data.water_temp);
     }
     //BMS LV
     if (canData.bms_lv_main.hasBeenUpdated == true) {
-        mainWindow.updateData(Parameter::SOC, canData.bms_lv_main.data.soc);
-        mainWindow.updateData(Parameter::BmslvTemp, canData.bms_lv_main.data.temp_avg);
-        mainWindow.updateData(Parameter::BmslvVoltage, canData.bms_lv_main.data.voltage_sum);
+        emit updateData(Parameter::SOC, canData.bms_lv_main.data.soc);
+        emit updateData(Parameter::BmslvTemp, canData.bms_lv_main.data.temp_avg);
+        emit updateData(Parameter::BmslvVoltage, canData.bms_lv_main.data.voltage_sum);
     }
     //...
 }
 
 void GUIHandler::handleAsyncFrames()
 {
-    if (canData.asynchronousFrames.at(0)->hasBeenUpdated) {
+    if (asyncCanData.asynchronousFrames.at(0)->hasBeenUpdated) {
         steeringWheel();
-        canData.asynchronousFrames.at(0)->hasBeenUpdated = false;
+        asyncCanData.asynchronousFrames.at(0)->hasBeenUpdated = false;
     }
-    if (canData.asynchronousFrames.at(1)->hasBeenUpdated)
+    if (asyncCanData.asynchronousFrames.at(1)->hasBeenUpdated)
         ; //lapTimer(); //todo: laptimer support
 }
 
@@ -146,17 +167,11 @@ void GUIHandler::generateJSON()
     }
 }
 
-void GUIHandler::startAsync()
-{
-    std::future<void> future =  std::async(std::launch::async, &GUIHandler::updateGUI, this);    //std::future destructor awaits result in destructor
-}
-
 void GUIHandler::steeringWheel()
 {
-    qDebug() << "steeringWheel() invoked";
     if (canData.steering_wheel_event.data.button not_eq buttonStates::not_pressed) {
 
-        mainWindow.navigate(canData.steering_wheel_event.data.button);
+        emit navigate(canData.steering_wheel_event.data.button);
 
     }
 
@@ -172,7 +187,7 @@ void GUIHandler::steeringWheel()
     else if (left_scroll not_eq scrolls[Side::Left]) {
 
         scrolls[Side::Left] = left_scroll;
-        mainWindow.getConfirmation(Side::Left, left_scroll);
+        emit getConfirmation(Side::Left, left_scroll);
 
     }
 
@@ -185,7 +200,7 @@ void GUIHandler::steeringWheel()
     else if (left_scroll not_eq scrolls[Side::Right]) {
 
         scrolls[Side::Right] = right_scroll;
-        mainWindow.getConfirmation(Side::Right, right_scroll);
+        emit getConfirmation(Side::Right, right_scroll);
 
     }
 }

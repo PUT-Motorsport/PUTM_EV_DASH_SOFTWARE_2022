@@ -6,6 +6,7 @@
 #include <QElapsedTimer>
 
 #include "guicomponent.h"
+#include "guihandler.h"
 
 #include "canhandler.h"
 #include "vehicle.h"
@@ -28,16 +29,22 @@ public:
     GUIComponent * subwindowShown;      //ensures two-way communication between classes
     GUIComponent * interruptSubwindowShown;     //allows to store previously open window if change confirmation "interrupts"
 
+public slots:
+
     void updateData(Parameter param, qreal value);
-    void raiseError(QString const &errorMessage, LogType errorType = LogType::Error);       //TODO: remove error codes functionality
+    void raiseError(QString const &errorMessage);
     void navigate(buttonStates navigation);
     void getConfirmation(Side side, scrollStates scroll);
-
+    void clearError();
 
 private slots:
     void reopen();
 
 private:
+
+
+    GUIHandler * guiHandler;
+    QThread canThread;
 
     void updateBestTime();
     void resetTimer();
@@ -55,7 +62,7 @@ private:
 
     ChangeConfirm * changeConfirm;
 
-    int errorCounter;
+    uint8_t errorCounter;
 
 };
 #endif // MAINWINDOW_H

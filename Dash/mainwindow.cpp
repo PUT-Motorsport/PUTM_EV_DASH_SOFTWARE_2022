@@ -2,10 +2,13 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent) , subwindowShown(nullptr), interruptSubwindowShown(nullptr), m_speed(0),
-      timerStarted(false), updateTimer(new QTimer()), ui(new Ui::MainWindow),  errorCounter(0)
+    : QMainWindow(parent) , subwindowShown(nullptr), interruptSubwindowShown(nullptr), guiHandler(new GUIHandler()),
+      canThread(), m_speed(0), timerStarted(false),  updateTimer(new QTimer()), ui(new Ui::MainWindow), errorCounter(0)
 {
     ui->setupUi(this);
+
+    guiHandler->moveToThread(&canThread);
+    canThread.start(QThread::InheritPriority);
 
     if (canHandler.connected())
         ui->can->setText("CAN Connected");
@@ -15,6 +18,13 @@ MainWindow::MainWindow(QWidget *parent)
     dvSelect = new DvSelect();
     serviceMode = new ServiceMode();
     changeConfirm = new ChangeConfirm();
+
+    //communication between threads
+    QObject::connect(guiHandler, &GUIHandler::updateData, this, &MainWindow::updateData);
+    QObject::connect(guiHandler, &GUIHandler::error, this, &MainWindow::raiseError);
+    QObject::connect(guiHandler, &GUIHandler::navigate, this, &MainWindow::navigate);
+    QObject::connect(guiHandler, &GUIHandler::getConfirmation, this, &MainWindow::getConfirmation);
+    QObject::connect(guiHandler, &GUIHandler::clearError, this, &MainWindow::clearError);
 
     QObject::connect(dvSelect, &DvSelect::finished, this, &MainWindow::reopen);
     QObject::connect(serviceMode, &ServiceMode::finished, this, &MainWindow::reopen);
@@ -37,6 +47,7 @@ MainWindow::~MainWindow()
     delete elapsedTimer;
     delete changeConfirm;
     delete updateTimer;
+    delete guiHandler;
 }
 
 void MainWindow::updateData(Parameter param, qreal value)
@@ -69,12 +80,12 @@ void MainWindow::updateData(Parameter param, qreal value)
     }
 }
 
-void MainWindow::raiseError(QString const &errorMessage, LogType errorType)
+void MainWindow::raiseError(QString const &errorMessage)
 {
-    logger.add(errorMessage, errorType);
+    logger.add(errorMessage);
+    errorCounter++;
     if (subwindowShown == nullptr) {
-        ui->error->setText("Error " + errorMessage);
-        errorCounter++;
+        ui->error->setText(errorMessage);
         QTimer::singleShot(3000, [this] () {
                 ui->error->setText("");
             });
@@ -82,7 +93,7 @@ void MainWindow::raiseError(QString const &errorMessage, LogType errorType)
     else {
         subwindowShown->raiseError(errorMessage);
     }
-    ui->errorCounter->setText(QString::number(errorCounter) + " errorr(s)");
+    ui->errorCounter->setText(QString::number(errorCounter) + " error(s)");
 }
 
 void MainWindow::navigate(buttonStates navigation)
@@ -119,6 +130,17 @@ void MainWindow::getConfirmation(Side side, scrollStates scroll)
     changeConfirm->toConfirm(side, scroll);      //prepare the subwindow
     this->hide();
     changeConfirm->show();
+}
+
+void MainWindow::clearError()
+{
+    if (errorCounter)
+        errorCounter--;
+
+    if (errorCounter > 0)
+        ui->errorCounter->setText(QString::number(errorCounter) + "error(s)");
+    else
+        ui->errorCounter->setText("No errors");
 }
 
 void MainWindow::reopen()
