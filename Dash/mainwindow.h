@@ -12,7 +12,6 @@
 #include "vehicle.h"
 #include "dvselect.h"
 #include "servicemode.h"
-#include "changeconfirm.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -34,7 +33,7 @@ public slots:
     void updateData(Parameter param, qreal value);
     void raiseError(QString const &errorMessage);
     void navigate(buttonStates navigation);
-    void getConfirmation(Side side, scrollStates scroll);
+    void setPreset(Side side, scrollStates scroll);
     void clearError();
 
 private slots:
@@ -59,8 +58,6 @@ private:
 
     DvSelect * dvSelect;
     ServiceMode * serviceMode;
-
-    ChangeConfirm * changeConfirm;
 
     uint8_t errorCounter;
 

@@ -34,34 +34,13 @@
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="regain">
+  <widget class="QLabel" name="tc">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>80</y>
-     <width>251</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>30</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>Energy regain</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="traction">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>150</y>
      <width>301</width>
-     <height>41</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
@@ -76,11 +55,32 @@
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="power">
+  <widget class="QLabel" name="slipRatio">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>210</y>
+     <y>130</y>
+     <width>301</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>30</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Max slip ratio</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="algorithm">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>180</y>
      <width>311</width>
      <height>41</height>
     </rect>
@@ -91,17 +91,17 @@
     </font>
    </property>
    <property name="text">
-    <string>Max Power</string>
+    <string>Algorithm</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="fan">
+  <widget class="QLabel" name="power">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>270</y>
+     <y>230</y>
      <width>261</width>
      <height>41</height>
     </rect>
@@ -112,44 +112,13 @@
     </font>
    </property>
    <property name="text">
-    <string>Fan setting</string>
+    <string>Max power</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="apps">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>370</y>
-     <width>261</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>30</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>Apps Curves</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QGraphicsView" name="appsValue">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>320</y>
-     <width>181</width>
-     <height>141</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLabel" name="regainValue">
+  <widget class="QLabel" name="tcValue">
    <property name="geometry">
     <rect>
      <x>350</x>
@@ -164,17 +133,17 @@
     </font>
    </property>
    <property name="text">
-    <string/>
+    <string>Active</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="tractionValue">
+  <widget class="QLabel" name="slipRatioValue">
    <property name="geometry">
     <rect>
      <x>350</x>
-     <y>140</y>
+     <y>120</y>
      <width>251</width>
      <height>51</height>
     </rect>
@@ -185,7 +154,28 @@
     </font>
    </property>
    <property name="text">
-    <string/>
+    <string>50%</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="algorithmValue">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>170</y>
+     <width>251</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>30</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>PID</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -195,7 +185,7 @@
    <property name="geometry">
     <rect>
      <x>350</x>
-     <y>200</y>
+     <y>220</y>
      <width>251</width>
      <height>51</height>
     </rect>
@@ -206,28 +196,7 @@
     </font>
    </property>
    <property name="text">
-    <string/>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="fanValue">
-   <property name="geometry">
-    <rect>
-     <x>350</x>
-     <y>260</y>
-     <width>251</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>30</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string/>
+    <string>50%</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -300,6 +269,132 @@ B to leave</string>
    </property>
    <property name="text">
     <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="regenValue">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>270</y>
+     <width>251</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>30</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>50%</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="regenPower">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>280</y>
+     <width>261</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>30</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Regen power</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="sensitivityValue">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>320</y>
+     <width>251</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>30</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>50%</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="sensitivity">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>330</y>
+     <width>261</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>30</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Sensitivity</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="appsValue">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>370</y>
+     <width>251</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>30</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Linear</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="apps">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>380</y>
+     <width>261</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>30</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Apps curve</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
   </widget>
  </widget>

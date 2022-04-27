@@ -3,7 +3,8 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent) , subwindowShown(nullptr), interruptSubwindowShown(nullptr), guiHandler(new GUIHandler()),
-      canThread(), m_speed(0), timerStarted(false),  updateTimer(new QTimer()), ui(new Ui::MainWindow), errorCounter(0)
+      canThread(), m_speed(0), timerStarted(false),  updateTimer(new QTimer()), ui(new Ui::MainWindow), dvSelect(new DvSelect()),
+      serviceMode(new ServiceMode()), errorCounter(0)
 {
     ui->setupUi(this);
 
@@ -15,20 +16,16 @@ MainWindow::MainWindow(QWidget *parent)
     else
         ui->can->setText("CAN error");
 
-    dvSelect = new DvSelect();
-    serviceMode = new ServiceMode();
-    changeConfirm = new ChangeConfirm();
 
     //communication between threads
     QObject::connect(guiHandler, &GUIHandler::updateData, this, &MainWindow::updateData);
     QObject::connect(guiHandler, &GUIHandler::error, this, &MainWindow::raiseError);
     QObject::connect(guiHandler, &GUIHandler::navigate, this, &MainWindow::navigate);
-    QObject::connect(guiHandler, &GUIHandler::getConfirmation, this, &MainWindow::getConfirmation);
+    QObject::connect(guiHandler, &GUIHandler::setPreset, this, &MainWindow::setPreset);
     QObject::connect(guiHandler, &GUIHandler::clearError, this, &MainWindow::clearError);
 
     QObject::connect(dvSelect, &DvSelect::finished, this, &MainWindow::reopen);
     QObject::connect(serviceMode, &ServiceMode::finished, this, &MainWindow::reopen);
-    QObject::connect(changeConfirm, &ChangeConfirm::finished, this, &MainWindow::reopen);
 
     elapsedTimer = new QElapsedTimer();
 
@@ -45,7 +42,6 @@ MainWindow::~MainWindow()
     delete dvSelect;
     delete serviceMode;
     delete elapsedTimer;
-    delete changeConfirm;
     delete updateTimer;
     delete guiHandler;
 }
@@ -100,11 +96,11 @@ void MainWindow::navigate(buttonStates navigation)
 {
     if (subwindowShown == nullptr) {
         switch (navigation) {
-        case buttonStates::button1_4:
-            subwindowShown = dvSelect;
-            this->hide();
-            dvSelect->show();
-            break;
+//        case buttonStates::button1_4:     //driverless is not ready for frame sending
+//            subwindowShown = dvSelect;
+//            this->hide();
+//            dvSelect->show();
+//            break;
         case buttonStates::button2_3:
             subwindowShown = serviceMode;
             this->hide();
@@ -123,13 +119,9 @@ void MainWindow::navigate(buttonStates navigation)
     else subwindowShown->navigate(navigation);
 }
 
-void MainWindow::getConfirmation(Side side, scrollStates scroll)
+void MainWindow::setPreset(Side side, scrollStates scroll)
 {
-    interruptSubwindowShown = subwindowShown;   //keeps the window that change confirm interrupted
-    subwindowShown = changeConfirm;
-    changeConfirm->toConfirm(side, scroll);      //prepare the subwindow
-    this->hide();
-    changeConfirm->show();
+    serviceMode->setPreset(side, scroll);
 }
 
 void MainWindow::clearError()
@@ -145,12 +137,8 @@ void MainWindow::clearError()
 
 void MainWindow::reopen()
 {
-    if (interruptSubwindowShown == nullptr) {   //if changeconfirm didn't trigger the change
-        this->show();
-        subwindowShown = nullptr;
-    }
-
-    interruptSubwindowShown = nullptr;
+    subwindowShown = nullptr;
+    this->show();
 }
 
 void MainWindow::updateBestTime()

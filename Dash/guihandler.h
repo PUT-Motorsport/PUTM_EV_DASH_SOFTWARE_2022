@@ -25,7 +25,7 @@ signals:
     void updateData(Parameter param, qreal value);
     void error(QString const &message);
     void navigate(buttonStates navigation);
-    void getConfirmation(Side side, scrollStates state);
+    void setPreset(Side side, scrollStates state);
     void clearError();
 
 private slots:
@@ -45,11 +45,11 @@ private:
 
     QTcpSocket * tcpSocket;
     QString const hostname = "127.0.0.1";
-    static constexpr int portNumber = 631;
+    static constexpr int portNumber = 1234;
 
-    static constexpr uint8_t jsonSize{};
+    static constexpr uint8_t relativeTelemetryFrequency{20};
 
-    nlohmann::json telemetry;
+
     AsyncCanData const &asyncCanData;
     CanData canData;
 

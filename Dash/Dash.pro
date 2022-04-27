@@ -15,7 +15,6 @@ CONFIG += c++17
 SOURCES += \
     canhandler.cpp \
     canraw.cpp \
-    changeconfirm.cpp \
     drivingselect.cpp \
     dvselect.cpp \
     guihandler.cpp \
@@ -38,7 +37,6 @@ HEADERS += \
     CanHeaders/PM08-CANBUS-TELEMETRY.hpp \
     canhandler.h \
     canraw.h \
-    changeconfirm.h \
     drivingselect.h \
     dvselect.h \
     guicomponent.h \
@@ -53,7 +51,6 @@ HEADERS += \
 
 FORMS += \
     canraw.ui \
-    changeconfirm.ui \
     drivingselect.ui \
     dvselect.ui \
     logs.ui \

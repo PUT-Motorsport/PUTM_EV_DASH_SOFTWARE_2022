@@ -3,11 +3,14 @@
 
 DrivingSelect::DrivingSelect(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::DrivingSelect), current(Setting::Regain)
+    currentSetting(Setting::TC), ui(new Ui::DrivingSelect)
 {
     ui->setupUi(this);
-    ui->regain->setStyleSheet("color: red;");
-    loadSettings();
+
+    labels = {{ui->tc, ui->tcValue}, {ui->slipRatio, ui->slipRatioValue}, {ui->algorithm, ui->algorithmValue},
+              {ui->power, ui->powerValue}, {ui->regenPower, ui->regenValue}, {ui->sensitivity, ui->sensitivityValue}, {ui->apps, ui->appsValue}};
+
+    changeHighlight();
 }
 
 DrivingSelect::~DrivingSelect()
@@ -18,11 +21,11 @@ DrivingSelect::~DrivingSelect()
 void DrivingSelect::navigate(buttonStates navigation)
 {
     switch (navigation) {
-    case buttonStates::button1:
-        changeValue();
+    case buttonStates::button2_3:
+        sendSettings();
         break;
     case buttonStates::button2:
-        sendCANFrame();
+        changeSettingValue();
         break;
     case buttonStates::button3:
         resetToCurrent();
@@ -41,155 +44,180 @@ void DrivingSelect::raiseError(const QString &errorMessage)
     ui->error->setText("Error: " + errorMessage);
     QTimer::singleShot(3000, [this] () {
             ui->error->setText("");
-        });
+    });
+}
+
+void DrivingSelect::setPreset(Side side, scrollStates scroll)
+{
+    QFile file(presets);
+
+    if(not(file.open(QIODevice::ReadOnly | QIODevice::Text))) {
+        logger.add(presets + " couldn't be read");
+    }
+
+    if (side)
+        file.readLine();
+
+    QString line = file.readLine();
+
+    auto list = line.split(',');
+
+    uint8_t newSetting = list.at(1 + static_cast<uint8_t>(scroll)).toUInt();
+
+    settingsFrame = currentSettings;
+
+    if (side == Side::Left)
+        settingsFrame.max_power = newSetting;
+    else
+        settingsFrame.regen_power = newSetting;
+
+    sendSettings();
+
+
+    file.close();
+}
+
+void DrivingSelect::sendSettings()
+{
+    settingsFrame.CRC = calculateCRC();
+
+    QCanBusFrame frame;
+    frame.setFrameId(DASH_TCS_FRAME_CAN_ID);
+
+    frame.setPayload(QByteArray(reinterpret_cast<char *>(&settingsFrame), DASH_TCS_FRAME_CAN_DLC));
+
+
+    if (not(canHandler.send(frame))) {
+        raiseError("Frame sending failed");
+    }
+    else {
+        currentSettings = settingsFrame;
+        logger.add("TC settings change has been requested");
+        this->raiseError("Sent!");
+    }
+    resetToCurrent();
 }
 
 void DrivingSelect::changeHighlight()
 {
+    //getNextSetting
+    if (currentSetting == Setting::Sensitivity)
+        currentSetting = Setting::TC;
 
-    if (current == Setting::Apps)
-        current = Setting::Regain;
     else
-        current = static_cast<Setting>(static_cast<int>(current) + 1);
+        currentSetting = static_cast<Setting>(static_cast<int>(currentSetting) + 1);
 
-    QString white = "color: white;";
-    QString red = "color: red;";
-    ui->power->setStyleSheet(white);
-    ui->powerValue->setStyleSheet(white);
-    ui->apps->setStyleSheet(white);
-    ui->regain->setStyleSheet(white);
-    ui->regainValue->setStyleSheet(white);
-    ui->fan->setStyleSheet(white);
-    ui->fanValue->setStyleSheet(white);
-    ui->traction->setStyleSheet(white);
-    ui->tractionValue->setStyleSheet(white);
+    QString white{"color: white;"};
+    QString red{"color: red;"};
 
-    switch (current) {
-    case Setting::Apps:
-        ui->apps->setStyleSheet(red);
-        break;
-    case Setting::Fan:
-        ui->fan->setStyleSheet(red);
-        ui->fanValue->setStyleSheet(red);
-        break;
-    case Setting::Traction:
-        ui->traction->setStyleSheet(red);
-        ui->tractionValue->setStyleSheet(red);
-        break;
-    case Setting::Power:
-        ui->power->setStyleSheet(red);
-        ui->powerValue->setStyleSheet(red);
-        break;
-    case Setting::Regain:
-        ui->regain->setStyleSheet(red);
-        ui->regainValue->setStyleSheet(red);
-        break;
-    default:
-        logger.add("changeHighlight received a wrong argument");
+    //clear previous highlight
+    for (auto pair: labels) {
+        pair.first->setStyleSheet(white);
+        pair.second->setStyleSheet(white);
     }
-}
+    //highlight setting
 
-void DrivingSelect::sendCANFrame()
-{
-    QCanBusFrame frame;
-    frame.setFrameType(QCanBusFrame::FrameType::DataFrame);
-    QString payloadString;
+    labels.at(static_cast<int>(currentSetting)).first->setStyleSheet(red);
+    labels.at(static_cast<int>(currentSetting)).second->setStyleSheet(red);
 
-    frame.setFrameId(payloads.at(static_cast<int>(current)).at(1).toInt());
-
-    switch (current) {
-    case Setting::Regain:
-        payloadString = payloads.at(0).at(2 +   //a shift by 3 items to skip descrpitions
-                                          regainValues.indexOf(ui->regainValue->text()));
-        frame.setPayload(QByteArray::fromHex(payloadString.toUtf8()));
-        currentSettingsValues[static_cast<int>(current)] = ui->regainValue->text();
-        break;
-    case Setting::Traction:
-        payloadString = payloads.at(1).at(2 +
-                                          tractionValues.indexOf(ui->tractionValue->text()));
-        frame.setPayload(QByteArray::fromHex(payloadString.toUtf8()));
-        currentSettingsValues[static_cast<int>(current)] = ui->tractionValue->text();
-        break;
-    case Setting::Power:
-        payloadString = payloads.at(2).at(2 +
-                                          powerValues.indexOf(ui->powerValue->text()));
-        frame.setPayload(QByteArray::fromHex(payloadString.toUtf8()));
-        currentSettingsValues[static_cast<int>(current)] = ui->powerValue->text();
-        break;
-    case Setting::Fan:
-        payloadString = payloads.at(3).at(2 +
-                                          fanValues.indexOf(ui->fanValue->text()));
-        frame.setPayload(QByteArray::fromHex(payloadString.toUtf8()));
-        currentSettingsValues[static_cast<int>(current)] = ui->fanValue->text();
-        break;
-    case Setting::Apps:
-                    //TODO
-        return;
-    }
-    qDebug() << "Payload " << payloadString;
-    if (not(canHandler.send(frame))) {
-        resetToCurrent();
-    }
-    else {
-        ui->sent->setText("Sent!");
-        QTimer::singleShot(1000, [this] () {
-                ui->sent->setText("");
-            });
-    }
-}
-
-void DrivingSelect::changeValue()
-{
-    int index;
-    switch (current) {
-    case Setting::Regain:
-        //find the index of current setting, add one, display
-        index = regainValues.indexOf(ui->regainValue->text()) + 1;
-        if (index >= regainValues.length())
-            index = 1;
-        ui->regainValue->setText(regainValues.at(index));
-        break;
-    case Setting::Traction:
-        index = tractionValues.indexOf(ui->tractionValue->text()) + 1;
-        if (index >= tractionValues.length())
-            index = 1;
-        ui->tractionValue->setText(tractionValues.at(index));
-        break;
-    case Setting::Power:
-        index = powerValues.indexOf(ui->powerValue->text()) + 1;
-        if (index >= powerValues.length())
-            index = 1;
-        ui->powerValue->setText(powerValues.at(index));
-        break;
-    case Setting::Fan:
-        index = fanValues.indexOf(ui->fanValue->text()) + 1;
-        if (index >= fanValues.length())
-            index = 1;
-        ui->fanValue->setText(fanValues.at(index));
-        break;
-    case Setting::Apps:
-        changeAppsCurve();
-        break; //TODO after curve graphics are created
-    default:
-        logger.add("Driving Select changeValue() error", LogType::AppError);
-    }
-}
-
-void DrivingSelect::loadSettings()
-{
-    return;
-}
-
-void DrivingSelect::changeAppsCurve()
-{
-    return; //TODO after adding curve graphics
 }
 
 void DrivingSelect::resetToCurrent()
 {
-    ui->regainValue->setText(currentSettingsValues.at(0));
-    ui->tractionValue->setText(currentSettingsValues.at(1));
-    ui->powerValue->setText(currentSettingsValues.at(2));
-    ui->fanValue->setText(currentSettingsValues.at(3));
-    //TODO: apps support
+    ui->tcValue->setText((currentSettings.on) ? "Active" : "Inactive");
+    ui->slipRatioValue->setText(QString::number(currentSettings.max_slip_ratio));
+    ui->algorithmValue->setText(
+                getSettingName(Setting::Algorithm, static_cast<uint8_t>(currentSettings.algorithm)));
+    ui->powerValue->setText(QString::number(currentSettings.max_power));
+    ui->regenValue->setText(QString::number(currentSettings.regen_power));
+    ui->sensitivityValue->setText(QString::number(currentSettings.sensivity));
+
+}
+
+uint8_t DrivingSelect::calculateCRC()
+{
+    return 0; //todo
+}
+
+uint8_t DrivingSelect::getNextSettingValue(Setting setting)
+{
+    const auto lineNo = 2 + static_cast<uint8_t>(setting);
+
+    QFile file(valuesFile);
+
+    if (not(file.open(QIODevice::ReadOnly | QIODevice::Text))) {
+        logger.add(valuesFile + "couldn't be opened");
+        return 1;
+    }
+
+    if (not(file.seek(lineNo))) {
+        logger.add("File of unexpected length");
+        return 1;
+    }
+    QString line(file.readLine());
+
+    QStringList list = line.split(',', Qt::SkipEmptyParts);
+
+    auto min = list.at(1).toInt();
+    auto max = list.at(2).toInt();
+    auto increment = list.at(3).toInt();
+
+    //get current value through pointer arithmetic
+
+    uint8_t * data = reinterpret_cast<uint8_t *>(&settingsFrame);
+
+    auto &current = *(data + static_cast<uint8_t>(setting));
+
+    if (current + increment < max) {
+        current += increment;
+    }
+    else {
+        current = min;
+    }
+
+    file.close();
+    return current;
+    return 1;
+}
+
+void DrivingSelect::changeSettingValue()
+{
+    auto next = getNextSettingValue(currentSetting);
+
+    if (currentSetting == Setting::TC or currentSetting == Setting::Algorithm or currentSetting == Setting::AppsCurve) {
+        labels.at(static_cast<uint8_t>(currentSetting)).second->setText(getSettingName(currentSetting, next));
+    }
+    else
+        labels.at(static_cast<uint8_t>(currentSetting)).second->setText(QString::number(next));
+
+    uint8_t * data = reinterpret_cast<uint8_t * >(&settingsFrame);
+
+    *(data + static_cast<uint8_t>(currentSetting)) = next;
+}
+
+const QString DrivingSelect::getSettingName(Setting setting, uint8_t value) const
+{
+    if (setting == Setting::TC) {
+        return (value) ? "Active" : "Inactive";
+    }
+    if (value > 10) {
+        logger.add("Incorrect setting name read. Processed.", LogType::AppError);
+        return QString("App error");
+    }
+
+    QFile file(descriptionsFile);
+    if (not(file.open(QIODevice::ReadOnly | QIODevice::Text))) {
+        logger.add(descriptionsFile + " couldn't be opened");
+        return QString();
+    }
+
+    if (not(file.seek(1 + 10 * (setting == Setting::Algorithm))))
+        logger.add("File of unexpected length");
+
+    for (auto iter = 0; iter < value; iter++)
+        file.readLine();
+
+    file.close();
+
+    return QString(file.readLine());
 }

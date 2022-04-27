@@ -1,0 +1,14 @@
+//Algorithm
+PI
+PID
+LQR
+LQRI
+SDRE
+MPC
+
+
+
+//Apps curve
+Linear
+Wet
+Acc

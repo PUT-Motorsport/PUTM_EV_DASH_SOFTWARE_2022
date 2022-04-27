@@ -27,6 +27,9 @@ public:
     void updateData(Parameter param, qreal value);
     void navigate(buttonStates navigation) override;
     void raiseError(QString const &errorMessage) override;
+    void setPreset(Side side, scrollStates scroll) {
+        driving->setPreset(side, scroll);
+    }
 
 private:
     Ui::ServiceMode *ui;
