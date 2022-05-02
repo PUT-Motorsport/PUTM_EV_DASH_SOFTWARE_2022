@@ -67,16 +67,20 @@ void CanHandler::onCanFrameReceived()
 
     for (auto dev: canData.synchronousFrames) {
         if (dev->id == frame.frameId()) {
+            canData.mtx.lock();
             std::memcpy(dev->dataPtr, frame.payload().constData(), dev->dlc);
             dev->hasBeenUpdated = true;
+            canData.mtx.unlock();
             return;
         }
     }
 
     for (auto event: canData.asynchronousFrames) {
         if (event->id == frame.frameId()) {
+            canData.mtx.lock();
             std::memcpy(event->dataPtr, frame.payload().constData(), event->dlc);
             event->hasBeenUpdated = true;
+            canData.mtx.unlock();
         }
     }
 
@@ -95,13 +99,8 @@ void CanHandler::heartbeat() {
     Dash_Main dash_main;
     dash_main.device_state = this->heartBeatState;
 
-    char * data = new char[sizeof(Dash_Main)];
 
-    std::memcpy(data, &dash_main, sizeof(Dash_Main));
-
-    heartbeatFrame.setPayload(data);
+    heartbeatFrame.setPayload(QByteArray(reinterpret_cast<char *>(&dash_main), sizeof(dash_main)));
 
     send(heartbeatFrame);
-
-    delete[] data;
 }

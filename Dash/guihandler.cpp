@@ -53,8 +53,8 @@ void GUIHandler::updateGUI()
 
     static uint8_t cycle{0};
 
-    if (cycle % relativeTelemetryFrequency == 0)
-        generateJSON();
+//    if (cycle % relativeTelemetryFrequency == 0)
+//        generateJSON();
 
     cycle++;
 
@@ -134,10 +134,16 @@ void GUIHandler::handleAsyncFrames()
 {
     if (asyncCanData.asynchronousFrames.at(0)->hasBeenUpdated) {
         steeringWheel();
+        asyncCanData.mtx.lock();
         asyncCanData.asynchronousFrames.at(0)->hasBeenUpdated = false;
+        asyncCanData.mtx.unlock();
     }
-    if (asyncCanData.asynchronousFrames.at(1)->hasBeenUpdated)
-        ; //lapTimer(); //todo: laptimer support
+    if (asyncCanData.asynchronousFrames.at(1)->hasBeenUpdated) {
+        emit lapPassed(canData.laptimer_pass.data.Sector);
+        asyncCanData.mtx.lock();
+        asyncCanData.asynchronousFrames.at(1)->hasBeenUpdated = false;
+        asyncCanData.mtx.unlock();
+    }
 }
 
 void GUIHandler::generateJSON()
@@ -208,13 +214,11 @@ void GUIHandler::steeringWheel()
     if (not((scrolls[Side::Left]).has_value())) {
 
         scrolls[Side::Left].emplace(left_scroll);
-        emit setPreset(Side::Left, left_scroll);    //fixme : assuming state
 
     }
     else if (left_scroll not_eq scrolls[Side::Left]) {
 
         scrolls[Side::Left] = left_scroll;
-        emit setPreset(Side::Left, left_scroll);
 
     }
 

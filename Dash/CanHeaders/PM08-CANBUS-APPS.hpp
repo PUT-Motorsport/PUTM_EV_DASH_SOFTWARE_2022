@@ -1,4 +1,4 @@
-//Generated on Thu Apr  7 17:02:54 2022
+//Generated on Sat Apr 30 12:45:20 2022
 #ifndef APPS
 #define APPS
 
@@ -8,10 +8,10 @@ enum struct Apps_states: uint8_t {
 	Normal_operation,
 	Power_up,
 	Sensor_Implausiblity,
-	Left_sensor_out_of_range___lower_bound,
-	Left_sensor_out_of_range___upper_bound,
-	Right_sensor_out_of_range___lower_bound,
-	Right_sensor_out_of_range___upper_bound,
+	Left_sensor_out_of_range_lower_bound,
+	Left_sensor_out_of_range_upper_bound,
+	Right_sensor_out_of_range_lower_bound,
+	Right_sensor_out_of_range_upper_bound,
 };
 
 struct __attribute__ ((packed)) Apps_main{
@@ -22,7 +22,7 @@ struct __attribute__ ((packed)) Apps_main{
 };
 
 
-const uint16_t APPS_MAIN_CAN_ID = 0;
+const uint16_t APPS_MAIN_CAN_ID = 0x5;
 const uint8_t APPS_MAIN_CAN_DLC = sizeof(Apps_main);
 const uint8_t APPS_MAIN_FREQUENCY = 100;
 

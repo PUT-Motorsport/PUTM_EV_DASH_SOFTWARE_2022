@@ -42,17 +42,20 @@ private:
     void changeSettingValue();
 
     Setting currentSetting; //todo: rename
-    Dash_TCS_frame settingsFrame;
-    Dash_TCS_frame currentSettings;
+    Dash_TCS settingsFrame;
+    Dash_TCS currentSettings;
 
     Ui::DrivingSelect *ui;
     QList<QPair<QLabel *, QLabel *>> labels;
 
-    QString const getSettingName(Setting setting, uint8_t value) const;
+    QString const getSettingName(Setting setting, uint8_t value);
 
-    QString const presets{"presets.csv"};
-    QString const descriptionsFile{"names.txt"};
-    QString const valuesFile{"values.csv"};
+    QString const presets{"ProgramData\\presets.csv"};
+    QFile presetsFile;
+    QString const descriptions{"ProgramData\\names.txt"};
+    QFile descriptionsFile;
+    QString const values{"ProgramData\\values.csv"};
+    QFile valuesFile;
 };
 
 #endif // DRIVINGSELECT_H

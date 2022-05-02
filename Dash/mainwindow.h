@@ -10,6 +10,7 @@
 
 #include "canhandler.h"
 #include "vehicle.h"
+#include "timer.h"
 #include "dvselect.h"
 #include "servicemode.h"
 
@@ -35,12 +36,12 @@ public slots:
     void navigate(buttonStates navigation);
     void setPreset(Side side, scrollStates scroll);
     void clearError();
-
+    void pass(uint8_t sector);
+    void setMaxPower(uint8_t maxPower);
 private slots:
     void reopen();
 
 private:
-
 
     GUIHandler * guiHandler;
     QThread canThread;
@@ -48,10 +49,13 @@ private:
     void updateBestTime();
     void resetTimer();
 
-    int m_speed;        //kept so that a change can start a timer
-    QTime best;
-    QElapsedTimer * elapsedTimer;
-    bool timerStarted;
+    std::array<QLabel *, 3> timerLabels;
+    std::array<Timer, 3> elapsedTimers;
+    std::array<std::chrono::duration<long, std::ratio<1, 1000>>::rep, 3> sectorTimes;
+    uint8_t currentSector;
+    static constexpr uint8_t delta = 2;
+    static constexpr uint16_t timerUpdateTime = 100;
+    void updateTimers();
     QTimer * updateTimer;     //will call the gui to update timer
 
     Ui::MainWindow *ui;

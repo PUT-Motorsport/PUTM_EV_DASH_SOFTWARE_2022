@@ -39,7 +39,7 @@ template<typename T>
 class Device : public DeviceBase {
 public:
     T data;
-    explicit Device(uint8_t id, std::string const &name, uint8_t frequency) :
+    explicit Device(uint8_t id, std::string const &name, uint8_t frequency = 0) :
         DeviceBase(id, sizeof(T), name, frequency) {
         dataPtr = &data; //for memory copying without v-calls
     }
@@ -50,21 +50,19 @@ struct CanData{
 
     Device<Apps_main> apps{ APPS_MAIN_CAN_ID, "Apps", APPS_MAIN_FREQUENCY };
     Device<AQ_main> aq_main{ AQ_MAIN_CAN_ID, "Aq main", AQ_MAIN_FREQUENCY };
-    Device<AQ_air_flow> aq_air_flow{ AQ_AIR_FLOW_CAN_ID, "Aq air flow", AQ_AIR_FLOW_FREQUENCY };
     Device<BMS_HV_main> bms_hv_main{ BMS_HV_MAIN_CAN_ID, "BMS HV", BMS_HV_MAIN_FREQUENCY };
     Device<BMS_LV_main> bms_lv_main{ BMS_LV_MAIN_CAN_ID, "BMS LV main", BMS_LV_MAIN_FREQUENCY };
     Device<BMS_LV_temperature> bms_lv_temperature{ BMS_LV_TEMPERATURE_CAN_ID, "BMS LV temperatures", BMS_LV_TEMPERATURE_FREQUENCY };
 //    Device<Dash_Main> dash_main{ DASH_MAIN_CAN_ID, "Dash Main", DASH_MAIN_FREQUENCY };
 //    Device<Dash_StateChange> dash_statechange{ DASH_STATECHANGE_CAN_ID, "Dash StateChange", DASH_STATECHANGE_FREQUENCY };
-    Device<Lap_timer_Main> laptimer_main{ LAP_TIMER_MAIN_CAN_ID, "Laptimer", LAP_TIMER_STATECHANGE_FREQUENCY };
-    Device<Lap_timer_StateChange> laptimer_statechange{ LAP_TIMER_STATECHANGE_CAN_ID, "Laptimer StateChange", LAP_TIMER_STATECHANGE_FREQUENCY };
+    Device<Lap_timer_Main> laptimer_main{ LAP_TIMER_MAIN_CAN_ID, "Laptimer", LAP_TIMER_MAIN_FREQUENCY };
+    Device<Lap_timer_Pass> laptimer_pass{ LAP_TIMER_PASS_CAN_ID, "Laptimer_pass"};
     Device<SF_main> sf_main{ SF_MAIN_CAN_ID, "SF main", SF_MAIN_FREQUENCY };
-    Device<SF_data_frame_0> sf_data_0{ SF_DATA_FRAME_0_CAN_ID, "Sf data 0", SF_DATA_FRAME_0_FREQUENCY };
-    Device<SF_data_frame_1> sf_data_1{ SF_DATA_FRAME_1_CAN_ID, "Sf data 1", SF_DATA_FRAME_1_FREQUENCY };
-    Device<SF_data_frame_2> sf_data_2{ SF_DATA_FRAME_2_CAN_ID, "Sf data 2", SF_DATA_FRAME_2_FREQUENCY };
-    Device<SF_data_frame_3> sf_data_3{ SF_DATA_FRAME_3_CAN_ID, "Sf data 3", SF_DATA_FRAME_3_FREQUENCY };
-    Device<SF_data_frame_4> sf_data_4{ SF_DATA_FRAME_4_CAN_ID, "Sf data 4", SF_DATA_FRAME_4_FREQUENCY };
-    Device<SF_data_frame_5> sf_data_5{ SF_DATA_FRAME_5_CAN_ID, "Sf data 5", SF_DATA_FRAME_5_FREQUENCY };
+    Device<SF_FrontBox> sf_frontBox{ SF_FRONTBOX_CAN_ID, "sf front box", SF_FRONTBOX_FREQUENCY };
+    Device<SF_CoolingAndVSafety> sf_cooling{ SF_COOLINGANDVSAFETY_CAN_ID, "sf cooling", SF_COOLINGANDVSAFETY_FREQUENCY };
+    Device<SF_DV> sf_dv{ SF_DV_CAN_ID, "sf dv", SF_DV_FREQUENCY };
+    Device<SF_WS> sf_ws{ SF_WS_CAN_ID, "sf ws", SF_WS_FREQUENCY };
+    Device<SF_NUCS> sf_nucs { SF_NUCS_CAN_ID, "sf nucs", SF_NUCS_FREQUENCY };
     Device<Steering_Wheel_main> steering_wheel_main{ STEERING_WHEEL_MAIN_CAN_ID, "Steering Wheel", STEERING_WHEEL_MAIN_FREQUENCY };
     Device<Steering_Wheel_event> steering_wheel_event{ STEERING_WHEEL_EVENT_CAN_ID, "Steering wheel event", STEERING_WHEEL_EVENT_FREQUENCY };
     Device<TS_main> ts_main{ TS_MAIN_CAN_ID, "TS", TS_MAIN_FREQUENCY };
@@ -73,17 +71,17 @@ struct CanData{
 
 };
 
+constexpr auto numberOfFrames = 15;
+
 struct AsyncCanData: public CanData {
     mutable QMutex mtx;
-    static constexpr auto numberOfFrames = 19;
 
-    std::array<DeviceBase * const, numberOfFrames> synchronousFrames = { &apps, &aq_main, &aq_air_flow, &bms_hv_main,
-                                        &bms_lv_main, &bms_lv_temperature,
-                                        &laptimer_main, &sf_main, &sf_data_0, &sf_data_1,
-                                        &sf_data_2, &sf_data_2, &sf_data_3, &sf_data_4, &sf_data_5, &steering_wheel_main,
-                                        &ts_main, &ts_rear_suspension, &telemetry_main };
 
-    mutable std::array<DeviceBase * const, 2> asynchronousFrames{&steering_wheel_event, &laptimer_statechange};
+    std::array<DeviceBase * const, numberOfFrames> synchronousFrames = { &apps, &aq_main, &bms_hv_main,
+                                        &bms_lv_main, &bms_lv_temperature, &laptimer_main, &sf_main, &sf_cooling, &sf_dv,
+                                        &sf_ws, &sf_nucs, &steering_wheel_main, &ts_main, &ts_rear_suspension, &telemetry_main };
+
+    mutable std::array<DeviceBase * const, 2> asynchronousFrames{&steering_wheel_event, &laptimer_pass};
 
     std::array<DeviceBase const * const, 8> statusFrames{&apps, &aq_main, &bms_hv_main, &bms_lv_main, &laptimer_main, &sf_main, &ts_main, &telemetry_main};
 };

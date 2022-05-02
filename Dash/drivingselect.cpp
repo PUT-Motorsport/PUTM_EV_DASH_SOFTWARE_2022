@@ -3,7 +3,7 @@
 
 DrivingSelect::DrivingSelect(QWidget *parent) :
     QDialog(parent),
-    currentSetting(Setting::TC), ui(new Ui::DrivingSelect)
+    currentSetting(Setting::TC), ui(new Ui::DrivingSelect), presetsFile(presets), descriptionsFile(descriptions), valuesFile(values)
 {
     ui->setupUi(this);
 
@@ -49,16 +49,10 @@ void DrivingSelect::raiseError(const QString &errorMessage)
 
 void DrivingSelect::setPreset(Side side, scrollStates scroll)
 {
-    QFile file(presets);
-
-    if(not(file.open(QIODevice::ReadOnly | QIODevice::Text))) {
-        logger.add(presets + " couldn't be read");
-    }
-
     if (side)
-        file.readLine();
+        presetsFile.readLine();
 
-    QString line = file.readLine();
+    QString line = presetsFile.readLine();
 
     auto list = line.split(',');
 
@@ -73,18 +67,18 @@ void DrivingSelect::setPreset(Side side, scrollStates scroll)
 
     sendSettings();
 
-
-    file.close();
+    presetsFile.close();
+    qDebug() << presetsFile.open(QIODevice::ReadOnly | QIODevice::Text);
 }
 
 void DrivingSelect::sendSettings()
 {
-    settingsFrame.CRC = calculateCRC();
+    settingsFrame.CRC_byte = calculateCRC();
 
     QCanBusFrame frame;
-    frame.setFrameId(DASH_TCS_FRAME_CAN_ID);
+    frame.setFrameId(DASH_TCS_CAN_ID);
 
-    frame.setPayload(QByteArray(reinterpret_cast<char *>(&settingsFrame), DASH_TCS_FRAME_CAN_DLC));
+    frame.setPayload(QByteArray(reinterpret_cast<char *>(&settingsFrame), DASH_TCS_CAN_DLC));
 
 
     if (not(canHandler.send(frame))) {
@@ -143,18 +137,11 @@ uint8_t DrivingSelect::getNextSettingValue(Setting setting)
 {
     const auto lineNo = 2 + static_cast<uint8_t>(setting);
 
-    QFile file(valuesFile);
-
-    if (not(file.open(QIODevice::ReadOnly | QIODevice::Text))) {
-        logger.add(valuesFile + "couldn't be opened");
-        return 1;
-    }
-
-    if (not(file.seek(lineNo))) {
+    if (not(valuesFile.seek(lineNo))) {
         logger.add("File of unexpected length");
         return 1;
     }
-    QString line(file.readLine());
+    QString line(valuesFile.readLine());
 
     QStringList list = line.split(',', Qt::SkipEmptyParts);
 
@@ -175,9 +162,9 @@ uint8_t DrivingSelect::getNextSettingValue(Setting setting)
         current = min;
     }
 
-    file.close();
+    valuesFile.close();
+    valuesFile.open(QIODevice::ReadOnly | QIODevice::Text);
     return current;
-    return 1;
 }
 
 void DrivingSelect::changeSettingValue()
@@ -195,7 +182,7 @@ void DrivingSelect::changeSettingValue()
     *(data + static_cast<uint8_t>(currentSetting)) = next;
 }
 
-const QString DrivingSelect::getSettingName(Setting setting, uint8_t value) const
+const QString DrivingSelect::getSettingName(Setting setting, uint8_t value)
 {
     if (setting == Setting::TC) {
         return (value) ? "Active" : "Inactive";
@@ -205,19 +192,13 @@ const QString DrivingSelect::getSettingName(Setting setting, uint8_t value) cons
         return QString("App error");
     }
 
-    QFile file(descriptionsFile);
-    if (not(file.open(QIODevice::ReadOnly | QIODevice::Text))) {
-        logger.add(descriptionsFile + " couldn't be opened");
-        return QString();
-    }
-
-    if (not(file.seek(1 + 10 * (setting == Setting::Algorithm))))
+    if (not(descriptionsFile.seek(1 + 10 * (setting == Setting::Algorithm))))
         logger.add("File of unexpected length");
 
     for (auto iter = 0; iter < value; iter++)
-        file.readLine();
+        descriptionsFile.readLine();
 
-    file.close();
+    descriptionsFile.close();
 
-    return QString(file.readLine());
+    return QString(descriptionsFile.readLine());
 }

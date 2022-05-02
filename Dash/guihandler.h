@@ -27,6 +27,7 @@ signals:
     void navigate(buttonStates navigation);
     void setPreset(Side side, scrollStates state);
     void clearError();
+    void lapPassed(uint8_t sector);
 
 private slots:
     void socketError(QAbstractSocket::SocketError const &error) const;
@@ -53,7 +54,7 @@ private:
     AsyncCanData const &asyncCanData;
     CanData canData;
 
-    std::array<uint8_t, AsyncCanData::numberOfFrames> cyclesMissed;
+    std::array<uint8_t, numberOfFrames> cyclesMissed;
     std::vector<DeviceBase *> errors;
 
     QTimer * updateTimer;

@@ -1,11 +1,11 @@
-//Generated on Thu Apr  7 17:02:52 2022
+//Generated on Sat Apr 30 12:45:17 2022
 #ifndef STEERING_WHEEL
 #define STEERING_WHEEL
 
 #include <cstdint>
 
 enum struct buttonStates: uint8_t {
-    not_pressed,
+	not_pressed,
 	button1,	//button1
 	button2,	//button2
 	button3,	//button3
@@ -44,10 +44,10 @@ struct __attribute__ ((packed)) Steering_Wheel_event{
 };
 
 
-const uint16_t STEERING_WHEEL_MAIN_CAN_ID = 0;
+const uint16_t STEERING_WHEEL_MAIN_CAN_ID = 0x28;
 const uint8_t STEERING_WHEEL_MAIN_CAN_DLC = sizeof(Steering_Wheel_main);
 const uint8_t STEERING_WHEEL_MAIN_FREQUENCY = 100;
-const uint16_t STEERING_WHEEL_EVENT_CAN_ID = 123;
+const uint16_t STEERING_WHEEL_EVENT_CAN_ID = 0x2d;
 const uint8_t STEERING_WHEEL_EVENT_CAN_DLC = sizeof(Steering_Wheel_event);
 const uint8_t STEERING_WHEEL_EVENT_FREQUENCY = 0;
 

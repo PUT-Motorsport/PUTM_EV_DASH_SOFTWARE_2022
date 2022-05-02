@@ -3,11 +3,13 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent) , subwindowShown(nullptr), interruptSubwindowShown(nullptr), guiHandler(new GUIHandler()),
-      canThread(), m_speed(0), timerStarted(false),  updateTimer(new QTimer()), ui(new Ui::MainWindow), dvSelect(new DvSelect()),
-      serviceMode(new ServiceMode()), errorCounter(0)
+      canThread(), elapsedTimers(), sectorTimes({}), currentSector(0),
+      updateTimer(new QTimer()), ui(new Ui::MainWindow), dvSelect(new DvSelect()), serviceMode(new ServiceMode()), errorCounter(0)
 {
     ui->setupUi(this);
 
+    timerLabels = {ui->sector1, ui->sector2, ui->sector3};
+    
     guiHandler->moveToThread(&canThread);
     canThread.start(QThread::InheritPriority);
 
@@ -23,17 +25,16 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(guiHandler, &GUIHandler::navigate, this, &MainWindow::navigate);
     QObject::connect(guiHandler, &GUIHandler::setPreset, this, &MainWindow::setPreset);
     QObject::connect(guiHandler, &GUIHandler::clearError, this, &MainWindow::clearError);
+    QObject::connect(guiHandler, &GUIHandler::lapPassed, this, &MainWindow::pass);
 
     QObject::connect(dvSelect, &DvSelect::finished, this, &MainWindow::reopen);
     QObject::connect(serviceMode, &ServiceMode::finished, this, &MainWindow::reopen);
 
-    elapsedTimer = new QElapsedTimer();
-
-    QObject::connect(updateTimer, &QTimer::timeout, this, [=](){
-        QTime time = QTime::fromMSecsSinceStartOfDay(elapsedTimer->elapsed());
-        ui->currentTime->setText(time.toString("hh:mm:ss:zzz"));
+    
+    QObject::connect(updateTimer, &QTimer::timeout, this, [this](){
+        updateTimers();
     });
-    best.setHMS(0,0,0);
+    updateTimer->start(timerUpdateTime);
 }
 
 MainWindow::~MainWindow()
@@ -41,7 +42,6 @@ MainWindow::~MainWindow()
     delete ui;
     delete dvSelect;
     delete serviceMode;
-    delete elapsedTimer;
     delete updateTimer;
     delete guiHandler;
 }
@@ -51,18 +51,11 @@ void MainWindow::updateData(Parameter param, qreal value)
     switch (param) {
     case Parameter::Speed:
         ui->speed->setText(QString::number(value));
-        if (m_speed == 0 and value != 0 and not(timerStarted)) {
-            elapsedTimer->start();
-            updateTimer->start(50);
-            timerStarted = true;
-        }
-        m_speed = value;
         break;
     case Parameter::Power:
-        ui->power->setText("Power: " + QString::number(value) + " kW");
+        ui->powerBar->setValue(value);
         break;
     case Parameter::RPM:
-        ui->rpmBar->setValue(value);
         break;
     case Parameter::CoolantTemp:
         ui->temperature->setText("Temp: " + QString::number(value) + " °C");    //only parameter shown on both
@@ -106,12 +99,6 @@ void MainWindow::navigate(buttonStates navigation)
             this->hide();
             serviceMode->show();
             break;
-        case buttonStates::button1:
-            updateBestTime();
-            break;
-        case buttonStates::button2:
-            resetTimer();
-            break;
         default:
             return;     //suppresses a warning, no real use
         }
@@ -135,42 +122,56 @@ void MainWindow::clearError()
         ui->errorCounter->setText("No errors");
 }
 
+void MainWindow::pass(uint8_t sector)
+{
+    sectorTimes.at(sector) = elapsedTimers.at(sector).get();
+
+    currentSector = sector;
+
+    elapsedTimers.at(sector).start();
+
+}
+
+void MainWindow::setMaxPower(uint8_t maxPower)
+{
+    ui->powerBar->setMaximum(maxPower);
+}
+
 void MainWindow::reopen()
 {
     subwindowShown = nullptr;
     this->show();
 }
 
-void MainWindow::updateBestTime()
+void MainWindow::updateTimers()
 {
-    QTime time = QTime::fromMSecsSinceStartOfDay(elapsedTimer->elapsed());
-    logger.add("Finished a lap in " + time.toString("hh:mm:ss:zzz"));
-    if (best == QTime(0,0,0) or best > time) {
-        best = time;
+    for (std::size_t iter = 0; iter < 3; ++iter) {
+
+        timerLabels.at(iter)->setText(QString::fromStdString(Timer::toStr(sectorTimes.at(iter))));
+
     }
+
+    auto const thisSectorTime = elapsedTimers.at(currentSector).get();
+
+    timerLabels.at(currentSector)->setText(QString::fromStdString(Timer::toStr(thisSectorTime)));
+
+    if (thisSectorTime + 1000 * delta < sectorTimes.at(currentSector) and elapsedTimers.at(currentSector).isValid()) {
+
+        timerLabels.at(currentSector)->setStyleSheet(QStringLiteral("color: green;"));
+
+    }
+
+    else if (thisSectorTime - 1000 * delta > sectorTimes.at(currentSector) and elapsedTimers.at(currentSector).isValid()) {
+
+        timerLabels.at(currentSector)->setStyleSheet(QStringLiteral("color: red;"));
+
+    }
+
     else {
-        elapsedTimer->restart();
-        return;
+
+        timerLabels.at(currentSector)->setStyleSheet(QStringLiteral("color: white;"));
+
     }
-    ui->bestTime->setText(time.toString("hh:mm:ss:zzz"));
-    elapsedTimer->restart();
+
+
 }
-
-void MainWindow::resetTimer()
-{
-    if (m_speed != 0)
-        elapsedTimer->restart();
-    else {
-        updateTimer->stop();
-        delete elapsedTimer;
-        elapsedTimer = new QElapsedTimer();
-        timerStarted = false;
-    }
-    ui->currentTime->setText(QTime(0, 0, 0).toString("hh:mm:ss:zzz"));
-    ui->bestTime->setText(QTime(0, 0, 0).toString("hh:mm:ss:zzz"));
-}
-
-
-
-
-

@@ -1,4 +1,4 @@
-//Generated on Thu Apr  7 17:02:53 2022
+//Generated on Sat Apr 30 12:45:17 2022
 #ifndef BMS_LV
 #define BMS_LV
 
@@ -35,10 +35,10 @@ struct __attribute__ ((packed)) BMS_LV_temperature{
 };
 
 
-const uint16_t BMS_LV_MAIN_CAN_ID = 200;
+const uint16_t BMS_LV_MAIN_CAN_ID = 0xf;
 const uint8_t BMS_LV_MAIN_CAN_DLC = sizeof(BMS_LV_main);
 const uint8_t BMS_LV_MAIN_FREQUENCY = 100;
-const uint16_t BMS_LV_TEMPERATURE_CAN_ID = 0;
+const uint16_t BMS_LV_TEMPERATURE_CAN_ID = 0x14;
 const uint8_t BMS_LV_TEMPERATURE_CAN_DLC = sizeof(BMS_LV_temperature);
 const uint8_t BMS_LV_TEMPERATURE_FREQUENCY = 1;
 

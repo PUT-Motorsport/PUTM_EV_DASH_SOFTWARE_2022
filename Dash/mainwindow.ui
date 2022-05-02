@@ -19,7 +19,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QProgressBar" name="rpmBar">
+   <widget class="QProgressBar" name="powerBar">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -50,7 +50,7 @@
    <widget class="QLabel" name="speed">
     <property name="geometry">
      <rect>
-      <x>260</x>
+      <x>270</x>
       <y>80</y>
       <width>261</width>
       <height>151</height>
@@ -72,10 +72,10 @@
    <widget class="QLabel" name="units">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>220</y>
-      <width>221</width>
-      <height>61</height>
+      <x>280</x>
+      <y>230</y>
+      <width>241</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="font">
@@ -95,7 +95,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>90</y>
+      <y>110</y>
       <width>241</width>
       <height>61</height>
      </rect>
@@ -116,8 +116,8 @@
    <widget class="QLabel" name="temperature">
     <property name="geometry">
      <rect>
-      <x>520</x>
-      <y>90</y>
+      <x>0</x>
+      <y>180</y>
       <width>271</width>
       <height>61</height>
      </rect>
@@ -135,88 +135,12 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="labelCurrent">
-    <property name="geometry">
-     <rect>
-      <x>500</x>
-      <y>370</y>
-      <width>271</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>URW Gothic</family>
-      <pointsize>26</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Current:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="currentTime">
-    <property name="geometry">
-     <rect>
-      <x>500</x>
-      <y>400</y>
-      <width>291</width>
-      <height>71</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>URW Gothic</family>
-      <pointsize>41</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>00:00:00.00</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="bestTime">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>400</y>
-      <width>291</width>
-      <height>71</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>URW Gothic</family>
-      <pointsize>41</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>00:00:00.00</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelBest">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>370</y>
-      <width>271</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>URW Gothic</family>
-      <pointsize>26</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Best:</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="can">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>170</y>
-      <width>261</width>
+      <x>260</x>
+      <y>380</y>
+      <width>281</width>
       <height>41</height>
      </rect>
     </property>
@@ -236,8 +160,8 @@
    <widget class="QLabel" name="errorCounter">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>150</y>
+      <x>10</x>
+      <y>250</y>
       <width>241</width>
       <height>41</height>
      </rect>
@@ -250,28 +174,6 @@
     </property>
     <property name="text">
      <string>No errors</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QLabel" name="power">
-    <property name="geometry">
-     <rect>
-      <x>240</x>
-      <y>280</y>
-      <width>311</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>URW Gothic</family>
-      <pointsize>34</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>n/a kW</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -300,6 +202,72 @@
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="sector1">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>120</y>
+      <width>201</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>URW Gothic</family>
+      <pointsize>27</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>00:00.000</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="sector2">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>180</y>
+      <width>201</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>URW Gothic</family>
+      <pointsize>27</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>00:00.000</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="sector3">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>240</y>
+      <width>201</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>URW Gothic</family>
+      <pointsize>27</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>00:00.000</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
   </widget>
