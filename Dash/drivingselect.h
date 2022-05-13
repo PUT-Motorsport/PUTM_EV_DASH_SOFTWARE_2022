@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QLabel>
 
+#include "lib/CRC.h"
 #include "guicomponent.h"
 #include "canhandler.h"
 #include "logger.h"
@@ -58,6 +59,9 @@ private:
     QString const valuesFileName{"settings.csv"};
 
     QVector<QString> loadFile(QString const &fileName);
+
+    //crc
+    CRC::Table<uint8_t, sizeof(uint8_t)> table;
 };
 
 #endif // DRIVINGSELECT_H

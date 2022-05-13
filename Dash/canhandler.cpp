@@ -42,9 +42,7 @@ bool CanHandler::connect()
 
 inline bool CanHandler::connected()
 {
-    canDevice->state();
-//    return canDevice->state() == QCanBusDevice::ConnectedState;   //fixme: SIGSEGV
-    return true;
+    return canDevice->state();
 }
 
 bool CanHandler::send(const QCanBusFrame &toSend)

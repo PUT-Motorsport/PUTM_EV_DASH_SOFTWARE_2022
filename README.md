@@ -10,7 +10,9 @@ Written in Qt 6.2.3 on Ubuntu 21, targeted for Raspberry Pi OS 11.
 
 The app uses an external library `libsocketcan`, which can be installed in a `libsocketcan-dev` package.
 
-The app also uses the [Nlohmanns's json library](https://github.com/nlohmann/json). Licensed under MIT, available in the project files in \Dash\lib.
+The app uses the [Nlohmanns's json library](https://github.com/nlohmann/json). Licensed under MIT, available in the project files in \Dash\lib.
+
+The app uses the [d-bahr's crc c++ library](https://github.com/d-bahr/CRCpp).
 
 ## CAN bus connection
 

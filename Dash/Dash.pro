@@ -41,6 +41,7 @@ HEADERS += \
     dvselect.h \
     guicomponent.h \
     guihandler.h \
+    lib/CRC.h \
     lib/json.hpp \
     logger.h \
     logs.h \

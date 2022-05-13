@@ -3,7 +3,13 @@
 
 DrivingSelect::DrivingSelect(QWidget *parent) :
     QDialog(parent),
-    currentSetting(Setting::TC), ui(new Ui::DrivingSelect)
+    currentSetting(Setting::TC), ui(new Ui::DrivingSelect),
+    table(CRC::Parameters<uint8_t, sizeof(uint8_t)>({.polynomial = 0x1d,
+                                                    .initialValue = 0xff,
+                                                    .finalXOR = 0,
+                                                    .reflectInput = false,
+                                                    .reflectOutput = false
+                                                    }))
 {
     currentSettings = {
         .on = true,
@@ -144,8 +150,8 @@ void DrivingSelect::resetToCurrent()
 }
 
 uint8_t DrivingSelect::calculateCRC()
-{
-    return 0; //todo
+{   
+    return CRC::Calculate(&currentSettings, sizeof(Dash_TCS) - 1, table);
 }
 
 uint8_t DrivingSelect::getSettingValue(Setting setting, bool next)
