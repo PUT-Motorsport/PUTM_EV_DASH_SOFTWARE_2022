@@ -7,6 +7,11 @@ CanHandler::CanHandler(QObject *parent): QObject(parent),
         logger.add("Cansockets plugin missing", LogType::AppError);
 
     QObject::connect(heartbeatTimer, &QTimer::timeout, this, &CanHandler::heartbeat);
+
+#ifdef SEND_HEARTBEAT
+    heartbeatTimer->start(1 / heartbeatFrequency);
+#endif
+
 }
 
 CanHandler::~CanHandler() {
@@ -19,7 +24,6 @@ bool CanHandler::connect()
     QString errorString;
     canDevice = QCanBus::instance()->createDevice(QStringLiteral("socketcan"),
                                                   QStringLiteral("vcan0"), &errorString);
-    //todo: remember to change before building for pi
     if (!canDevice) {
         logger.add("Can Device creation failed: " + errorString, LogType::Critical);
         return false;
@@ -38,18 +42,21 @@ bool CanHandler::connect()
 
 inline bool CanHandler::connected()
 {
+    canDevice->state();
 //    return canDevice->state() == QCanBusDevice::ConnectedState;   //fixme: SIGSEGV
     return true;
 }
 
 bool CanHandler::send(const QCanBusFrame &toSend)
 {
-    if (not(connected()))
+    if (not(connected())) {
+        logger.add("Attempted sending in unconnected state", LogType::Critical);
         return false;
-
+    }
     if (canDevice->writeFrame(toSend))
         return true;
 
+    logger.add("Frame sending failed");
     return false;
 }
 
@@ -93,6 +100,7 @@ void CanHandler::onCanErrorOcurred()
 }
 
 void CanHandler::heartbeat() {
+
     QCanBusFrame heartbeatFrame;
     heartbeatFrame.setFrameId(DASH_MAIN_CAN_ID);
 

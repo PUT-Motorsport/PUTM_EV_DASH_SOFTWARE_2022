@@ -2,8 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QTimer>
-#include <QElapsedTimer>
 
 #include "guicomponent.h"
 #include "guihandler.h"

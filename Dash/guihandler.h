@@ -10,8 +10,6 @@
 #include <optional>
 #include <algorithm>
 
-#define DATA_TIMEOUT_CHECK false
-
 extern CanHandler canHandler;
 
 class GUIHandler: public QObject

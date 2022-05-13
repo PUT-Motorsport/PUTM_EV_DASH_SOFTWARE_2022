@@ -81,7 +81,7 @@ struct AsyncCanData: public CanData {
                                         &bms_lv_main, &bms_lv_temperature, &laptimer_main, &sf_main, &sf_cooling, &sf_dv,
                                         &sf_ws, &sf_nucs, &steering_wheel_main, &ts_main, &ts_rear_suspension, &telemetry_main };
 
-    mutable std::array<DeviceBase * const, 2> asynchronousFrames{&steering_wheel_event, &laptimer_pass};
+    std::array<DeviceBase * const, 2> asynchronousFrames{&steering_wheel_event, &laptimer_pass};
 
     std::array<DeviceBase const * const, 8> statusFrames{&apps, &aq_main, &bms_hv_main, &bms_lv_main, &laptimer_main, &sf_main, &ts_main, &telemetry_main};
 };

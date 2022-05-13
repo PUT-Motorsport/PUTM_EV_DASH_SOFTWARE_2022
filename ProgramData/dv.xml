@@ -1,7 +1,0 @@
-<dvMissions>
-    <mission description="Mission 1" frameID="101" framePayload="0001"></mission>
-    <mission description="Mission 2" frameID="102" framePayload="0002"></mission>
-    <mission description="Mission 3" frameID="103" framePayload="0003"></mission>
-    <mission description="Mission 4" frameID="104" framePayload="0004"></mission>
-    <mission description="Mission 5" frameID="105" framePayload="0005"></mission>
-</dvMissions>

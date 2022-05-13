@@ -34,7 +34,6 @@ private slots:
 private:
     QCanBusDevice *canDevice;
     AsyncCanData canData;
-    std::queue<DeviceBase *> asyncFrames;
 
     QTimer * retryTimer;    //todo
     static constexpr auto retryTime = 200;
@@ -44,5 +43,5 @@ private:
 
     Dash_states heartBeatState;
     QTimer * heartbeatTimer;
-    static constexpr auto hearbeatFrequency = 10;
+    static constexpr auto heartbeatFrequency = 10;
 };

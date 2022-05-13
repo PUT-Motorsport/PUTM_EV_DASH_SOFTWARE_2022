@@ -101,7 +101,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>230</y>
+     <y>220</y>
      <width>261</width>
      <height>41</height>
     </rect>
@@ -205,10 +205,10 @@
   <widget class="QLabel" name="hint">
    <property name="geometry">
     <rect>
-     <x>610</x>
+     <x>580</x>
      <y>40</y>
-     <width>181</width>
-     <height>141</height>
+     <width>211</width>
+     <height>291</height>
     </rect>
    </property>
    <property name="font">
@@ -217,10 +217,13 @@
     </font>
    </property>
    <property name="text">
-    <string>X to change
-Y to accept
-A to toggle
-B to leave</string>
+    <string>1 - next paramer
+2 - prev parameter
+3 - toggle
+4 - exit 
+2_3 - confirm
+1_4 - reset to 
+current</string>
    </property>
   </widget>
   <widget class="QLabel" name="error">
@@ -275,7 +278,7 @@ B to leave</string>
    <property name="geometry">
     <rect>
      <x>350</x>
-     <y>270</y>
+     <y>300</y>
      <width>251</width>
      <height>51</height>
     </rect>
@@ -296,7 +299,7 @@ B to leave</string>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>280</y>
+     <y>310</y>
      <width>261</width>
      <height>41</height>
     </rect>
@@ -317,7 +320,7 @@ B to leave</string>
    <property name="geometry">
     <rect>
      <x>350</x>
-     <y>320</y>
+     <y>350</y>
      <width>251</width>
      <height>51</height>
     </rect>
@@ -338,7 +341,7 @@ B to leave</string>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>330</y>
+     <y>360</y>
      <width>261</width>
      <height>41</height>
     </rect>
@@ -359,7 +362,7 @@ B to leave</string>
    <property name="geometry">
     <rect>
      <x>350</x>
-     <y>370</y>
+     <y>260</y>
      <width>251</width>
      <height>51</height>
     </rect>
@@ -380,7 +383,7 @@ B to leave</string>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>380</y>
+     <y>260</y>
      <width>261</width>
      <height>41</height>
     </rect>

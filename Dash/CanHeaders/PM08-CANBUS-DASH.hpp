@@ -30,6 +30,12 @@ struct __attribute__ ((packed)) Dash_Smart_Fuses_FAN_speed{
 	uint8_t water_pump; // on off
 };
 
+struct __attribute__ ((packed)) Dash_steering_wheel_request{
+};
+
+struct __attribute__ ((packed)) Dash_lap_finished{
+    uint32_t time; // total lap time (all sectors) in microseconds
+};
 
 const uint16_t DASH_MAIN_CAN_ID = 0x64;
 const uint8_t DASH_MAIN_CAN_DLC = sizeof(Dash_Main);
@@ -40,6 +46,12 @@ const uint8_t DASH_TCS_FREQUENCY = 0;
 const uint16_t DASH_SMART_FUSES_FAN_SPEED_CAN_ID = 0x32;
 const uint8_t DASH_SMART_FUSES_FAN_SPEED_CAN_DLC = sizeof(Dash_Smart_Fuses_FAN_speed);
 const uint8_t DASH_SMART_FUSES_FAN_SPEED_FREQUENCY = 0;
+const uint16_t DASH_STEERING_WHEEL_REQUEST_CAN_ID = 0x37;
+const uint8_t DASH_STEERING_WHEEL_REQUEST_CAN_DLC = sizeof(Dash_steering_wheel_request);
+const uint8_t DASH_STEERING_WHEEL_REQUEST_FREQUENCY = 0;
+const uint16_t DASH_LAP_FINISHED_CAN_ID = 0x7d;
+const uint8_t DASH_LAP_FINISHED_CAN_DLC = sizeof(Dash_lap_finished);
+const uint8_t DASH_LAP_FINISHED_FREQUENCY = 0;
 
 #endif
 

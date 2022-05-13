@@ -58,11 +58,11 @@ void MainWindow::updateData(Parameter param, qreal value)
     case Parameter::RPM:
         break;
     case Parameter::CoolantTemp:
-        ui->temperature->setText("Temp: " + QString::number(value) + " °C");    //only parameter shown on both
+        ui->temperature->setText(QString::number(value) + " °C");    //only parameter shown on both
         serviceMode->updateData(param, value);
         break;
     case Parameter::SOC:
-        ui->soc->setText("SOC: " + QString::number(value));
+        ui->soc->setText(QString::number(value));
         break;
     default:
         serviceMode->updateData(param, value);
@@ -124,9 +124,21 @@ void MainWindow::clearError()
 
 void MainWindow::pass(uint8_t sector)
 {
-    sectorTimes.at(sector) = elapsedTimers.at(sector).get();
+    auto thisSectorTime = elapsedTimers.at(currentSector).get();
+    sectorTimes.at(currentSector) = thisSectorTime;
 
-    currentSector = sector;
+    if (sector == 0) {
+
+        QCanBusFrame lapTime;
+        lapTime.setFrameId(0);
+        lapTime.setPayload(QByteArray(
+                               reinterpret_cast<char *>(&thisSectorTime), sizeof(thisSectorTime)));
+
+        canHandler.send(lapTime);
+
+    }
+
+    currentSector = sector; //update the current sector
 
     elapsedTimers.at(sector).start();
 
@@ -155,13 +167,13 @@ void MainWindow::updateTimers()
 
     timerLabels.at(currentSector)->setText(QString::fromStdString(Timer::toStr(thisSectorTime)));
 
-    if (thisSectorTime + 1000 * delta < sectorTimes.at(currentSector) and elapsedTimers.at(currentSector).isValid()) {
+    if (thisSectorTime <= sectorTimes.at(currentSector) and elapsedTimers.at(currentSector).isValid()) {
 
         timerLabels.at(currentSector)->setStyleSheet(QStringLiteral("color: green;"));
 
     }
 
-    else if (thisSectorTime - 1000 * delta > sectorTimes.at(currentSector) and elapsedTimers.at(currentSector).isValid()) {
+    else if (thisSectorTime > sectorTimes.at(currentSector) and elapsedTimers.at(currentSector).isValid()) {
 
         timerLabels.at(currentSector)->setStyleSheet(QStringLiteral("color: red;"));
 

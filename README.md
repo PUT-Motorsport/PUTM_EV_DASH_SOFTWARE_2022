@@ -26,6 +26,13 @@ The time is added to file names on app exit to simplify the code.
 
 Both files have a header informing about the time of app launch.
 
+### Program macros
+
+The program behavior can be influenced with macros:
+
+1) if `SEND_HEARTBEAT` is defined, the heartbeat frame will be sent @10Hz.
+2) if `DATA_TIMEOUT_CHECK` is defined, the all synchronous frames are checked. If a frame has not been received for 10 times the expected interval, an error will be raised. 
+
 ## The GUI
 
 ### Main Window
@@ -38,9 +45,11 @@ The main window displays key vehicle data:
 - can status
 - battery level (SOC)
 
-and has a lap timer. The timer starts automatically as soon as vehicle movement is detected. The driver can end the lap, using the "X" button on the steering wheel. The current time is then cleared and the best time can be updated. After pressing the "Y" button, the timer can be hard-reset. If the vehicle is in motion, the hard-reset will clear the best timer and restart the current timer. If the vehicle is stopped, both timers will be cleared, and the app will wait until the vehicle starts moving again to start counting.
+and lap times split into 3 sectors. Entering each sector is detected by the lap timer device and relayed over CAN.
 
-From the main window, two additional subwindows can be opened: the driverless mission select window and the service mode window.
+Finishing each lap (entering the 1 sector) is relayed over CAN with measured total lap time. 
+
+From the main window, two additional subwindows can be opened: ~~the driverless mission selection window~~ and the service mode window.
 
 ![Main Window](https://i.ibb.co/YLY0d7P/vision1.jpg)
 
@@ -87,8 +96,6 @@ The driverless mission selection window reads the missions' description, frame i
 
 This window can display the CAN log while the app is running.
 
-**Right now, the app is able only to sniff the data from the static class logger. A way to load data from the files will be found**
-
 ![Raw CAN data](https://i.ibb.co/0X1P8kq/Screenshot-from-2022-02-16-16-20-33.png)
 
 ### App and vehicle logs
@@ -99,33 +106,21 @@ This window can display the 'App and Vehicle log' while the app is running.
 
 ### Driving parameters selection window
 
-The parameters that can be changed here are:
+The parameters that can be changed are:
 
-- energy regain
-- traction control
-- max power
-- fan setting
-- APPS curve
+- Traction Control (active/inactive)
+- maximum slip ratio (0 - 100%)
+- algorithm used in traction control (PI, PID, LQR, LQRI, SDRE, MPC)
+- APPS curve (Linear, Wet, Acceleration)
+- max power (0 - 100%)
+- regen power (0 - 100%)
+- traction control sensitivity (0 - 100%)
 
-All values, frame ids and payloads are loaded from a .csv file.
+All values are loaded from a .csv file.
 
 The current parameter is displayed in red and can be toggled with the "A" button. Pressing "X" changes the current value. The "Y" button confirms the change and sends a frame with corresponing id and payload. If the driver switches to another parameter or the window is closed before confirming the change, the settings' values are reset to display accurate data.
 
 ![Driving parameters selection](https://i.ibb.co/GCKG50j/Screenshot-from-2022-02-17-10-30-38.png)
-
-### Driving parameters change confirmation window
-
-If the driver changes the value of one of the steering wheel dials, this window will appear. It will load all parameters from a .xml file:
-- the description of setting changed
-- the id of the confirmation frame
-
-This type of frames has a new type "03:Confirmation".
-
-The payload of these frames is treated as a new value of the setting and is set to the outgoing frame.
-
-If the driver accepts or rejects the change, this window is closed immediately.
-
-If a frame could not be sent, this window stays open for as long as the driver rejects the change or the frame is finally sent.
 
 ##### Complete windows' schematic
 
@@ -150,6 +145,6 @@ This structure also means that some navigation data will need to be passed up to
 
 The shared memory is a collection of data structures present on the CAN bus. The main GUI thread reads from can and does a `memcpy` into the shared resources. (As a relatively low cost operation, it can be computed on the main GUI thread).
 
-Then, every screen refresh cycle, that data is being interpreted on a secondary thread.Parameters are updated, errors checked and navigation processed.
+Then, every screen refresh cycle, that data is being interpreted on a secondary thread. Parameters are updated, errors checked and navigation processed.
 
 Copies are made so that shared memory is locked for a short period of time (GUI calls take a long time to process). This way, if a 3rd process is needed (e.g. faster JSON updates), no major code changes are neccessary.

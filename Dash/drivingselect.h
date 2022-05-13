@@ -38,11 +38,11 @@ private:
     void changeHighlight();
     void resetToCurrent();
     uint8_t calculateCRC();
-    uint8_t getNextSettingValue(Setting setting);
-    void changeSettingValue();
+    uint8_t getSettingValue(Setting setting, bool next);
+    void changeSettingValue(bool next);
 
     Setting currentSetting; //todo: rename
-    Dash_TCS settingsFrame;
+    Dash_TCS previousSettings;
     Dash_TCS currentSettings;
 
     Ui::DrivingSelect *ui;
@@ -50,12 +50,14 @@ private:
 
     QString const getSettingName(Setting setting, uint8_t value);
 
-    QString const presets{"ProgramData\\presets.csv"};
-    QFile presetsFile;
-    QString const descriptions{"ProgramData\\names.txt"};
-    QFile descriptionsFile;
-    QString const values{"ProgramData\\values.csv"};
-    QFile valuesFile;
+    QVector<QString> presets;
+    QString const presetsFileName{"presets.csv"};
+    QVector<QString> descriptions;
+    QString const descriptionsFileName{"names.txt"};
+    QVector<QString> values;
+    QString const valuesFileName{"settings.csv"};
+
+    QVector<QString> loadFile(QString const &fileName);
 };
 
 #endif // DRIVINGSELECT_H

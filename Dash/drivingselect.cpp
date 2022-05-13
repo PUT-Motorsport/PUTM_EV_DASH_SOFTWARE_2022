@@ -3,12 +3,29 @@
 
 DrivingSelect::DrivingSelect(QWidget *parent) :
     QDialog(parent),
-    currentSetting(Setting::TC), ui(new Ui::DrivingSelect), presetsFile(presets), descriptionsFile(descriptions), valuesFile(values)
+    currentSetting(Setting::TC), ui(new Ui::DrivingSelect)
 {
+    currentSettings = {
+        .on = true,
+        .max_slip_ratio = 50,
+        .algorithm = 0,
+        .max_power = 50,
+        .apps_curve = 0,
+        .regen_power = 50,
+        .sensivity = 50,
+        .CRC_byte = 0
+        };
+
+    previousSettings = currentSettings;
+
     ui->setupUi(this);
 
+    descriptions = loadFile(descriptionsFileName);
+    values = loadFile(valuesFileName);
+    presets = loadFile(presetsFileName);
+
     labels = {{ui->tc, ui->tcValue}, {ui->slipRatio, ui->slipRatioValue}, {ui->algorithm, ui->algorithmValue},
-              {ui->power, ui->powerValue}, {ui->regenPower, ui->regenValue}, {ui->sensitivity, ui->sensitivityValue}, {ui->apps, ui->appsValue}};
+              {ui->power, ui->powerValue}, {ui->apps, ui->appsValue}, {ui->regenPower, ui->regenValue}, {ui->sensitivity, ui->sensitivityValue}};
 
     changeHighlight();
 }
@@ -24,11 +41,16 @@ void DrivingSelect::navigate(buttonStates navigation)
     case buttonStates::button2_3:
         sendSettings();
         break;
+    case buttonStates::button1_4:
+        resetToCurrent();
+        break;
+    case buttonStates::button1:
+        changeSettingValue(true);
+        break;
     case buttonStates::button2:
-        changeSettingValue();
+        changeSettingValue(false);
         break;
     case buttonStates::button3:
-        resetToCurrent();
         changeHighlight();
         break;
     case buttonStates::button4:
@@ -49,43 +71,37 @@ void DrivingSelect::raiseError(const QString &errorMessage)
 
 void DrivingSelect::setPreset(Side side, scrollStates scroll)
 {
-    if (side)
-        presetsFile.readLine();
 
-    QString line = presetsFile.readLine();
-
-    auto list = line.split(',');
+    auto list = presets.at(side).split(',', Qt::SkipEmptyParts);
 
     uint8_t newSetting = list.at(1 + static_cast<uint8_t>(scroll)).toUInt();
 
-    settingsFrame = currentSettings;
+    previousSettings = currentSettings;
 
     if (side == Side::Left)
-        settingsFrame.max_power = newSetting;
+        previousSettings.max_power = newSetting;
     else
-        settingsFrame.regen_power = newSetting;
+        previousSettings.regen_power = newSetting;
 
     sendSettings();
 
-    presetsFile.close();
-    qDebug() << presetsFile.open(QIODevice::ReadOnly | QIODevice::Text);
 }
 
 void DrivingSelect::sendSettings()
 {
-    settingsFrame.CRC_byte = calculateCRC();
+    currentSettings.CRC_byte = calculateCRC();
 
     QCanBusFrame frame;
     frame.setFrameId(DASH_TCS_CAN_ID);
 
-    frame.setPayload(QByteArray(reinterpret_cast<char *>(&settingsFrame), DASH_TCS_CAN_DLC));
+    frame.setPayload(QByteArray(reinterpret_cast<char *>(&currentSettings), DASH_TCS_CAN_DLC));
 
 
     if (not(canHandler.send(frame))) {
         raiseError("Frame sending failed");
     }
     else {
-        currentSettings = settingsFrame;
+        previousSettings = currentSettings;
         logger.add("TC settings change has been requested");
         this->raiseError("Sent!");
     }
@@ -118,14 +134,13 @@ void DrivingSelect::changeHighlight()
 
 void DrivingSelect::resetToCurrent()
 {
-    ui->tcValue->setText((currentSettings.on) ? "Active" : "Inactive");
-    ui->slipRatioValue->setText(QString::number(currentSettings.max_slip_ratio));
+    ui->tcValue->setText(getSettingName(Setting::TC, previousSettings.on));
+    ui->slipRatioValue->setText(QString::number(previousSettings.max_slip_ratio));
     ui->algorithmValue->setText(
-                getSettingName(Setting::Algorithm, static_cast<uint8_t>(currentSettings.algorithm)));
-    ui->powerValue->setText(QString::number(currentSettings.max_power));
-    ui->regenValue->setText(QString::number(currentSettings.regen_power));
-    ui->sensitivityValue->setText(QString::number(currentSettings.sensivity));
-
+                getSettingName(Setting::Algorithm, static_cast<uint8_t>(previousSettings.algorithm)));
+    ui->powerValue->setText(QString::number(previousSettings.max_power));
+    ui->regenValue->setText(QString::number(previousSettings.regen_power));
+    ui->sensitivityValue->setText(QString::number(previousSettings.sensivity));
 }
 
 uint8_t DrivingSelect::calculateCRC()
@@ -133,53 +148,47 @@ uint8_t DrivingSelect::calculateCRC()
     return 0; //todo
 }
 
-uint8_t DrivingSelect::getNextSettingValue(Setting setting)
+uint8_t DrivingSelect::getSettingValue(Setting setting, bool next)
 {
-    const auto lineNo = 2 + static_cast<uint8_t>(setting);
-
-    if (not(valuesFile.seek(lineNo))) {
-        logger.add("File of unexpected length");
-        return 1;
-    }
-    QString line(valuesFile.readLine());
-
-    QStringList list = line.split(',', Qt::SkipEmptyParts);
+    auto list = values.at(1 + static_cast<uint8_t>(setting)).split(',', Qt::SkipEmptyParts);
 
     auto min = list.at(1).toInt();
     auto max = list.at(2).toInt();
     auto increment = list.at(3).toInt();
 
-    //get current value through pointer arithmetic
+    //get current value
+    uint8_t * data = reinterpret_cast<uint8_t *>(&currentSettings);
 
-    uint8_t * data = reinterpret_cast<uint8_t *>(&settingsFrame);
+    auto& current = data[static_cast<uint8_t>(setting)];
 
-    auto &current = *(data + static_cast<uint8_t>(setting));
-
-    if (current + increment < max) {
-        current += increment;
+    if (next) {
+        if (current + increment <= max) {
+            current += increment;
+        }
+        else {
+            current = min;
+        }
     }
     else {
-        current = min;
+        if (current - increment >= min)
+            current -= increment;
+
+        else
+            current = max;
     }
 
-    valuesFile.close();
-    valuesFile.open(QIODevice::ReadOnly | QIODevice::Text);
     return current;
 }
 
-void DrivingSelect::changeSettingValue()
+void DrivingSelect::changeSettingValue(bool next)
 {
-    auto next = getNextSettingValue(currentSetting);
+    auto nextSetting = getSettingValue(currentSetting, next);
 
     if (currentSetting == Setting::TC or currentSetting == Setting::Algorithm or currentSetting == Setting::AppsCurve) {
-        labels.at(static_cast<uint8_t>(currentSetting)).second->setText(getSettingName(currentSetting, next));
+        labels.at(static_cast<uint8_t>(currentSetting)).second->setText(getSettingName(currentSetting, nextSetting));
     }
     else
-        labels.at(static_cast<uint8_t>(currentSetting)).second->setText(QString::number(next));
-
-    uint8_t * data = reinterpret_cast<uint8_t * >(&settingsFrame);
-
-    *(data + static_cast<uint8_t>(currentSetting)) = next;
+        labels.at(static_cast<uint8_t>(currentSetting)).second->setText(QString::number(nextSetting) + '%');
 }
 
 const QString DrivingSelect::getSettingName(Setting setting, uint8_t value)
@@ -187,18 +196,24 @@ const QString DrivingSelect::getSettingName(Setting setting, uint8_t value)
     if (setting == Setting::TC) {
         return (value) ? "Active" : "Inactive";
     }
-    if (value > 10) {
-        logger.add("Incorrect setting name read. Processed.", LogType::AppError);
-        return QString("App error");
+
+    return descriptions.at(1 + 10 * (setting == Setting::AppsCurve) + value).trimmed();
+}
+
+QVector<QString> DrivingSelect::loadFile(const QString &fileName)
+{
+    QFile file(fileName);
+
+    if (not file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        logger.add(fileName + " couldn't be loaded", LogType::Critical);
+        return QVector<QString>(20, "");
     }
 
-    if (not(descriptionsFile.seek(1 + 10 * (setting == Setting::Algorithm))))
-        logger.add("File of unexpected length");
+    QVector<QString> result;
 
-    for (auto iter = 0; iter < value; iter++)
-        descriptionsFile.readLine();
+    while (not file.atEnd()) {
+        result.emplaceBack(QString(file.readLine()));
+    }
 
-    descriptionsFile.close();
-
-    return QString(descriptionsFile.readLine());
+    return result;
 }

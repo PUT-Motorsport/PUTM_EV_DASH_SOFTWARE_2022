@@ -15,8 +15,21 @@ GUIHandler::GUIHandler(): retryTimer(new QTimer()), tcpSocket(new QTcpSocket()),
     for (auto &item: cyclesMissed)
         item = 0;   //initialize the array
 
-    //testing
-    generateJSON();
+//    //testing
+//    generateJSON();
+
+    //get information about current steering wheel scroll position
+
+    Dash_steering_wheel_request request{};
+
+    QCanBusFrame frame{};
+    frame.setFrameId(DASH_STEERING_WHEEL_REQUEST_CAN_ID);
+    frame.setPayload(QByteArray(reinterpret_cast<char *>(&request), sizeof(Dash_steering_wheel_request)));
+
+    if (not canHandler.send(frame)) {
+        logger.add("Steering wheel request not sent", LogType::AppError);
+    }
+
 }
 
 GUIHandler::~GUIHandler()
@@ -69,18 +82,21 @@ void GUIHandler::updateGUI()
 
 void GUIHandler::verifyData()
 {
-#if DATA_TIMEOUT_CHECK
-    qDebug() << "Verified devices";
-    for (std::size_t iter = 0; iter < canData.hasDeviceStatus.size(); iter++) {
-        if (canData.hasDeviceStatus.at(iter)->maxNumberOfCyclesMissed == 0)
-            continue;   //if max number of cycles missed is -1, no data check should be performed
 
-        if (cyclesMissed.at(iter) >= canData.hasDeviceStatus.at(iter)->maxNumberOfCyclesMissed) {
-            mainWindow.raiseError(QString::fromStdString("Device " +
-                                 canData.hasDeviceStatus.at(iter)->name + " missed too many cycles"));
+#ifdef DATA_TIMEOUT_CHECK
+    qDebug() << "Verified devices";
+    for (std::size_t iter = 0; iter < numberOfFrames; iter++)  {
+
+        if (not asyncCanData.synchronousFrames.at(iter)->hasBeenUpdated) {
+            cyclesMissed.at(iter)++;
         }
-        cyclesMissed.at(iter)++;
+
+        if (cyclesMissed.at(iter) > asyncCanData.synchronousFrames.at(iter)->maxNumberOfCyclesMissed) {
+            logger.add(QString::fromStdString("Device " + asyncCanData.synchronousFrames.at(iter)->name
+                                                         + " has timed out"), LogType::Error);
+        }
     }
+
 #endif
 
 }

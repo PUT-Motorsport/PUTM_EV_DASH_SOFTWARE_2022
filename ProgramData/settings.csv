@@ -1,8 +1,8 @@
-Setting,Min value, Max value, Increment
+Setting,Min value,Max value,Increment
 TC,0,1,1
 Max slip ratio,0,100,1
-Algorithm,0,7,1
-Apps curve,0,2,1
+Algorithm,0,5,1
 Max Power,0,100,1
+Apps curve,0,2,1
 Regen power,0,100,1
 Sensitivity,0,100,1
