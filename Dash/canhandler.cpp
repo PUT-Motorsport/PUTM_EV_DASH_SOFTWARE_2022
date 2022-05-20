@@ -23,7 +23,7 @@ bool CanHandler::connect()
 {
     QString errorString;
     canDevice = QCanBus::instance()->createDevice(QStringLiteral("socketcan"),
-                                                  QStringLiteral("vcan0"), &errorString);
+                                                  QStringLiteral("can0"), &errorString);
     if (!canDevice) {
         logger.add("Can Device creation failed: " + errorString, LogType::Critical);
         return false;
@@ -40,7 +40,7 @@ bool CanHandler::connect()
     return true;
 }
 
-inline bool CanHandler::connected()
+bool CanHandler::connected()
 {
     return canDevice->state();
 }

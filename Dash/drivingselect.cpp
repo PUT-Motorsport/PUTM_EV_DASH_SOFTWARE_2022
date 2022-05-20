@@ -206,19 +206,19 @@ const QString DrivingSelect::getSettingName(Setting setting, uint8_t value)
     return descriptions.at(1 + 10 * (setting == Setting::AppsCurve) + value).trimmed();
 }
 
-QVector<QString> DrivingSelect::loadFile(const QString &fileName)
+QList<QString> DrivingSelect::loadFile(const QString &fileName)
 {
     QFile file(fileName);
 
     if (not file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         logger.add(fileName + " couldn't be loaded", LogType::Critical);
-        return QVector<QString>(20, "");
+        return QList<QString>();
     }
 
-    QVector<QString> result;
+    QList<QString> result;
 
     while (not file.atEnd()) {
-        result.emplaceBack(QString(file.readLine()));
+        result.append(QString(file.readLine()));
     }
 
     return result;

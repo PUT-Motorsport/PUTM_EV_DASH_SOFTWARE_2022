@@ -21,8 +21,11 @@ public:
 
         if (m_started)
             return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - m_start).count();
-
-        return std::chrono::duration<long, std::ratio<1, 1000>>::rep(0);
+#ifdef raspberrypi
+        return 0ll;
+#else
+      return 0l;
+#endif
     }
 
     static auto toStr(std::chrono::duration<long, std::ratio<1, 1000>>::rep time) {

@@ -16,7 +16,7 @@ Logs::~Logs()
     delete refreshTimer;
 }
 
-void Logs::navigate(buttonStates navigation)
+void Logs::navigate([[maybe_unused]]buttonStates navigation)
 {
     refreshTimer->stop();
     this->done(QDialog::Accepted);

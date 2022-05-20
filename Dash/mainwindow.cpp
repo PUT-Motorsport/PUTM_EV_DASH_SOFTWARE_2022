@@ -97,7 +97,7 @@ void MainWindow::navigate(buttonStates navigation)
         case buttonStates::button2_3:
             subwindowShown = serviceMode;
             this->hide();
-            serviceMode->show();
+            serviceMode->showFullScreen();
             break;
         default:
             return;     //suppresses a warning, no real use
@@ -152,7 +152,7 @@ void MainWindow::setMaxPower(uint8_t maxPower)
 void MainWindow::reopen()
 {
     subwindowShown = nullptr;
-    this->show();
+    this->showFullScreen();
 }
 
 void MainWindow::updateTimers()

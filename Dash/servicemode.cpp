@@ -64,7 +64,7 @@ void ServiceMode::navigate(buttonStates navigation)
             subwindowShown = canRaw;
             this->hide();
             canRaw->startSniffing();
-            canRaw->show();
+            canRaw->showFullScreen();
             break;
         case buttonStates::button4:
             this->done(QDialog::Accepted);
@@ -73,12 +73,12 @@ void ServiceMode::navigate(buttonStates navigation)
             subwindowShown = logs;
             this->hide();
             logs->startSniffing();
-            logs->show();
+            logs->showFullScreen();
             break;
         case buttonStates::button2:
             subwindowShown = driving;
             this->hide();
-            driving->show();
+            driving->showFullScreen();
             break;
         default:
             return;     //suppresses a warning, no real use
@@ -103,5 +103,5 @@ void ServiceMode::raiseError(const QString &errorMessage)
 void ServiceMode::reopen()
 {
     subwindowShown = nullptr;
-    this->show();
+    this->showFullScreen();
 }

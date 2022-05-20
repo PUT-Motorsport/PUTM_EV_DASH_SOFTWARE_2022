@@ -16,7 +16,7 @@ CanRaw::~CanRaw()
     delete refreshTimer;
 }
 
-void CanRaw::navigate(buttonStates navigation)
+void CanRaw::navigate([[maybe_unused]]buttonStates navigation)
 {
     refreshTimer->stop();
     this->done(QDialog::Accepted);

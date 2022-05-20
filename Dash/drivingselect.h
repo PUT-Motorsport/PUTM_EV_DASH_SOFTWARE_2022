@@ -51,14 +51,14 @@ private:
 
     QString const getSettingName(Setting setting, uint8_t value);
 
-    QVector<QString> presets;
+    QList<QString> presets;
     QString const presetsFileName{"presets.csv"};
-    QVector<QString> descriptions;
+    QList<QString> descriptions;
     QString const descriptionsFileName{"names.txt"};
-    QVector<QString> values;
+    QList<QString> values;
     QString const valuesFileName{"settings.csv"};
 
-    QVector<QString> loadFile(QString const &fileName);
+    QList<QString> loadFile(QString const &fileName);
 
     //crc
     CRC::Table<uint8_t, sizeof(uint8_t)> table;
