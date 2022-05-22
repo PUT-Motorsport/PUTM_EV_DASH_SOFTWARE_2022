@@ -9,9 +9,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     timerLabels = {ui->sector1, ui->sector2, ui->sector3};
-    
+    qDebug() << "Prepared to dispatch guihandler";
     guiHandler->moveToThread(&canThread);
-    canThread.start(QThread::InheritPriority);
+    canThread.start(QThread::HighPriority);
 
     if (canHandler.connected())
         ui->can->setText("CAN Connected");
@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     //communication between threads
-    QObject::connect(guiHandler, &GUIHandler::updateData, this, &MainWindow::updateData);
+    auto success = QObject::connect(guiHandler, &GUIHandler::updateData, this, &MainWindow::updateData);
     QObject::connect(guiHandler, &GUIHandler::error, this, &MainWindow::raiseError);
     QObject::connect(guiHandler, &GUIHandler::navigate, this, &MainWindow::navigate);
     QObject::connect(guiHandler, &GUIHandler::setPreset, this, &MainWindow::setPreset);
@@ -30,7 +30,10 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(dvSelect, &DvSelect::finished, this, &MainWindow::reopen);
     QObject::connect(serviceMode, &ServiceMode::finished, this, &MainWindow::reopen);
 
-    
+    if (not success) {
+        qDebug() << "Signal-slot connection failed";
+    }
+
     QObject::connect(updateTimer, &QTimer::timeout, this, [this](){
         updateTimers();
     });
@@ -48,6 +51,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::updateData(Parameter param, qreal value)
 {
+    qDebug() << "Received a call";
     switch (param) {
     case Parameter::Speed:
         ui->speed->setText(QString::number(value));
@@ -87,6 +91,7 @@ void MainWindow::raiseError(QString const &errorMessage)
 
 void MainWindow::navigate(buttonStates navigation)
 {
+    qDebug() << "Received call to navigate";
     if (subwindowShown == nullptr) {
         switch (navigation) {
 //        case buttonStates::button1_4:     //driverless is not ready for frame sending

@@ -3,6 +3,7 @@
 GUIHandler::GUIHandler(): retryTimer(new QTimer()), tcpSocket(new QTcpSocket()),
     asyncCanData(canHandler.getCanData()), updateTimer(new QTimer())
 {
+    qDebug() << "GUI Handler created";
     canHandler.connect();
 
     QObject::connect(updateTimer, &QTimer::timeout, this, &GUIHandler::updateGUI);
@@ -136,6 +137,10 @@ void GUIHandler::getUpdates()
     if (canData.ts_main.hasBeenUpdated == true) {
         emit updateData(Parameter::Speed, canData.ts_main.data.vehicle_speed);
         emit updateData(Parameter::CoolantTemp, canData.ts_main.data.water_temp);
+        emit updateData(Parameter::Power, canData.ts_main.data.vehicle_speed *
+                        canData.bms_hv_main.data.voltage_sum);
+        emit updateData(Parameter::RPM, canData.ts_main.data.vehicle_speed);
+        emit updateData(Parameter::InverterTemp, canData.ts_main.data.motor_current);
     }
     //BMS LV
     if (canData.bms_lv_main.hasBeenUpdated == true) {
@@ -143,7 +148,12 @@ void GUIHandler::getUpdates()
         emit updateData(Parameter::BmslvTemp, canData.bms_lv_main.data.temp_avg);
         emit updateData(Parameter::BmslvVoltage, canData.bms_lv_main.data.voltage_sum);
     }
-    //...
+    //BMS HV
+    if (canData.bms_hv_main.hasBeenUpdated == true) {
+        emit updateData(Parameter::BmshvTemp, canData.bms_hv_main.data.temp_avg);
+        emit updateData(Parameter::BmshvVoltage, canData.bms_hv_main.data.voltage_sum);
+
+    }
 }
 
 void GUIHandler::handleAsyncFrames()
