@@ -27,4 +27,3 @@ const uint8_t APPS_MAIN_CAN_DLC = sizeof(Apps_main);
 const uint8_t APPS_MAIN_FREQUENCY = 100;
 
 #endif
-

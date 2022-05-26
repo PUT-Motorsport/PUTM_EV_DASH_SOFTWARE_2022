@@ -3,8 +3,6 @@
 #define WHEELTEMP
 
 #include <cstdint>
-#include "hal_can.hpp"
-#include "message_abstraction.hpp"
 
 enum struct WheelTemp_states: uint8_t {
 	Power_up,

@@ -1,4 +1,4 @@
-//Generated on Sat Apr 30 12:45:17 2022
+//Generated on Tue May 24 17:28:32 2022
 #ifndef BMS_LV
 #define BMS_LV
 
@@ -8,6 +8,7 @@ enum struct BMS_LV_states: uint8_t {
 	Normal,
 	Charging,	// warning
 	Unbalanced,	// warning
+	Temp_warning,	// warning
 	Voltage_low,	// shut down
 	Voltage_high,	// shut down
 	Temp_high,	// shut down
@@ -16,22 +17,22 @@ enum struct BMS_LV_states: uint8_t {
 };
 
 struct __attribute__ ((packed)) BMS_LV_main{
-	int16_t voltage_sum; // eg 2500 means 25.00V
-	int8_t soc; // state of charge
-	int8_t temp_avg; // in Celsius
-	int8_t current; 
+	uint16_t voltage_sum; // eg 2500 means 25.00V
+	uint8_t soc; // state of charge
+	uint8_t temp_avg; // in Celsius
+	uint8_t current; 
 	BMS_LV_states device_state; 
 };
 
 struct __attribute__ ((packed)) BMS_LV_temperature{
-	int8_t temp_1; // in Celsius
-	int8_t temp_2; // in Celsius
-	int8_t temp_3; // in Celsius
-	int8_t temp_4; // in Celsius
-	int8_t temp_5; // in Celsius
-	int8_t temp_6; // in Celsius
-	int8_t temp_7; // in Celsius
-	int8_t temp_8; // in Celsius
+	uint8_t temp_1; // in Celsius
+	uint8_t temp_2; // in Celsius
+	uint8_t temp_3; // in Celsius
+	uint8_t temp_4; // in Celsius
+	uint8_t temp_5; // in Celsius
+	uint8_t temp_6; // in Celsius
+	uint8_t temp_7; // in Celsius
+	uint8_t temp_8; // in Celsius
 };
 
 
@@ -43,4 +44,3 @@ const uint8_t BMS_LV_TEMPERATURE_CAN_DLC = sizeof(BMS_LV_temperature);
 const uint8_t BMS_LV_TEMPERATURE_FREQUENCY = 1;
 
 #endif
-

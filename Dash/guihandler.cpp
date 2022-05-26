@@ -1,7 +1,7 @@
 #include "guihandler.h"
 
-GUIHandler::GUIHandler(): retryTimer(new QTimer()), tcpSocket(new QTcpSocket()),
-    asyncCanData(canHandler.getCanData()), updateTimer(new QTimer())
+GUIHandler::GUIHandler(): retryTimer(new QTimer()),
+    asyncCanData(canHandler.getCanData()), previousValues({}), cyclesMissed({}), updateTimer(new QTimer())
 {
     qDebug() << "GUI Handler created";
     canHandler.connect();
@@ -9,15 +9,8 @@ GUIHandler::GUIHandler(): retryTimer(new QTimer()), tcpSocket(new QTcpSocket()),
     QObject::connect(updateTimer, &QTimer::timeout, this, &GUIHandler::updateGUI);
     updateTimer->start(1000 / frequency);
 
-    connectTcpSocket();
 //    QObject::connect(tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)), //qt issue
 //    this, SLOT(socketError(QAbstractSocketError &error)));
-
-    for (auto &item: cyclesMissed)
-        item = 0;   //initialize the array
-
-//    //testing
-//    generateJSON();
 
     //get information about current steering wheel scroll position
 
@@ -37,26 +30,6 @@ GUIHandler::~GUIHandler()
 {
     delete updateTimer;
     delete retryTimer;
-    delete tcpSocket;
-}
-
-void GUIHandler::socketError(const QAbstractSocket::SocketError &error) const
-{
-    logger.add("Connection with localhost lost. Reason: " + QString::number(error) + ". Retrying.");
-
-}
-
-void GUIHandler::connectTcpSocket()
-{
-    tcpSocket->connectToHost(hostname, portNumber); //fixme: may not establish the connection before it is checked
-
-
-    if (tcpSocket->state() == QAbstractSocket::ConnectedState) {
-        logger.add("Socket connection established.");
-        return;
-    }
-    logger.add("Socket connection failed.");
-    retryTimer->start(retryTime);
 }
 
 void GUIHandler::updateGUI()
@@ -133,26 +106,33 @@ void GUIHandler::checkErrors()
 
 void GUIHandler::getUpdates()
 {
-    //TS
-    if (canData.ts_main.hasBeenUpdated == true) {
-        emit updateData(Parameter::Speed, canData.ts_main.data.vehicle_speed);
-        emit updateData(Parameter::CoolantTemp, canData.ts_main.data.water_temp);
-        emit updateData(Parameter::Power, canData.ts_main.data.vehicle_speed *
+    //APPS
+    if (canData.apps.hasBeenUpdated) {
+        tryUpdateData(Parameter::Apps, canData.apps.data.pedal_position);
+    }
+    //TS main
+    if (canData.tc_main.hasBeenUpdated) {
+        tryUpdateData(Parameter::Speed, canData.tc_main.data.vehicle_speed / 100);
+        tryUpdateData(Parameter::Power, canData.tc_main.data.vehicle_speed *
                         canData.bms_hv_main.data.voltage_sum);
-        emit updateData(Parameter::RPM, canData.ts_main.data.vehicle_speed);
-        emit updateData(Parameter::InverterTemp, canData.ts_main.data.motor_current);
+        tryUpdateData(Parameter::RPM, 2 * 3.1415 / (canData.tc_main.data.engine_speed));
+    }
+    //TC temperatures
+    if (canData.tc_temperatures.hasBeenUpdated) {
+        tryUpdateData(Parameter::CoolantTemp, canData.tc_temperatures.data.water_temp_out);
+        tryUpdateData(Parameter::EngineTemp, canData.tc_temperatures.data.engine);
+        tryUpdateData(Parameter::InverterTemp, canData.tc_temperatures.data.inverter);
     }
     //BMS LV
-    if (canData.bms_lv_main.hasBeenUpdated == true) {
-        emit updateData(Parameter::SOC, canData.bms_lv_main.data.soc);
-        emit updateData(Parameter::BmslvTemp, canData.bms_lv_main.data.temp_avg);
-        emit updateData(Parameter::BmslvVoltage, canData.bms_lv_main.data.voltage_sum);
+    if (canData.bms_lv_main.hasBeenUpdated) {
+        tryUpdateData(Parameter::SOC, canData.bms_lv_main.data.soc);
+        tryUpdateData(Parameter::BmslvTemp, canData.bms_lv_main.data.temp_avg);
+        tryUpdateData(Parameter::BmslvVoltage, canData.bms_lv_main.data.voltage_sum);
     }
     //BMS HV
-    if (canData.bms_hv_main.hasBeenUpdated == true) {
-        emit updateData(Parameter::BmshvTemp, canData.bms_hv_main.data.temp_avg);
-        emit updateData(Parameter::BmshvVoltage, canData.bms_hv_main.data.voltage_sum);
-
+    if (canData.bms_hv_main.hasBeenUpdated) {
+        tryUpdateData(Parameter::BmshvTemp, canData.bms_hv_main.data.temp_avg);
+        tryUpdateData(Parameter::BmshvVoltage, canData.bms_hv_main.data.voltage_sum);
     }
 }
 
@@ -172,56 +152,11 @@ void GUIHandler::handleAsyncFrames()
     }
 }
 
-void GUIHandler::generateJSON()
+void GUIHandler::tryUpdateData(Parameter param, int32_t value)
 {
-    nlohmann::json telemetry;
-    //timestamp: posix time
-    telemetry["timestamp"] = std::chrono::duration_cast<std::chrono::milliseconds>(
-                std::chrono::system_clock::now().time_since_epoch()).count();
-    telemetry["APPS"]   = {{"pedal_position", static_cast<uint>(canData.apps.data.pedal_position)},
-                          {"position_diff", canData.apps.data.position_diff},
-                          {"state"}, static_cast<int>(canData.apps.data.device_state)};
-    telemetry["BMS LV"] = {{"voltage_sum", static_cast<int>(canData.bms_lv_main.data.voltage_sum)},
-                          {"soc", canData.bms_lv_main.data.soc},
-                          {"temp_avg", canData.bms_lv_main.data.temp_avg},
-                          {"current", canData.bms_lv_main.data.current},
-                          {"state", static_cast<uint>(canData.bms_lv_main.data.device_state)},
-                          {"temp1", canData.bms_lv_temperature.data.temp_1},
-                          {"temp2", canData.bms_lv_temperature.data.temp_2},
-                          {"temp3", canData.bms_lv_temperature.data.temp_3},
-                          {"temp4", canData.bms_lv_temperature.data.temp_4},
-                          {"temp5", canData.bms_lv_temperature.data.temp_5},
-                          {"temp6", canData.bms_lv_temperature.data.temp_6},
-                          {"temp7", canData.bms_lv_temperature.data.temp_7},
-                          {"temp8", canData.bms_lv_temperature.data.temp_8}};
-    telemetry["BMS HV"] = {{"voltage_sum", static_cast<uint>(canData.bms_hv_main.data.voltage_sum)},
-                          {"soc", canData.bms_hv_main.data.soc},
-                          {"temp_max", canData.bms_hv_main.data.temp_max},
-                          {"temp_avg", canData.bms_hv_main.data.temp_avg},
-                          {"current", canData.bms_hv_main.data.current},
-                          {"state", canData.bms_hv_main.data.device_state}};
-    telemetry["Laptimer"] = {{"state", canData.laptimer_main.data.device_state}};
-    telemetry["SF"]       = {{}};
-    telemetry["Steering Wheel"] = {{"steering_wheel_angle", static_cast<uint>(canData.steering_wheel_main.data.s_w_a)},
-                                  {"state", canData.steering_wheel_main.data.device_state}};
-    telemetry["TC"]     = {{"vehicle_speed", static_cast<uint>(canData.ts_main.data.vehicle_speed)},
-                          {"water_temp", canData.ts_main.data.water_temp},
-                          {"water_pressure", canData.ts_main.data.water_pressure},
-                          {"motor_current", canData.ts_main.data.motor_current},
-                          {"tractive_system_on", static_cast<bool>(canData.ts_main.data.tractive_system_on)},
-                          {"rtds_active", static_cast<bool>(canData.ts_main.data.rtds_active)},
-                          {"traction_control_enable", static_cast<bool>(canData.ts_main.data.traction_control_enable)},
-                          {"regen_enable", static_cast<bool>(canData.ts_main.data.regen_enable)},
-                          {"traction_control_intesivity", canData.ts_main.data.traction_control_intensivity},
-                          {"adc_susp_right", static_cast<uint>(canData.ts_rear_suspension.data.adc_susp_right)},
-                          {"adc_susp_left", static_cast<uint>(canData.ts_rear_suspension.data.adc_susp_left)},
-                          {"acc_latteral", static_cast<uint>(canData.ts_rear_suspension.data.acc_lateral)},
-                          {"acc_longitunal", static_cast<uint>(canData.ts_rear_suspension.data.acc_longitunal)},
-                          {"state", canData.ts_main.data.device_state}};
-    telemetry["Telemetry"] = {{"state", canData.telemetry_main.data.device_state}};
-
-    if (tcpSocket->write(reinterpret_cast<char *>(&telemetry), sizeof(telemetry))) {
-        logger.add("Data sending failed");
+    if (value not_eq previousValues.at(static_cast<uint8_t>(param))) {
+        emit updateData(param, value);
+        previousValues.at(static_cast<uint8_t>(param)) = value;
     }
 }
 

@@ -49,9 +49,9 @@ MainWindow::~MainWindow()
     delete guiHandler;
 }
 
-void MainWindow::updateData(Parameter param, qreal value)
+void MainWindow::updateData(Parameter param, int32_t value)
 {
-    qDebug() << "Received a call";
+    qDebug() << "Received a call" << static_cast<int>(param);
     switch (param) {
     case Parameter::Speed:
         ui->speed->setText(QString::number(value));
@@ -94,11 +94,9 @@ void MainWindow::navigate(buttonStates navigation)
     qDebug() << "Received call to navigate";
     if (subwindowShown == nullptr) {
         switch (navigation) {
-//        case buttonStates::button1_4:     //driverless is not ready for frame sending
-//            subwindowShown = dvSelect;
-//            this->hide();
-//            dvSelect->show();
-//            break;
+        case buttonStates::button1_4:
+            QCoreApplication::quit();
+            break;
         case buttonStates::button2_3:
             subwindowShown = serviceMode;
             this->hide();

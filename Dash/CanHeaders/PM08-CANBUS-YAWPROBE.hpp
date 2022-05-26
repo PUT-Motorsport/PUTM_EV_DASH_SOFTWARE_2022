@@ -3,8 +3,6 @@
 #define YAWPROBE
 
 #include <cstdint>
-#include "hal_can.hpp"
-#include "message_abstraction.hpp"
 
 enum struct YawProbe_states: uint8_t {
 	Power_up,

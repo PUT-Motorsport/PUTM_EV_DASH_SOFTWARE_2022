@@ -54,10 +54,6 @@ struct CanData {
   Device<BMS_LV_temperature> bms_lv_temperature{BMS_LV_TEMPERATURE_CAN_ID,
                                                 "BMS LV temperatures",
                                                 BMS_LV_TEMPERATURE_FREQUENCY};
-  //    Device<Dash_Main> dash_main{ DASH_MAIN_CAN_ID, "Dash Main",
-  //    DASH_MAIN_FREQUENCY }; Device<Dash_StateChange> dash_statechange{
-  //    DASH_STATECHANGE_CAN_ID, "Dash StateChange", DASH_STATECHANGE_FREQUENCY
-  //    };
   Device<Lap_timer_Main> laptimer_main{LAP_TIMER_MAIN_CAN_ID, "Laptimer",
                                        LAP_TIMER_MAIN_FREQUENCY};
   Device<Lap_timer_Pass> laptimer_pass{LAP_TIMER_PASS_CAN_ID, "Laptimer_pass"};
@@ -76,14 +72,17 @@ struct CanData {
   Device<Steering_Wheel_event> steering_wheel_event{
       STEERING_WHEEL_EVENT_CAN_ID, "Steering wheel event",
       STEERING_WHEEL_EVENT_FREQUENCY};
-  Device<TS_main> ts_main{TS_MAIN_CAN_ID, "TS", TS_MAIN_FREQUENCY};
-  Device<TS_rear_suspension> ts_rear_suspension{
-      TS_REAR_SUSPENSION_CAN_ID, "TS_rear", TS_REAR_SUSPENSION_FREQUENCY};
+  Device<TC_main> tc_main{TC_MAIN_CAN_ID, "TC", TC_MAIN_FREQUENCY};
+  Device<TC_rear_suspension> tc_rear_suspension{
+      TC_REAR_SUSPENSION_CAN_ID, "TC_rear", TC_REAR_SUSPENSION_FREQUENCY};
+  Device<TC_temperatures> tc_temperatures{TC_TEMPERATURES_CAN_ID, "Tc temperatures", TC_TEMPERATURES_FREQUENCY};
+  Device<TC_imu_gyro> tc_imu_gyro{TC_IMU_GYRO_CAN_ID, "Tc imu gyro", TC_IMU_GYRO_FREQUENCY};
+  Device<TC_imu_acc> tc_imu_acc{TC_IMU_ACC_CAN_ID, "Tc imu acc", TC_IMU_ACC_FREQUENCY};
   Device<Telemetry_Main> telemetry_main{TELEMETRY_MAIN_CAN_ID, "Telemetry",
                                         TELEMETRY_MAIN_FREQUENCY};
 };
 
-constexpr auto numberOfFrames = 15;
+constexpr auto numberOfFrames = 18;
 
 struct AsyncCanData : public CanData {
   mutable QMutex mtx;
@@ -101,8 +100,11 @@ struct AsyncCanData : public CanData {
       &sf_ws,
       &sf_nucs,
       &steering_wheel_main,
-      &ts_main,
-      &ts_rear_suspension,
+      &tc_main,
+      &tc_rear_suspension,
+      &tc_temperatures,
+      &tc_imu_gyro,
+      &tc_imu_acc,
       &telemetry_main};
 
   std::array<DeviceBase *const, 2> asynchronousFrames{&steering_wheel_event,
@@ -110,7 +112,7 @@ struct AsyncCanData : public CanData {
 
   std::array<DeviceBase const *const, 8> statusFrames{
       &apps,          &aq_main, &bms_hv_main, &bms_lv_main,
-      &laptimer_main, &sf_main, &ts_main,     &telemetry_main};
+      &laptimer_main, &sf_main, &tc_main,     &telemetry_main};
 };
 
 enum class Parameter {

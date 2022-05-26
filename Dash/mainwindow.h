@@ -29,7 +29,7 @@ public:
 
 public slots:
 
-    void updateData(Parameter param, qreal value);
+    void updateData(Parameter param, int32_t value);
     void raiseError(QString const &errorMessage);
     void navigate(buttonStates navigation);
     void setPreset(Side side, scrollStates scroll);

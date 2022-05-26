@@ -1,4 +1,4 @@
-//Generated on Sat Apr 30 12:45:13 2022
+//Generated on Wed May 11 12:18:57 2022
 #ifndef DASH
 #define DASH
 
@@ -34,8 +34,9 @@ struct __attribute__ ((packed)) Dash_steering_wheel_request{
 };
 
 struct __attribute__ ((packed)) Dash_lap_finished{
-    uint32_t time; // total lap time (all sectors) in microseconds
+	uint32_t time; // total lap time (all sectors) in microseconds
 };
+
 
 const uint16_t DASH_MAIN_CAN_ID = 0x64;
 const uint8_t DASH_MAIN_CAN_DLC = sizeof(Dash_Main);
@@ -54,4 +55,3 @@ const uint8_t DASH_LAP_FINISHED_CAN_DLC = sizeof(Dash_lap_finished);
 const uint8_t DASH_LAP_FINISHED_FREQUENCY = 0;
 
 #endif
-
