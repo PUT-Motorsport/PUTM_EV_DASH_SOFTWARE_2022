@@ -1,11 +1,8 @@
 #!/usr/bin/bash
 
-sudo slcan_attach -f -s8 -o /dev/ttyACM0
-sudo slcand ttyACM0 slcan0
-sudo ifconfig slcan0 up
+sudo modprobe can
+sudo modprobe can-raw
+sudo modprobe slcan
 
-startx #run the gui environment
-
-cd ~/Dash
-
-./Dash
+sudo slcand -o -c -s8 /dev/ttyACM0 can0
+sudo ifconfig can0 up

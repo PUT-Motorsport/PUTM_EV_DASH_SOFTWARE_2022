@@ -247,7 +247,7 @@
     </font>
    </property>
    <property name="text">
-    <string>APPS Value: n/a%</string>
+    <string>APPS Value: 0%</string>
    </property>
   </widget>
   <widget class="QLabel" name="bmshvvoltage">

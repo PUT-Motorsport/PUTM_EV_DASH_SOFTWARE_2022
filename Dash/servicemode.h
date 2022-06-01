@@ -4,41 +4,40 @@
 #include <QDialog>
 #include <QTimer>
 
-#include "guicomponent.h"
-#include "drivingselect.h"
 #include "canraw.h"
+#include "drivingselect.h"
+#include "guicomponent.h"
 #include "logs.h"
 
-#include "vehicle.h"
-#include "logger.h"
 #include "canhandler.h"
+#include "logger.h"
+#include "vehicle.h"
 
 namespace Ui {
 class ServiceMode;
 }
 
-class ServiceMode : public QDialog, public GUIComponent
-{
-    Q_OBJECT
+class ServiceMode : public QDialog, public GUIComponent {
+  Q_OBJECT
 
 public:
-    explicit ServiceMode(QWidget *parent = nullptr);
-    ~ServiceMode();
-    void updateData(Parameter param, qreal value);
-    void navigate(buttonStates navigation) override;
-    void raiseError(QString const &errorMessage) override;
-    void setPreset(Side side, scrollStates scroll) {
-        driving->setPreset(side, scroll);
-    }
+  explicit ServiceMode(QWidget *parent = nullptr);
+  ~ServiceMode();
+  void updateData(Parameter param, int value);
+  void navigate(buttonStates navigation) override;
+  void raiseError(QString const &errorMessage) override;
+  void setPreset(Side side, scrollStates scroll) {
+    driving->setPreset(side, scroll);
+  }
 
 private:
-    Ui::ServiceMode *ui;
-    DrivingSelect * driving;
-    Logs * logs;
-    CanRaw * canRaw;
-    GUIComponent * subwindowShown;
+  Ui::ServiceMode *ui;
+  DrivingSelect *driving;
+  Logs *logs;
+  CanRaw *canRaw;
+  GUIComponent *subwindowShown;
 private slots:
-    void reopen();
+  void reopen();
 };
 
 #endif // SERVICEMODE_H

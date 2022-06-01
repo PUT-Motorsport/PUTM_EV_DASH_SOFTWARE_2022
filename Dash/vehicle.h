@@ -75,9 +75,12 @@ struct CanData {
   Device<TC_main> tc_main{TC_MAIN_CAN_ID, "TC", TC_MAIN_FREQUENCY};
   Device<TC_rear_suspension> tc_rear_suspension{
       TC_REAR_SUSPENSION_CAN_ID, "TC_rear", TC_REAR_SUSPENSION_FREQUENCY};
-  Device<TC_temperatures> tc_temperatures{TC_TEMPERATURES_CAN_ID, "Tc temperatures", TC_TEMPERATURES_FREQUENCY};
-  Device<TC_imu_gyro> tc_imu_gyro{TC_IMU_GYRO_CAN_ID, "Tc imu gyro", TC_IMU_GYRO_FREQUENCY};
-  Device<TC_imu_acc> tc_imu_acc{TC_IMU_ACC_CAN_ID, "Tc imu acc", TC_IMU_ACC_FREQUENCY};
+  Device<TC_temperatures> tc_temperatures{
+      TC_TEMPERATURES_CAN_ID, "Tc temperatures", TC_TEMPERATURES_FREQUENCY};
+  Device<TC_imu_gyro> tc_imu_gyro{TC_IMU_GYRO_CAN_ID, "Tc imu gyro",
+                                  TC_IMU_GYRO_FREQUENCY};
+  Device<TC_imu_acc> tc_imu_acc{TC_IMU_ACC_CAN_ID, "Tc imu acc",
+                                TC_IMU_ACC_FREQUENCY};
   Device<Telemetry_Main> telemetry_main{TELEMETRY_MAIN_CAN_ID, "Telemetry",
                                         TELEMETRY_MAIN_FREQUENCY};
 };

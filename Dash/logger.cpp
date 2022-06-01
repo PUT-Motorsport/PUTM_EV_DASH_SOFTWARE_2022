@@ -1,74 +1,69 @@
 #include "logger.h"
 
-Logger::Logger(): canLogName("can.txt"), logName("log.txt")
-{
-    open();
-    add("Started at " + QTime().currentTime().toString());
-    addCAN("Started at " + QTime().currentTime().toString());
+Logger::Logger() : canLogName("can.txt"), logName("log.txt") {
+  open();
+  add("Started at " + QTime().currentTime().toString());
+  addCAN("Started at " + QTime().currentTime().toString());
 }
 
-Logger::~Logger()
-{
-    qDebug() << "Logger file closed";
-    canLog.rename(QTime().currentTime().toString() + "-can.txt");
-    log.rename(QTime().currentTime().toString() + "-log.txt");
-    canLog.close();
-    log.close();
+Logger::~Logger() {
+  qDebug() << "Logger file closed";
+  canLog.rename(QTime().currentTime().toString() + "-can.txt");
+  log.rename(QTime().currentTime().toString() + "-log.txt");
+  canLog.close();
+  log.close();
 }
 
-void Logger::forceFlush()
-{
-    log.close();
-    if (not(log.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)))
-        qDebug() << "Failed to open log file";
-    logStream.setDevice(&log);
+void Logger::forceFlush() {
+  log.close();
+  if (not(log.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)))
+    qDebug() << "Failed to open log file";
+  logStream.setDevice(&log);
 }
 
-void Logger::open()
-{
+void Logger::open() {
 
-    canLog.setFileName(canLogName);
+  canLog.setFileName(canLogName);
 
-    if (not(canLog.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)))
-        qDebug() << "Failed to open can log file";
-    canStream.setDevice(&canLog);
+  if (not(canLog.open(QIODevice::WriteOnly | QIODevice::Append |
+                      QIODevice::Text)))
+    qDebug() << "Failed to open can log file";
+  canStream.setDevice(&canLog);
 
-    log.setFileName(logName);
+  log.setFileName(logName);
 
-    if (not(log.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)))
-        qDebug() << "Failed to open log file";
-    logStream.setDevice(&log);
+  if (not(log.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)))
+    qDebug() << "Failed to open log file";
+  logStream.setDevice(&log);
 }
 
-void Logger::add(const QString &message, LogType type)
-{
-    logLine = QTime().currentTime().toString();
-    switch (type) {
-    case LogType::Normal:
-        break;
-    case LogType::AppError:
-        logLine += " @App Error@ ";
-        break;
-    case LogType::Error:
-        logLine += " !Error! ";
-        break;
-    case LogType::Critical:
-        logLine += " !!!Critical Error!!! ";
-        break;
-    }
-    logLine += message;
-    qDebug() << logLine;
-    logStream << logLine << '\n';
-    logLinesCount++;
+void Logger::add(const QString &message, LogType type) {
+  logLine = QTime().currentTime().toString();
+  switch (type) {
+  case LogType::Normal:
+    break;
+  case LogType::AppError:
+    logLine += " @App Error@ ";
+    break;
+  case LogType::Error:
+    logLine += " !Error! ";
+    break;
+  case LogType::Critical:
+    logLine += " !!!Critical Error!!! ";
+    break;
+  }
+  logLine += message;
+  qDebug() << logLine;
+  logStream << logLine << '\n';
+  logLinesCount++;
 
 #ifdef TERMINALOUTPUT
-    std::cout << logline;
+  std::cout << logline;
 #endif
 }
 
-void Logger::addCAN(QString canFrame)
-{
-    canLine = QTime().currentTime().toString() + ' ' + canFrame;
-    qDebug() << canLine;
-    canStream << canLine + '\n';
+void Logger::addCAN(QString canFrame) {
+  canLine = QTime().currentTime().toString() + ' ' + canFrame;
+  qDebug() << canLine;
+  canStream << canLine + '\n';
 }

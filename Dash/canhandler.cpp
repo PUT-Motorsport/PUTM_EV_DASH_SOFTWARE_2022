@@ -1,21 +1,14 @@
 #include "canhandler.h"
 
 CanHandler::CanHandler(QObject *parent)
-    : QObject(parent), heartbeatTimer(new QTimer()) {
+    : QObject(parent) {
   if (!QCanBus::instance()->plugins().contains("socketcan"))
     logger.add("Cansockets plugin missing", LogType::AppError);
 
-  QObject::connect(heartbeatTimer, &QTimer::timeout, this,
-                   &CanHandler::heartbeat);
-
-#ifdef SEND_HEARTBEAT
-  heartbeatTimer->start(1 / heartbeatFrequency);
-#endif
 }
 
 CanHandler::~CanHandler() {
   delete canDevice;
-  delete heartbeatTimer;
 }
 
 bool CanHandler::connect() {

@@ -63,7 +63,7 @@
      </font>
     </property>
     <property name="text">
-     <string>n/a</string>
+     <string>0</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
