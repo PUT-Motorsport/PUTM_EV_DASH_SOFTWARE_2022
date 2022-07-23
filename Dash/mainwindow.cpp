@@ -1,12 +1,20 @@
 #include "mainwindow.h"
+
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), subwindowShown(nullptr),
-      interruptSubwindowShown(nullptr), guiHandler(new GUIHandler()),
-      canThread(), elapsedTimers(), sectorTimes({}), currentSector(0),
-      updateTimer(new QTimer()), ui(new Ui::MainWindow),
-      dvSelect(new DvSelect()), serviceMode(new ServiceMode()),
+    : QMainWindow(parent),
+      subwindowShown(nullptr),
+      interruptSubwindowShown(nullptr),
+      guiHandler(new GUIHandler()),
+      canThread(),
+      elapsedTimers(),
+      sectorTimes({}),
+      currentSector(0),
+      updateTimer(new QTimer()),
+      ui(new Ui::MainWindow),
+      dvSelect(new DvSelect()),
+      serviceMode(new ServiceMode()),
       errorCounter(0) {
   ui->setupUi(this);
 
@@ -43,6 +51,10 @@ MainWindow::MainWindow(QWidget *parent)
   QObject::connect(updateTimer, &QTimer::timeout, this,
                    [this]() { updateTimers(); });
   updateTimer->start(timerUpdateTime);
+
+  serviceMode->show();
+
+  this->setBMSHVState(BMS_HV_states::AIR_opened);
 }
 
 MainWindow::~MainWindow() {
@@ -53,30 +65,32 @@ MainWindow::~MainWindow() {
   delete guiHandler;
 }
 
-void MainWindow::updateData(Parameter param, int value) {
+void MainWindow::updateData(Parameter param, float value) {
   qDebug() << "Received a call" << static_cast<int>(param);
   switch (param) {
-  case Parameter::Speed:
-    ui->speed->setText(QString::number(value));
-    break;
-  case Parameter::Power:
-    ui->powerBar->setValue(value);
-    break;
-  case Parameter::RPM:
-    break;
-  case Parameter::CoolantTemp:
-    ui->temperature->setText(QString::number(value) +
-                             " °C"); // only parameter shown on both
-    serviceMode->updateData(param, value);
-    break;
-  case Parameter::SOC:
-    ui->soc->setText(QString::number(value));
-    break;
-  default:
-    if (subwindowShown not_eq nullptr)
+    case Parameter::Speed:
+      ui->speed->setText(QString::number(value));
+      break;
+    case Parameter::Power:
+      ui->powerBar->setValue(value);
+      break;
+    case Parameter::RPM:
+      break;
+    case Parameter::CoolantTemp:
+      ui->temperature->setText(QString::number(value) +
+                               " °C");  // only parameter shown on both
       serviceMode->updateData(param, value);
-    else
-      return;
+      break;
+    case Parameter::HVSOC:
+      ui->hvsoc->setText("HV: " + QString::number(value) + "%");
+      break;
+    case Parameter::LVSOC:
+      ui->lvsoc->setText("LV: " + QString::number(value) + "%");
+    default:
+      //    if (subwindowShown not_eq nullptr)
+      serviceMode->updateData(param, value);
+      //    else
+      //      return;
   }
 }
 
@@ -96,16 +110,16 @@ void MainWindow::navigate(buttonStates navigation) {
   qDebug() << "Received call to navigate";
   if (subwindowShown == nullptr) {
     switch (navigation) {
-    case buttonStates::button1_4:
-      QCoreApplication::quit();
-      break;
-    case buttonStates::button2_3:
-      subwindowShown = serviceMode;
-      this->hide();
-      serviceMode->showFullScreen();
-      break;
-    default:
-      return; // suppresses a warning, no real use
+      case buttonStates::button1_4:
+        QCoreApplication::quit();
+        break;
+      case buttonStates::button2_3:
+        subwindowShown = serviceMode;
+        this->hide();
+        serviceMode->showFullScreen();
+        break;
+      default:
+        return;  // suppresses a warning, no real use
     }
   } else
     subwindowShown->navigate(navigation);
@@ -116,8 +130,7 @@ void MainWindow::setPreset(Side side, scrollStates scroll) {
 }
 
 void MainWindow::clearError() {
-  if (errorCounter)
-    errorCounter--;
+  if (errorCounter) errorCounter--;
 
   if (errorCounter > 0)
     ui->errorCounter->setText(QString::number(errorCounter) + "error(s)");
@@ -130,7 +143,6 @@ void MainWindow::pass(uint8_t sector) {
   sectorTimes.at(currentSector) = thisSectorTime;
 
   if (sector == 0) {
-
     QCanBusFrame lapTime;
     lapTime.setFrameId(0);
     lapTime.setPayload(QByteArray(reinterpret_cast<char *>(&thisSectorTime),
@@ -139,13 +151,30 @@ void MainWindow::pass(uint8_t sector) {
     canHandler.send(lapTime);
   }
 
-  currentSector = sector; // update the current sector
+  currentSector = sector;  // update the current sector
 
   elapsedTimers.at(sector).start();
 }
 
 void MainWindow::setMaxPower(uint8_t maxPower) {
   ui->powerBar->setMaximum(maxPower);
+}
+
+void MainWindow::setBMSHVState(BMS_HV_states state) {
+  switch (state) {
+    case BMS_HV_states::AIR_closed:
+      ui->bms_hv_state->setText("AIR closed");
+      break;
+    case BMS_HV_states::AIR_opened:
+      ui->bms_hv_state->setText("AIR opened");
+      break;
+    case BMS_HV_states::Precharge:
+      ui->bms_hv_state->setText("Precharge");
+      break;
+    default:
+      ui->bms_hv_state->setText("");
+      break;
+  }
 }
 
 void MainWindow::reopen() {
@@ -155,7 +184,6 @@ void MainWindow::reopen() {
 
 void MainWindow::updateTimers() {
   for (std::size_t iter = 0; iter < 3; ++iter) {
-
     timerLabels.at(iter)->setText(
         QString::fromStdString(Timer::toStr(sectorTimes.at(iter))));
   }
@@ -167,7 +195,6 @@ void MainWindow::updateTimers() {
 
   if (thisSectorTime <= sectorTimes.at(currentSector) and
       elapsedTimers.at(currentSector).isValid()) {
-
     timerLabels.at(currentSector)
         ->setStyleSheet(QStringLiteral("color: green;"));
 
@@ -175,13 +202,11 @@ void MainWindow::updateTimers() {
 
   else if (thisSectorTime > sectorTimes.at(currentSector) and
            elapsedTimers.at(currentSector).isValid()) {
-
     timerLabels.at(currentSector)->setStyleSheet(QStringLiteral("color: red;"));
 
   }
 
   else {
-
     timerLabels.at(currentSector)
         ->setStyleSheet(QStringLiteral("color: white;"));
   }

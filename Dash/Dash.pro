@@ -16,6 +16,12 @@ debug:   DESTDIR = build/debug
 
 #DEFINES += raspberrypi
 
+CONFIG += debug_and_release
+CONFIG += build_all
+CONFIG += warn_on
+
+QMAKE_CXXFLAGS += -Ofast
+
 OBJECTS_DIR = $$DESTDIR/.obj
 MOC_DIR = $$DESTDIR/.moc
 RCC_DIR = $$DESTDIR/.qrc

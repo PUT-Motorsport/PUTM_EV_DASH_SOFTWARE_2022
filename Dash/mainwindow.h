@@ -32,13 +32,14 @@ public:
 
 public slots:
 
-  void updateData(Parameter param, int value);
+  void updateData(Parameter param, float value);
   void raiseError(QString const &errorMessage);
   void navigate(buttonStates navigation);
   void setPreset(Side side, scrollStates scroll);
   void clearError();
   void pass(uint8_t sector);
   void setMaxPower(uint8_t maxPower);
+  void setBMSHVState(BMS_HV_states state);
 private slots:
   void reopen();
 

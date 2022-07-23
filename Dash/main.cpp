@@ -13,6 +13,7 @@ int main(int argc, char *argv[]) {
   qRegisterMetaType<buttonStates>("buttonStates");
   qRegisterMetaType<Side>("Side");
   qRegisterMetaType<scrollStates>("scrollStates");
+  qRegisterMetaType<BMS_HV_states>("BMS_HV_states");
 
   QApplication a(argc, argv);
   QFile styleSheetFile(":/style.qss");

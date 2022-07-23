@@ -30,6 +30,8 @@ bool CanHandler::connect() {
                    &CanHandler::onCanErrorOcurred);
 
   return true;
+
+  canDevice->clear();
 }
 
 bool CanHandler::connected() { return canDevice->state(); }
@@ -52,9 +54,17 @@ void CanHandler::startNewDataCycle() {
 }
 
 void CanHandler::onCanFrameReceived() {
+
+    if (canDevice->framesAvailable() > 100) {
+        qDebug() << "overflow";
+        canDevice->clear(QCanBusDevice::Direction::Input);
+    }
+
   QCanBusFrame frame = canDevice->readFrame();
 
   logger.addCAN(frame.toString());
+
+  bool processed{false};
 
   for (auto dev : canData.synchronousFrames) {
     if (dev->id == frame.frameId()) {
@@ -62,9 +72,12 @@ void CanHandler::onCanFrameReceived() {
       std::memcpy(dev->dataPtr, frame.payload().constData(), dev->dlc);
       dev->hasBeenUpdated = true;
       canData.mtx.unlock();
-      return;
+      processed = true;
+      break;
     }
   }
+
+  if (not processed) {
 
   for (auto event : canData.asynchronousFrames) {
     if (event->id == frame.frameId()) {
@@ -73,6 +86,11 @@ void CanHandler::onCanFrameReceived() {
       event->hasBeenUpdated = true;
       canData.mtx.unlock();
     }
+  }
+  }
+
+  if (canDevice->framesAvailable() > 0) {
+      onCanFrameReceived();
   }
 }
 

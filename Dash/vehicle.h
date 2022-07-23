@@ -113,15 +113,16 @@ struct AsyncCanData : public CanData {
   std::array<DeviceBase *const, 2> asynchronousFrames{&steering_wheel_event,
                                                       &laptimer_pass};
 
-  std::array<DeviceBase const *const, 8> statusFrames{
-      &apps,          &aq_main, &bms_hv_main, &bms_lv_main,
+  std::array<DeviceBase const *const, 7> statusFrames{
+      &apps,          &aq_main, &bms_lv_main,
       &laptimer_main, &sf_main, &tc_main,     &telemetry_main};
 };
 
 enum class Parameter {
   Speed,
   RPM,
-  SOC,
+  HVSOC,
+  LVSOC,
   Power,
   BmshvVoltage,
   BmslvVoltage,
