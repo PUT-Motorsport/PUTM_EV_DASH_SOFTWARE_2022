@@ -1,4 +1,5 @@
 #include "canraw.h"
+
 #include "ui_canraw.h"
 
 CanRaw::CanRaw(QWidget *parent) : QDialog(parent), ui(new Ui::CanRaw) {
@@ -13,6 +14,7 @@ CanRaw::~CanRaw() {
 }
 
 void CanRaw::navigate([[maybe_unused]] buttonStates navigation) {
+  // all buttons should exit this window
   refreshTimer->stop();
   this->done(QDialog::Accepted);
 }
@@ -30,10 +32,9 @@ void CanRaw::sniff() {
     currentLines = 0;
   }
 
-  if (newLine == logger.canLine)
-    return;
+  if (newLine == logger.canLine) return;
 
-  newLine = logger.canLine; // FIXME: Probably not the cleanest way to do it
+  newLine = logger.canLine;  // FIXME: Probably not the cleanest way to do it
   ui->textLogs->append(newLine);
   currentLines++;
 }

@@ -1,84 +1,130 @@
-//Generated on Sat Apr 30 12:45:20 2022
+// Generated on Wed Jun 15 10:27:30 2022
 #ifndef SF
 #define SF
 
 #include <cstdint>
 
-typedef struct { 
-	uint16_t ok : 1; 
-	uint16_t overheat : 1; 
-	uint16_t undercurrent : 1; 
-	uint16_t overcurrent : 1; 
-	uint16_t current : 12; 
-} FuseData;
-
-enum struct SF_states: uint8_t {
-	OK,
-	CERROR,	// critical error
-	WARNING_1,
-	FUSE_0_FAILED,
-	FUSE_1_FAILED,
-	FUSE_2_FAILED,
-	FUSE_3_FAILED,
+enum struct SmartFuseState : uint8_t {
+  Ok,
+  ResetState,
+  SPIError,
+  /*
+   * over temperature event +
+   * power limitation event +
+   * VDS mask
+   */
+  OTPLVDS,
+  TempFail,
+  LatchOff,
+  /*
+   * open load event  +
+   * shorted to ground
+   */
+  OLOFF,
+  /*
+   * device enters FailSafe on start up or when watch dog is
+   * failed to be toggled within every 30 ms to 70 ms
+   */
+  FailSafe,
+  NotResponding,
+};
+enum struct ChannelState : uint8_t {
+  Ok,
+  UnderCurrent,
+  OverCurrent,
+  LatchOff,
+  /*
+   *  Output stuck to VCC/openload off state status.
+   */
+  STKFLTR,
+  /*
+   * This bit is ‘1’ if VDS is high at turn-off,
+   * indicative of a potential overload condition
+   */
+  VDSFS,
+  /*
+   * Channel feedback status. Combination of Power limitation, OT,
+   * OVERLOAD detection (VDS at turn-off). This bit is latched
+   * during OFF-state of the channel in order to allow asynchronous
+   * diagnostic and it is automatically cleared when the PL/OT/VDS
+   * junction temperature falls below the thermal reset temperature
+   * of OT detection, TRS.
+   */
+  CHFBSR,
+  Error
 };
 
-struct __attribute__ ((packed)) SF_main{
-	FuseData fuses_overall_state; // combined states + sum of all currenst
-	SF_states device_state; // -----------------------------------------------------------------
+enum struct SF_states : uint8_t {
+  Ok,
+  Warning_1,
+  Warning_2,
+  Error,
 };
 
-struct __attribute__ ((packed)) SF_FrontBox{
-	FuseData fuse_0_inverter; // state + mA read
-	FuseData fuse_0_boxf_mb; // state + mA read
-	FuseData fuse_0_apps; // state + mA read
-	FuseData fuse_0_tsal_logic; // state + mA read
+struct __attribute__((packed)) SF_main {
+  SF_states device_state;
+  SmartFuseState fuse_0_state;  // status returned by smart fuse
+  SmartFuseState fuse_1_state;  // status returned by smart fuse
+  SmartFuseState fuse_2_state;  // status returned by smart fuse
+  SmartFuseState fuse_3_state;  // status returned by smart fuse
 };
 
-struct __attribute__ ((packed)) SF_CoolingAndVSafety{
-	FuseData fuse_1_fan_l; // state + mA read
-	FuseData fuse_1_fan_r; // state + mA read
-	FuseData fuse_3_pump; // state + mA read
-	FuseData fuse_2_v_safety; // state + mA read
+struct __attribute__((packed)) SF_PassiveElements {
+  ChannelState break_light;
+  ChannelState fan_mono;
+  ChannelState fan_l;
+  ChannelState fan_r;
+  ChannelState wheel_speed_1;  // idk which is left and which is right
+  ChannelState wheel_speed_2;  // idk which is left and which is right or front
+                               // or whatever
+  ChannelState water_potentiometer;  // they are together
+  ChannelState tsal_assi;            // supply for leds ex.
 };
 
-struct __attribute__ ((packed)) SF_DV{
-	FuseData fuse_0_box_dv; // state + mA read
-	FuseData fuse_0_tsal_hv; // state + mA read
-	FuseData fuse_2_wheel; // state + mA read
-	FuseData fuse_1_dashboard; // state + mA read
+struct __attribute__((packed)) SF_LegendaryDVAndSupply {
+  ChannelState lidar;
+  ChannelState box_dv;
+  ChannelState jetson;
+  ChannelState odrive;
+  ChannelState tsal;
+  ChannelState bspd_esb;
+  ChannelState spare_1;
+  ChannelState spare_2;
 };
 
-struct __attribute__ ((packed)) SF_WS{
-	FuseData fuse_1_ws_rl; // state + mA read
-	FuseData fuse_1_ws_fl; // state + mA read
-	FuseData fuse_1_ws_rr; // state + mA read
-	FuseData fuse_2_ws_fr; // state + mA read
+struct __attribute__((packed)) SF_Supply {
+  ChannelState inverter;
+  ChannelState front_box;
+  ChannelState dash;
+  ChannelState laptimer;
+  ChannelState bat_hv;
+  ChannelState diagport;
+  ChannelState pomp;
+  ChannelState motec;
 };
 
-struct __attribute__ ((packed)) SF_NUCS{
-	FuseData fuse_2_jetson; // state + mA read
-	FuseData fuse_2_intel_nuc; // state + mA read
+struct __attribute__((packed)) SF_safety {
+  bool firewall;
+  bool hvd;
+  bool inverter;
+  bool dv;
+  bool tsms;  //
 };
-
 
 const uint16_t SF_MAIN_CAN_ID = 0x41;
 const uint8_t SF_MAIN_CAN_DLC = sizeof(SF_main);
 const uint8_t SF_MAIN_FREQUENCY = 100;
-const uint16_t SF_FRONTBOX_CAN_ID = 0x46;
-const uint8_t SF_FRONTBOX_CAN_DLC = sizeof(SF_FrontBox);
-const uint8_t SF_FRONTBOX_FREQUENCY = 10;
-const uint16_t SF_COOLINGANDVSAFETY_CAN_ID = 0x4b;
-const uint8_t SF_COOLINGANDVSAFETY_CAN_DLC = sizeof(SF_CoolingAndVSafety);
-const uint8_t SF_COOLINGANDVSAFETY_FREQUENCY = 10;
-const uint16_t SF_DV_CAN_ID = 0x50;
-const uint8_t SF_DV_CAN_DLC = sizeof(SF_DV);
-const uint8_t SF_DV_FREQUENCY = 10;
-const uint16_t SF_WS_CAN_ID = 0x55;
-const uint8_t SF_WS_CAN_DLC = sizeof(SF_WS);
-const uint8_t SF_WS_FREQUENCY = 10;
-const uint16_t SF_NUCS_CAN_ID = 0x5a;
-const uint8_t SF_NUCS_CAN_DLC = sizeof(SF_NUCS);
-const uint8_t SF_NUCS_FREQUENCY = 10;
+const uint16_t SF_PASSIVEELEMENTS_CAN_ID = 0x46;
+const uint8_t SF_PASSIVEELEMENTS_CAN_DLC = sizeof(SF_PassiveElements);
+const uint8_t SF_PASSIVEELEMENTS_FREQUENCY = 10;
+const uint16_t SF_LEGENDARYDVANDSUPPLY_CAN_ID = 0x4b;
+const uint8_t SF_LEGENDARYDVANDSUPPLY_CAN_DLC = sizeof(SF_LegendaryDVAndSupply);
+const uint8_t SF_LEGENDARYDVANDSUPPLY_FREQUENCY = 10;
+const uint16_t SF_SUPPLY_CAN_ID = 0x50;
+const uint8_t SF_SUPPLY_CAN_DLC = sizeof(SF_Supply);
+const uint8_t SF_SUPPLY_FREQUENCY = 10;
+const uint16_t SF_SAFETY_CAN_ID = 0x3d;
+const uint8_t SF_SAFETY_CAN_DLC = sizeof(SF_safety);
+const uint8_t SF_SAFETY_FREQUENCY = 1;
 
 #endif
-

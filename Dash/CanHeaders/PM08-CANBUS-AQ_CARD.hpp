@@ -1,4 +1,4 @@
-// Generated on Tue May 24 17:28:32 2022
+// Generated on Wed Jun 15 10:27:21 2022
 #ifndef AQ
 #define AQ
 
@@ -39,6 +39,10 @@ struct __attribute__((packed)) AQ_gyroscope {
   int16_t speed_z;  // rotary speed z
 };
 
+struct __attribute__((packed)) AQ_ts_button {
+  uint8_t placeholder;  // Placeholder field to avoid sending an empty frame
+};
+
 const uint16_t AQ_MAIN_CAN_ID = 0x5f;
 const uint8_t AQ_MAIN_CAN_DLC = sizeof(AQ_main);
 const uint8_t AQ_MAIN_FREQUENCY = 100;
@@ -48,5 +52,7 @@ const uint8_t AQ_ACCELERATION_FREQUENCY = 100;
 const uint16_t AQ_GYROSCOPE_CAN_ID = 0x87;
 const uint8_t AQ_GYROSCOPE_CAN_DLC = sizeof(AQ_gyroscope);
 const uint8_t AQ_GYROSCOPE_FREQUENCY = 100;
-
+const uint16_t AQ_TS_BUTTON_CAN_ID = 0x60;
+const uint8_t AQ_TS_BUTTON_CAN_DLC = sizeof(AQ_ts_button);
+const uint8_t AQ_TS_BUTTON_FREQUENCY = 0;
 #endif

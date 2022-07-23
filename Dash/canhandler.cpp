@@ -1,15 +1,11 @@
 #include "canhandler.h"
 
-CanHandler::CanHandler(QObject *parent)
-    : QObject(parent) {
+CanHandler::CanHandler(QObject *parent) : QObject(parent) {
   if (!QCanBus::instance()->plugins().contains("socketcan"))
     logger.add("Cansockets plugin missing", LogType::AppError);
-
 }
 
-CanHandler::~CanHandler() {
-  delete canDevice;
-}
+CanHandler::~CanHandler() { delete canDevice; }
 
 bool CanHandler::connect() {
   QString errorString;
@@ -41,24 +37,21 @@ bool CanHandler::send(const QCanBusFrame &toSend) {
     logger.add("Attempted sending in unconnected state", LogType::Critical);
     return false;
   }
-  if (canDevice->writeFrame(toSend))
-    return true;
+  if (canDevice->writeFrame(toSend)) return true;
 
   logger.add("Frame sending failed");
   return false;
 }
 
 void CanHandler::startNewDataCycle() {
-  for (auto &device : canData.synchronousFrames)
-    device->hasBeenUpdated = false;
+  for (auto &device : canData.synchronousFrames) device->hasBeenUpdated = false;
 }
 
 void CanHandler::onCanFrameReceived() {
-
-    if (canDevice->framesAvailable() > 100) {
-        qDebug() << "overflow";
-        canDevice->clear(QCanBusDevice::Direction::Input);
-    }
+  if (canDevice->framesAvailable() > 100) {
+    qDebug() << "overflow";
+    canDevice->clear(QCanBusDevice::Direction::Input);
+  }
 
   QCanBusFrame frame = canDevice->readFrame();
 
@@ -78,19 +71,18 @@ void CanHandler::onCanFrameReceived() {
   }
 
   if (not processed) {
-
-  for (auto event : canData.asynchronousFrames) {
-    if (event->id == frame.frameId()) {
-      canData.mtx.lock();
-      std::memcpy(event->dataPtr, frame.payload().constData(), event->dlc);
-      event->hasBeenUpdated = true;
-      canData.mtx.unlock();
+    for (auto event : canData.asynchronousFrames) {
+      if (event->id == frame.frameId()) {
+        canData.mtx.lock();
+        std::memcpy(event->dataPtr, frame.payload().constData(), event->dlc);
+        event->hasBeenUpdated = true;
+        canData.mtx.unlock();
+      }
     }
-  }
   }
 
   if (canDevice->framesAvailable() > 0) {
-      onCanFrameReceived();
+    onCanFrameReceived();  // frames may arrive while the function is executed
   }
 }
 
@@ -100,12 +92,10 @@ void CanHandler::onCanErrorOcurred() {
 }
 
 void CanHandler::heartbeat() {
-
-  QCanBusFrame heartbeatFrame;
+  QCanBusFrame heartbeatFrame{};
   heartbeatFrame.setFrameId(DASH_MAIN_CAN_ID);
 
-  Dash_Main dash_main;
-  dash_main.device_state = this->heartBeatState;
+  Dash_Main dash_main{.device_state = this->heartBeatState};
 
   heartbeatFrame.setPayload(
       QByteArray(reinterpret_cast<char *>(&dash_main), sizeof(dash_main)));

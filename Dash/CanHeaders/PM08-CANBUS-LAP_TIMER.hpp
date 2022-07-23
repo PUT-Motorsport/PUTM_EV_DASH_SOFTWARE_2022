@@ -1,23 +1,22 @@
-//Generated on Sat Apr 30 12:45:18 2022
+// Generated on Wed Jun 15 10:27:30 2022
 #ifndef LAP_TIMER
 #define LAP_TIMER
 
 #include <cstdint>
 
-enum struct Lap_timer_states: uint8_t {
-	Power_up,
-	Error,
+enum struct Lap_timer_states : uint8_t {
+  Power_up,
+  Error,
 };
 
-struct __attribute__ ((packed)) Lap_timer_Main{
-	Lap_timer_states device_state; 
+struct __attribute__((packed)) Lap_timer_Main {
+  Lap_timer_states device_state;
 };
 
-struct __attribute__ ((packed)) Lap_timer_Pass{
-	uint8_t Sector; // "0x00 - default
-	Lap_timer_states device_state; // 
+struct __attribute__((packed)) Lap_timer_Pass {
+  uint8_t Sector;                 // "0x00 - default
+  Lap_timer_states device_state;  //
 };
-
 
 const uint16_t LAP_TIMER_MAIN_CAN_ID = 0x78;
 const uint8_t LAP_TIMER_MAIN_CAN_DLC = sizeof(Lap_timer_Main);
@@ -27,4 +26,3 @@ const uint8_t LAP_TIMER_PASS_CAN_DLC = sizeof(Lap_timer_Pass);
 const uint8_t LAP_TIMER_PASS_FREQUENCY = 0;
 
 #endif
-

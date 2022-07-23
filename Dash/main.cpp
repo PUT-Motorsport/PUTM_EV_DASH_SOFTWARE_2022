@@ -1,13 +1,15 @@
-#include "logger.h"
-#include "mainwindow.h"
 #include <QApplication>
 #include <QFile>
+
+#include "logger.h"
+#include "mainwindow.h"
 
 Logger logger;
 CanHandler canHandler;
 
 int main(int argc, char *argv[]) {
-  qDebug() << "This is a debug build"; // will print only compiled in debug mode
+  qDebug()
+      << "This is a debug build";  // will print only compiled in debug mode
   // qt metatype registration
   qRegisterMetaType<Parameter>("Parameter");
   qRegisterMetaType<buttonStates>("buttonStates");
@@ -21,6 +23,6 @@ int main(int argc, char *argv[]) {
   QString styleSheet{QLatin1String(styleSheetFile.readAll())};
   a.setStyleSheet(styleSheet);
   MainWindow w;
-  w.show/*FullScreen*/();
+  w.showFullScreen();
   return a.exec();
 }

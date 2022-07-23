@@ -5,7 +5,6 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       subwindowShown(nullptr),
-      interruptSubwindowShown(nullptr),
       guiHandler(new GUIHandler()),
       canThread(),
       elapsedTimers(),
@@ -52,8 +51,6 @@ MainWindow::MainWindow(QWidget *parent)
                    [this]() { updateTimers(); });
   updateTimer->start(timerUpdateTime);
 
-  serviceMode->show();
-
   this->setBMSHVState(BMS_HV_states::AIR_opened);
 }
 
@@ -86,11 +83,9 @@ void MainWindow::updateData(Parameter param, float value) {
       break;
     case Parameter::LVSOC:
       ui->lvsoc->setText("LV: " + QString::number(value) + "%");
+      break;
     default:
-      //    if (subwindowShown not_eq nullptr)
       serviceMode->updateData(param, value);
-      //    else
-      //      return;
   }
 }
 
@@ -110,9 +105,9 @@ void MainWindow::navigate(buttonStates navigation) {
   qDebug() << "Received call to navigate";
   if (subwindowShown == nullptr) {
     switch (navigation) {
-      case buttonStates::button1_4:
-        QCoreApplication::quit();
-        break;
+        //      case buttonStates::button1_4:
+        //        QCoreApplication::quit();
+        //        break;
       case buttonStates::button2_3:
         subwindowShown = serviceMode;
         this->hide();

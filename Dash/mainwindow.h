@@ -3,11 +3,10 @@
 
 #include <QMainWindow>
 
-#include "guicomponent.h"
-#include "guihandler.h"
-
 #include "canhandler.h"
 #include "dvselect.h"
+#include "guicomponent.h"
+#include "guihandler.h"
 #include "servicemode.h"
 #include "timer.h"
 #include "vehicle.h"
@@ -17,33 +16,32 @@ namespace Ui {
 class MainWindow;
 }
 QT_END_NAMESPACE
-// remember to zero all values on screens
+
 class MainWindow : public QMainWindow {
   Q_OBJECT
 
-public:
+ public:
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
 
-  GUIComponent *subwindowShown; // ensures two-way communication between classes
   GUIComponent
-      *interruptSubwindowShown; // allows to store previously open window if
-                                // change confirmation "interrupts"
+      *subwindowShown;  // ensures two-way communication between classes
 
-public slots:
+ public slots:
 
   void updateData(Parameter param, float value);
   void raiseError(QString const &errorMessage);
   void navigate(buttonStates navigation);
   void setPreset(Side side, scrollStates scroll);
   void clearError();
-  void pass(uint8_t sector);
+  [[deprecated]] void pass(uint8_t sector);
   void setMaxPower(uint8_t maxPower);
   void setBMSHVState(BMS_HV_states state);
-private slots:
+
+ private slots:
   void reopen();
 
-private:
+ private:
   GUIHandler *guiHandler;
   QThread canThread;
 
@@ -58,7 +56,7 @@ private:
   static constexpr uint8_t delta = 2;
   static constexpr uint16_t timerUpdateTime = 100;
   void updateTimers();
-  QTimer *updateTimer; // will call the gui to update timer
+  QTimer *updateTimer;  // will call the gui to update timer
 
   Ui::MainWindow *ui;
 
@@ -67,4 +65,4 @@ private:
 
   uint8_t errorCounter;
 };
-#endif // MAINWINDOW_H
+#endif  // MAINWINDOW_H

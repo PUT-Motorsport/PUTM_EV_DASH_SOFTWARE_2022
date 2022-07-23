@@ -14,19 +14,19 @@ namespace Ui {
 class DvSelect;
 }
 
-// deprecated
-
-class DvSelect : public QDialog, public GUIComponent {
+class /*[[deprecated("Dv mode will not be supported")]]*/ DvSelect
+    : public QDialog,
+      public GUIComponent {
   Q_OBJECT
 
-public:
+ public:
   explicit DvSelect(QWidget *parent = nullptr);
-  ~DvSelect();
+  virtual ~DvSelect();
 
   void navigate(buttonStates navigation) override;
   void raiseError(QString const &errorMessage) override;
 
-private:
+ private:
   void toggleMission(int direction);
   void sendCANframe();
 
@@ -37,4 +37,4 @@ private:
   int currentMission;
 };
 
-#endif // DVSELECT_H
+#endif  // DVSELECT_H

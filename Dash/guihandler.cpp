@@ -44,10 +44,6 @@ void GUIHandler::updateGUI() {
       asyncCanData);  // casting to parent because mutexes can't be copied
   asyncCanData.mtx.unlock();
 
-  static uint8_t cycle{0};
-
-  cycle++;
-
   verifyData();
   checkErrors();
   getUpdates();
@@ -78,7 +74,7 @@ void GUIHandler::verifyData() {
 
 void GUIHandler::checkErrors() {
   // check for new errors
-  for (auto const device : asyncCanData.synchronousFrames) {
+  for (auto const device : asyncCanData.statusFrames) {
     if (device->hasBeenUpdated) {
       uint8_t const *const state =
           reinterpret_cast<uint8_t *>(device->dataPtr) + device->dlc -
@@ -93,8 +89,6 @@ void GUIHandler::checkErrors() {
       }
     }
   }
-  // ex
-
   // check if old errors have been cleared
 
   for (auto iter = errors.begin(); iter not_eq errors.end(); ++iter) {
@@ -109,7 +103,6 @@ void GUIHandler::checkErrors() {
       }
     }
   }
-  //    qDebug() << errors.size();
 }
 
 void GUIHandler::getUpdates() {
@@ -124,7 +117,8 @@ void GUIHandler::getUpdates() {
                                         canData.bms_hv_main.data.voltage_sum /
                                         100);
     tryUpdateData(Parameter::RPM,
-                  2 * 3.1415 / (canData.tc_main.data.engine_speed));
+                  60 / (2 * 3.1415 / (canData.tc_main.data.engine_speed)));
+    // RPM = 60 s / T_obr, T_obr = 2pi / omega
   }
   // TC temperatures
   if (canData.tc_temperatures.hasBeenUpdated) {
@@ -136,14 +130,14 @@ void GUIHandler::getUpdates() {
   }
   // BMS LV
   if (canData.bms_lv_main.hasBeenUpdated) {
-    tryUpdateData(Parameter::LVSOC, canData.bms_lv_main.data.soc);
+    tryUpdateData(Parameter::LVSOC, canData.bms_lv_main.data.soc / 100);
     tryUpdateData(Parameter::BmslvTemp, canData.bms_lv_main.data.temp_avg);
     tryUpdateData(Parameter::BmslvVoltage,
                   canData.bms_lv_main.data.voltage_sum);
   }
   // BMS HV
   if (canData.bms_hv_main.hasBeenUpdated) {
-    tryUpdateData(Parameter::HVSOC, canData.bms_hv_main.data.soc / 100);
+    tryUpdateData(Parameter::HVSOC, canData.bms_hv_main.data.soc);
     tryUpdateData(Parameter::BmshvTemp, canData.bms_hv_main.data.temp_avg);
     tryUpdateData(Parameter::BmshvVoltage,
                   canData.bms_hv_main.data.voltage_sum);
@@ -170,6 +164,7 @@ void GUIHandler::handleAsyncFrames() {
 }
 
 void GUIHandler::tryUpdateData(Parameter param, float value) {
+  // check whether the gui needs to be called
   if (value not_eq previousValues.at(static_cast<uint8_t>(param))) {
     emit updateData(param, value);
     previousValues.at(static_cast<uint8_t>(param)) = value;
@@ -184,6 +179,9 @@ void GUIHandler::steeringWheel() {
 
   auto left_scroll = canData.steering_wheel_event.data.l_s_1;
   auto right_scroll = canData.steering_wheel_event.data.r_s_1;
+
+  // the value of std::optionals should be initialized after receiving the first
+  // steering wheel frame
 
   // left scroll
   if (not((scrolls[Side::Left]).has_value())) {

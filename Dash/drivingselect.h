@@ -12,18 +12,6 @@
 #include "lib/CRC.h"
 #include "logger.h"
 
-enum class Setting {
-  TC,
-  MaxSlipRatio,
-  Algorithm,
-  MaxPower,
-  AppsCurve,
-  RegenPower,
-  Sensitivity
-};
-enum class Algorithm { PI, PID, LQR, LQRI, SDRE, MPC };
-enum class Apps_curve { Linear, Wet, Acc };
-
 namespace Ui {
 class DrivingSelect;
 }
@@ -31,7 +19,7 @@ class DrivingSelect;
 class DrivingSelect : public QDialog, public GUIComponent {
   Q_OBJECT
 
-public:
+ public:
   explicit DrivingSelect(QWidget *parent = nullptr);
   ~DrivingSelect();
   void navigate(buttonStates navigation) override;
@@ -39,7 +27,7 @@ public:
 
   void setPreset(Side side, scrollStates scroll);
 
-private:
+ private:
   void sendSettings();
   void changeHighlight();
   void resetToCurrent();
@@ -47,7 +35,7 @@ private:
   uint8_t getSettingValue(Setting setting, bool next);
   void changeSettingValue(bool next);
 
-  Setting currentSetting; // todo: rename
+  Setting currentSetting;  // todo: rename
   Dash_TCS previousSettings;
   Dash_TCS currentSettings;
 
@@ -69,4 +57,4 @@ private:
   CRC::Table<uint8_t, sizeof(uint8_t)> table;
 };
 
-#endif // DRIVINGSELECT_H
+#endif  // DRIVINGSELECT_H

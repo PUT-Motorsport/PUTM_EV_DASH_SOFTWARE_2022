@@ -1,15 +1,18 @@
 #include "drivingselect.h"
+
 #include "ui_drivingselect.h"
 
 DrivingSelect::DrivingSelect(QWidget *parent)
-    : QDialog(parent), currentSetting(Setting::TC), ui(new Ui::DrivingSelect),
+    : QDialog(parent),
+      currentSetting(Setting::TC),
+      ui(new Ui::DrivingSelect),
       table(
           CRC::Parameters<uint8_t, sizeof(uint8_t)>({.polynomial = 0x1d,
                                                      .initialValue = 0xff,
                                                      .finalXOR = 0,
                                                      .reflectInput = false,
                                                      .reflectOutput = false})) {
-  currentSettings = {.on = true,
+  currentSettings = {.on = true,  // hard-coded initial settings
                      .max_slip_ratio = 50,
                      .algorithm = 0,
                      .max_power = 50,
@@ -41,35 +44,38 @@ DrivingSelect::~DrivingSelect() { delete ui; }
 
 void DrivingSelect::navigate(buttonStates navigation) {
   switch (navigation) {
-  case buttonStates::button2_3:
-    sendSettings();
-    break;
-  case buttonStates::button1_4:
-    resetToCurrent();
-    break;
-  case buttonStates::button1:
-    changeSettingValue(true);
-    break;
-  case buttonStates::button2:
-    changeSettingValue(false);
-    break;
-  case buttonStates::button3:
-    changeHighlight();
-    break;
-  case buttonStates::button4:
-    resetToCurrent();
-    this->done(QDialog::Accepted);
-  default:
-    return;
+    case buttonStates::button2_3:
+      sendSettings();
+      break;
+    case buttonStates::button1_4:
+      resetToCurrent();
+      break;
+    case buttonStates::button1:
+      changeSettingValue(true);
+      break;
+    case buttonStates::button2:
+      changeSettingValue(false);
+      break;
+    case buttonStates::button3:
+      changeHighlight();
+      break;
+    case buttonStates::button4:
+      resetToCurrent();
+      this->done(QDialog::Accepted);
+    default:
+      return;
   }
 }
 
 void DrivingSelect::raiseError(const QString &errorMessage) {
   ui->error->setText("Error: " + errorMessage);
   QTimer::singleShot(3000, [this]() { ui->error->setText(""); });
+  // the warning is a clang-bug -> the timer cannot be passed as a parameter,
+  // since it's a temporary object
 }
 
 void DrivingSelect::setPreset(Side side, scrollStates scroll) {
+#if enablePresets  // considering deprecating this function, unused feature
 
   auto list = presets.at(side).split(',', Qt::SkipEmptyParts);
 
@@ -83,6 +89,7 @@ void DrivingSelect::setPreset(Side side, scrollStates scroll) {
     previousSettings.regen_power = newSetting;
 
   sendSettings();
+#endif
 }
 
 void DrivingSelect::sendSettings() {
@@ -144,20 +151,21 @@ uint8_t DrivingSelect::getSettingValue(Setting setting, bool next) {
   auto list = values.at(1 + static_cast<uint8_t>(setting))
                   .split(',', Qt::SkipEmptyParts);
 
-  auto min = list.at(1).toInt();
+  auto min = list.at(1).toInt();  // load values from file
   auto max = list.at(2).toInt();
   auto increment = list.at(3).toInt();
 
   // get current value
+  // a hacky way around a switch-case, since all fields in currentSettings are
+  // uint8_t
   uint8_t *data = reinterpret_cast<uint8_t *>(&currentSettings);
-
   auto &current = data[static_cast<uint8_t>(setting)];
 
   if (next) {
     if (current + increment <= max) {
       current += increment;
     } else {
-      current = min;
+      current = min;  // wrap around values
     }
   } else {
     if (current - increment >= min)

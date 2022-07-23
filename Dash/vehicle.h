@@ -1,6 +1,11 @@
 #ifndef VEHICLE_H
 #define VEHICLE_H
 
+#include <QMutex>
+#include <array>
+#include <queue>
+#include <string>
+
 #include "CanHeaders/PM08-CANBUS-APPS.hpp"
 #include "CanHeaders/PM08-CANBUS-AQ_CARD.hpp"
 #include "CanHeaders/PM08-CANBUS-BMS_HV.hpp"
@@ -11,10 +16,6 @@
 #include "CanHeaders/PM08-CANBUS-STEERING_WHEEL.hpp"
 #include "CanHeaders/PM08-CANBUS-TC.hpp"
 #include "CanHeaders/PM08-CANBUS-TELEMETRY.hpp"
-#include <QMutex>
-#include <array>
-#include <queue>
-#include <string>
 
 struct DeviceBase {
   DeviceBase(uint8_t id, uint8_t dlc, std::string const &name,
@@ -34,17 +35,17 @@ struct DeviceBase {
   bool doesTimeout;
 };
 
-template <typename T> class Device : public DeviceBase {
-public:
+template <typename T>
+class Device : public DeviceBase {
+ public:
   T data;
   explicit Device(uint8_t id, std::string const &name, uint8_t frequency = 0)
       : DeviceBase(id, sizeof(T), name, frequency) {
-    dataPtr = &data; // for memory copying without v-calls
+    dataPtr = &data;  // for memory copying without v-calls
   }
 };
 
 struct CanData {
-
   Device<Apps_main> apps{APPS_MAIN_CAN_ID, "Apps", APPS_MAIN_FREQUENCY};
   Device<AQ_main> aq_main{AQ_MAIN_CAN_ID, "Aq main", AQ_MAIN_FREQUENCY};
   Device<BMS_HV_main> bms_hv_main{BMS_HV_MAIN_CAN_ID, "BMS HV",
@@ -58,14 +59,15 @@ struct CanData {
                                        LAP_TIMER_MAIN_FREQUENCY};
   Device<Lap_timer_Pass> laptimer_pass{LAP_TIMER_PASS_CAN_ID, "Laptimer_pass"};
   Device<SF_main> sf_main{SF_MAIN_CAN_ID, "SF main", SF_MAIN_FREQUENCY};
-  Device<SF_FrontBox> sf_frontBox{SF_FRONTBOX_CAN_ID, "sf front box",
-                                  SF_FRONTBOX_FREQUENCY};
-  Device<SF_CoolingAndVSafety> sf_cooling{SF_COOLINGANDVSAFETY_CAN_ID,
-                                          "sf cooling",
-                                          SF_COOLINGANDVSAFETY_FREQUENCY};
-  Device<SF_DV> sf_dv{SF_DV_CAN_ID, "sf dv", SF_DV_FREQUENCY};
-  Device<SF_WS> sf_ws{SF_WS_CAN_ID, "sf ws", SF_WS_FREQUENCY};
-  Device<SF_NUCS> sf_nucs{SF_NUCS_CAN_ID, "sf nucs", SF_NUCS_FREQUENCY};
+  Device<SF_PassiveElements> sf_passive{SF_PASSIVEELEMENTS_CAN_ID, "sf passive",
+                                        SF_PASSIVEELEMENTS_FREQUENCY};
+  Device<SF_LegendaryDVAndSupply> sf_dv{SF_LEGENDARYDVANDSUPPLY_CAN_ID,
+                                        "sf dv and supply",
+                                        SF_LEGENDARYDVANDSUPPLY_FREQUENCY};
+  Device<SF_Supply> sf_supply{SF_SUPPLY_CAN_ID, "sf supply",
+                              SF_SUPPLY_FREQUENCY};
+  Device<SF_safety> sf_safety{SF_SAFETY_CAN_ID, "sf safety",
+                              SF_SAFETY_FREQUENCY};
   Device<Steering_Wheel_main> steering_wheel_main{
       STEERING_WHEEL_MAIN_CAN_ID, "Steering Wheel",
       STEERING_WHEEL_MAIN_FREQUENCY};
@@ -98,10 +100,10 @@ struct AsyncCanData : public CanData {
       &bms_lv_temperature,
       &laptimer_main,
       &sf_main,
-      &sf_cooling,
+      &sf_passive,
       &sf_dv,
-      &sf_ws,
-      &sf_nucs,
+      &sf_supply,
+      &sf_safety,
       &steering_wheel_main,
       &tc_main,
       &tc_rear_suspension,
@@ -114,10 +116,11 @@ struct AsyncCanData : public CanData {
                                                       &laptimer_pass};
 
   std::array<DeviceBase const *const, 7> statusFrames{
-      &apps,          &aq_main, &bms_lv_main,
-      &laptimer_main, &sf_main, &tc_main,     &telemetry_main};
+      &apps,    &aq_main, &bms_lv_main,   &laptimer_main,
+      &sf_main, &tc_main, &telemetry_main};
 };
 
+// common defs
 enum class Parameter {
   Speed,
   RPM,
@@ -133,7 +136,6 @@ enum class Parameter {
   BmslvTemp,
   Apps
 };
-enum class Status { Working, InError, Unresolved }; // probably not needed
 enum class Window {
   Main,
   CAN,
@@ -142,7 +144,18 @@ enum class Window {
   Logs,
   ServiceMode,
   ChangeConfirm
-}; // will be used to decide GUI calls redirection
+};  // will be used to decide GUI calls redirection
 enum Side { Left, Right };
+enum class Setting {
+  TC,
+  MaxSlipRatio,
+  Algorithm,
+  MaxPower,
+  AppsCurve,
+  RegenPower,
+  Sensitivity
+};
+enum class Algorithm { PI, PID, LQR, LQRI, SDRE, MPC };
+enum class Apps_curve { Linear, Wet, Acc };
 
-#endif // VEHICLE_H
+#endif  // VEHICLE_H

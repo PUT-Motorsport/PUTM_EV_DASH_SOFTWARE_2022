@@ -34,7 +34,7 @@ class GUIHandler : public QObject {
   void getUpdates();
   void handleAsyncFrames();
   void connectTcpSocket();
-  void generateJSON();
+  [[deprecated]] void generateJSON();
   void tryUpdateData(Parameter param, float value);
 
   QTimer *retryTimer;

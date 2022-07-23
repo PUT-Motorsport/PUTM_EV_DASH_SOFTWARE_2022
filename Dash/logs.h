@@ -12,24 +12,26 @@ class Logs;
 
 class Logs : public QDialog, public GUIComponent {
   Q_OBJECT
-
-public:
-  explicit Logs(QWidget *parent = nullptr); // TODO: find a way to load the log
-                                            // files instead of sniffing them
+  // should this class be a singleton?
+ public:
+  explicit Logs(QWidget *parent =
+                    nullptr);  // TODO: find a way to load the log files instead
+                               // of sniffing them (probably not possible,
+                               // thanks to a journaling filesystem)
   ~Logs();
   void navigate(buttonStates navigation) override;
   void raiseError(QString const &errorMessage) override;
 
   void startSniffing();
 
-private:
+ private:
   void sniff();
   Ui::Logs *ui;
   QString newLine;
   QTimer *refreshTimer;
   static constexpr int refreshTime = 100;
-  static constexpr unsigned short int maxLines = 20;
-  unsigned short int currentLines;
+  static constexpr uint8_t maxLines = 20;
+  uint8_t currentLines;
 };
 
-#endif // LOGS_H
+#endif  // LOGS_H

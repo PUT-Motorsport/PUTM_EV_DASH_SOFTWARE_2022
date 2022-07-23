@@ -53,3 +53,5 @@ compile_commands.json
 
 # App specific logger files
 logs/
+Dash/build/*
+Dash/.qtc_clangd/*
