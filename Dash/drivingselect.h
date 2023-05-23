@@ -7,10 +7,8 @@
 #include <QRegularExpression>
 #include <QTimer>
 
-#include "canhandler.h"
 #include "guicomponent.h"
 #include "lib/CRC.h"
-#include "logger.h"
 
 namespace Ui {
 class DrivingSelect;

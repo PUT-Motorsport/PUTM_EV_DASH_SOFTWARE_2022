@@ -12,8 +12,7 @@ class Logs;
 
 class Logs : public QDialog, public GUIComponent {
   Q_OBJECT
-  // should this class be a singleton?
- public:
+public:
   explicit Logs(QWidget *parent =
                     nullptr);  // TODO: find a way to load the log files instead
                                // of sniffing them (probably not possible,

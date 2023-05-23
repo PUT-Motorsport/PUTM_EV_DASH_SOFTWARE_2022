@@ -7,7 +7,6 @@
 #include <QDomDocument>
 #include <QTimer>
 
-#include "canhandler.h"
 #include "guicomponent.h"
 
 namespace Ui {

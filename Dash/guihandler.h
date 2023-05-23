@@ -7,7 +7,6 @@
 #include <optional>
 
 #include "canhandler.h"
-#include "lib/json.hpp"
 #include "vehicle.h"
 
 extern CanHandler canHandler;
@@ -33,8 +32,6 @@ class GUIHandler : public QObject {
   void checkErrors();
   void getUpdates();
   void handleAsyncFrames();
-  void connectTcpSocket();
-  [[deprecated]] void generateJSON();
   void tryUpdateData(Parameter param, float value);
 
   QTimer *retryTimer;
@@ -42,7 +39,7 @@ class GUIHandler : public QObject {
 
   AsyncCanData const &asyncCanData;
   CanData canData;
-  std::array<int32_t, 13> previousValues;
+  std::array<int32_t, 14> previousValues;
 
   std::array<uint8_t, numberOfFrames> cyclesMissed;
   std::vector<DeviceBase *> errors;

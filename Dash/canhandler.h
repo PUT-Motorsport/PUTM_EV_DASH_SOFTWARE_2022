@@ -8,6 +8,7 @@
 #include <QTimer>
 #include <cstring>  //memcpy
 
+#include "CanHeaders/PM08-CANBUS-DASH.hpp"
 #include "logger.h"
 #include "vehicle.h"
 
@@ -40,9 +41,6 @@ class CanHandler : public QObject {
  private:
   QCanBusDevice *canDevice;
   AsyncCanData canData;
-
-  QTimer *retryTimer;  // todo
-  static constexpr auto retryTime = 200;
 
   Dash_states heartBeatState;
 };

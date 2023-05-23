@@ -10,7 +10,7 @@ CanHandler::~CanHandler() { delete canDevice; }
 bool CanHandler::connect() {
   QString errorString;
   canDevice = QCanBus::instance()->createDevice(
-      QStringLiteral("socketcan"), QStringLiteral("can0"), &errorString);
+      QStringLiteral("socketcan"), QStringLiteral("vcan0"), &errorString);
   if (!canDevice) {
     logger.add("Can Device creation failed: " + errorString, LogType::Critical);
     return false;
@@ -30,7 +30,7 @@ bool CanHandler::connect() {
   canDevice->clear();
 }
 
-bool CanHandler::connected() { return canDevice->state(); }
+bool CanHandler::connected() { return true; /*canDevice->state(); */}
 
 bool CanHandler::send(const QCanBusFrame &toSend) {
   if (not(connected())) {

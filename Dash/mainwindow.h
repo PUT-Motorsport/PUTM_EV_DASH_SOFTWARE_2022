@@ -34,7 +34,6 @@ class MainWindow : public QMainWindow {
   void navigate(buttonStates navigation);
   void setPreset(Side side, scrollStates scroll);
   void clearError();
-  [[deprecated]] void pass(uint8_t sector);
   void setMaxPower(uint8_t maxPower);
   void setBMSHVState(BMS_HV_states state);
 
@@ -48,15 +47,8 @@ class MainWindow : public QMainWindow {
   void updateBestTime();
   void resetTimer();
 
-  std::array<QLabel *, 3> timerLabels;
-  std::array<Timer, 3> elapsedTimers;
-  std::array<std::chrono::duration<long, std::ratio<1, 1000>>::rep, 3>
-      sectorTimes;
-  uint8_t currentSector;
   static constexpr uint8_t delta = 2;
   static constexpr uint16_t timerUpdateTime = 100;
-  void updateTimers();
-  QTimer *updateTimer;  // will call the gui to update timer
 
   Ui::MainWindow *ui;
 

@@ -10,7 +10,6 @@
 #include "CanHeaders/PM08-CANBUS-AQ_CARD.hpp"
 #include "CanHeaders/PM08-CANBUS-BMS_HV.hpp"
 #include "CanHeaders/PM08-CANBUS-BMS_LV.hpp"
-#include "CanHeaders/PM08-CANBUS-DASH.hpp"
 #include "CanHeaders/PM08-CANBUS-LAP_TIMER.hpp"
 #include "CanHeaders/PM08-CANBUS-SF.hpp"
 #include "CanHeaders/PM08-CANBUS-STEERING_WHEEL.hpp"
@@ -55,9 +54,9 @@ struct CanData {
   Device<BMS_LV_temperature> bms_lv_temperature{BMS_LV_TEMPERATURE_CAN_ID,
                                                 "BMS LV temperatures",
                                                 BMS_LV_TEMPERATURE_FREQUENCY};
-  Device<Lap_timer_Main> laptimer_main{LAP_TIMER_MAIN_CAN_ID, "Laptimer",
-                                       LAP_TIMER_MAIN_FREQUENCY};
-  Device<Lap_timer_Pass> laptimer_pass{LAP_TIMER_PASS_CAN_ID, "Laptimer_pass"};
+  Device<PUTM_CAN::Lap_timer_Main> laptimer_main{PUTM_CAN::LAP_TIMER_MAIN_CAN_ID, "Laptimer",
+                                                 PUTM_CAN::LAP_TIMER_MAIN_FREQUENCY};
+  Device<PUTM_CAN::Lap_timer_Acc_time> laptimer_acc{PUTM_CAN::LAP_TIMER_ACC_TIME_CAN_ID, "Laptimer_pass"};
   Device<SF_main> sf_main{SF_MAIN_CAN_ID, "SF main", SF_MAIN_FREQUENCY};
   Device<SF_PassiveElements> sf_passive{SF_PASSIVEELEMENTS_CAN_ID, "sf passive",
                                         SF_PASSIVEELEMENTS_FREQUENCY};
@@ -113,7 +112,7 @@ struct AsyncCanData : public CanData {
       &telemetry_main};
 
   std::array<DeviceBase *const, 2> asynchronousFrames{&steering_wheel_event,
-                                                      &laptimer_pass};
+                                                      &laptimer_acc};
 
   std::array<DeviceBase const *const, 7> statusFrames{
       &apps,    &aq_main, &bms_lv_main,   &laptimer_main,
@@ -134,7 +133,8 @@ enum class Parameter {
   CoolantTemp,
   BmshvTemp,
   BmslvTemp,
-  Apps
+  Apps,
+    Laptime,
 };
 enum class Window {
   Main,

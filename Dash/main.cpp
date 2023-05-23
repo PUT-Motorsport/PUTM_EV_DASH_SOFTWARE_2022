@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QFile>
+#include <QProcess>
 
 #include "logger.h"
 #include "mainwindow.h"
@@ -8,6 +9,7 @@ Logger logger;
 CanHandler canHandler;
 
 int main(int argc, char *argv[]) {
+  QProcess::execute("xset", QStringList() << "-dpms" << "s" << "off");
   qDebug()
       << "This is a debug build";  // will print only compiled in debug mode
   // qt metatype registration
@@ -23,6 +25,6 @@ int main(int argc, char *argv[]) {
   QString styleSheet{QLatin1String(styleSheetFile.readAll())};
   a.setStyleSheet(styleSheet);
   MainWindow w;
-  w.showFullScreen();
+  w.show/*FullScreen*/();
   return a.exec();
 }

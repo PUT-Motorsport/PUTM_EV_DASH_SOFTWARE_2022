@@ -2,6 +2,8 @@
 
 #include <chrono>
 #include <string>
+#include <QString>
+#include <QTextStream>
 
 class [[deprecated(
     "Created to count laptimes, handed over to the laptimer")]] Timer {
@@ -46,3 +48,13 @@ class [[deprecated(
   bool m_started;
   std::chrono::system_clock::time_point m_start;
 };
+
+inline QString milliseconds_to_string(uint32_t milliseconds) {
+  const auto minutes = milliseconds / 1000 / 60;
+  const auto seconds = milliseconds % 1000;
+  milliseconds = milliseconds % 1000;
+  QString str;
+  QTextStream stream(&str);
+  stream << minutes << ":" << seconds << ":" << milliseconds;
+  return str;
+}

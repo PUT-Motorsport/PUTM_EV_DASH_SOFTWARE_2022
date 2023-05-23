@@ -12,25 +12,11 @@ GUIHandler::GUIHandler()
   QObject::connect(updateTimer, &QTimer::timeout, this, &GUIHandler::updateGUI);
   updateTimer->start(1000 / frequency);
 
-  //    QObject::connect(tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)),
-  //    //qt issue this, SLOT(socketError(QAbstractSocketError &error)));
-
   // get information about current steering wheel scroll position
 
   QObject::connect(heartbeatTimer, &QTimer::timeout, &canHandler,
                    &CanHandler::heartbeat);
   heartbeatTimer->start(1000 / 10);
-
-  Dash_steering_wheel_request request{};
-
-  QCanBusFrame frame{};
-  frame.setFrameId(DASH_STEERING_WHEEL_REQUEST_CAN_ID);
-  frame.setPayload(QByteArray(reinterpret_cast<char *>(&request),
-                              sizeof(Dash_steering_wheel_request)));
-
-  if (not canHandler.send(frame)) {
-    logger.add("Steering wheel request not sent", LogType::AppError);
-  }
 }
 
 GUIHandler::~GUIHandler() {
@@ -156,8 +142,8 @@ void GUIHandler::handleAsyncFrames() {
     asyncCanData.mtx.unlock();
   }
   if (asyncCanData.asynchronousFrames.at(1)->hasBeenUpdated) {
-    emit lapPassed(canData.laptimer_pass.data.Sector);
     asyncCanData.mtx.lock();
+    tryUpdateData(Parameter::Laptime, reinterpret_cast<PUTM_CAN::Lap_timer_Acc_time *>(asyncCanData.asynchronousFrames.at(1)->dataPtr)->Acc_Time);
     asyncCanData.asynchronousFrames.at(1)->hasBeenUpdated = false;
     asyncCanData.mtx.unlock();
   }

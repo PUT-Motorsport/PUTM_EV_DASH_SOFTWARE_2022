@@ -9,8 +9,6 @@
 #include "guicomponent.h"
 #include "logs.h"
 
-#include "canhandler.h"
-#include "logger.h"
 #include "vehicle.h"
 
 namespace Ui {

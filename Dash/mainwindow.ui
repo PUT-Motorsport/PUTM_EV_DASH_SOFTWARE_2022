@@ -204,55 +204,11 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="sector1">
-    <property name="geometry">
-     <rect>
-      <x>560</x>
-      <y>120</y>
-      <width>201</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>URW Gothic</family>
-      <pointsize>27</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>00:00.000</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-    </property>
-   </widget>
    <widget class="QLabel" name="sector2">
     <property name="geometry">
      <rect>
       <x>560</x>
       <y>180</y>
-      <width>201</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>URW Gothic</family>
-      <pointsize>27</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>00:00.000</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-    </property>
-   </widget>
-   <widget class="QLabel" name="sector3">
-    <property name="geometry">
-     <rect>
-      <x>560</x>
-      <y>240</y>
       <width>201</width>
       <height>61</height>
      </rect>
